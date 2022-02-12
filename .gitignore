@@ -1,0 +1,20 @@
+# Byte-compiled / optimized / DLL files
+.DS*
+
+__pycache__/
+*.py[cod]
+*$py.class
+
+# virtualenv
+.venv/
+venv/
+config/ping_collector.yaml
+ENV/
+*.log
+.idea*
+.vscode/
+dist/
+bin/
+build/
+config-jpd/
+db/
