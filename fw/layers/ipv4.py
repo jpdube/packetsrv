@@ -1,7 +1,7 @@
 from fw.layers.packet import Packet
 from fw.layers.fields import ByteField, ShortField, IPv4Address, W24Field
 from fw.utils.calc_checksum import calc_checksum
-#  from fw.utils.print_hex import print_hex
+from fw.utils.print_hex import print_hex
 
 
 from struct import pack, unpack
@@ -54,14 +54,15 @@ class IPV4(Packet):
         #     return
         # print('IPV4 from packet')
         raw_packet = bytes(packet)
+        # print_hex(raw_packet)
 
         octet_0 = unpack('B', raw_packet[:1])[0]
         version = (octet_0 & 0xf0) >> 4
         ihl = (octet_0 & 0x0f)
 
         if ihl == IHL_SHORT:
-            temp = unpack('!BHHHBBHII', raw_packet[1:20])
-            print(temp)
+            # temp = unpack('!BHHHBBHII', raw_packet[1:20])
+            # print(temp)
             octet_1, length, identification, fragment, ttl, protocol, checksum, src_ip, dst_ip = unpack(
                 '!BHHHBBHII', raw_packet[1:20])
             options = None
@@ -130,4 +131,4 @@ class IPV4(Packet):
         return result
 
     def __str__(self) -> str:
-        return f'IPV4: src_ip: {self.src_ip}, dst_ip: {self.dst_ip}, proto: {self.protocol}'
+        return f'IPV4: src_ip: {self.src_ip}, dst_ip: {self.dst_ip}, proto: {self._protocol}'

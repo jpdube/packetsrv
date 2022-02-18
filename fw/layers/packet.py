@@ -5,7 +5,7 @@ class Packet:
 
     def __init__(self, **kwargs):
 
-        print('Super init called')
+        # print('Super init called')
 
         for name, value in kwargs.items():
             if name in self._fields:

@@ -41,7 +41,7 @@ class ShortField(Field):
         if isinstance(value, bytes):
             svalue = (value[0] << 8) & 0xff00
             svalue += value[1] & 0x00ff
-            print(f'svalue: {svalue}, 0: {value[0]}, 1: {value[1]}')
+            # print(f'svalue: {svalue}, 0: {value[0]}, 1: {value[1]}')
 
             super().__init__(svalue)
         else:
@@ -156,7 +156,7 @@ class IPv4Address(Field):
             bin_addr += (int(split_addr[2]) << 8) & 0x0000ff00
             bin_addr += int(split_addr[3]) & 0x000000ff
 
-            print(f'IPV4 Address: {bin_addr:04X}')
+            # print(f'IPV4 Address: {bin_addr:04X}')
             return bin_addr
 
     def __eq__(self, other) -> bool:

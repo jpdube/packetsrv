@@ -73,4 +73,4 @@ class UDP(Packet):
         return csum
 
     def __str__(self) -> str:
-        return f'UDP: Src port: {self.src_port}, Dst Port: {self.dst_port}'
+        return f'UDP: Src port: {self.src_port.value}, Dst Port: {self.dst_port.value}'

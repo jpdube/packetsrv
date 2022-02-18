@@ -1,5 +1,6 @@
-from fw.layers.ethernet import ETHER_TYPE_ARP, ETHER_TYPE_IPV4, Ethernet
+from fw.layers.ethernet import ETHER_TYPE_ARP, ETHER_TYPE_IPV4, ETHER_TYPE_IPV6, Ethernet
 from fw.layers.ipv4 import IPV4, IP_PROTO_UDP, IP_PROTO_TCP, IP_PROTO_ICMP
+from fw.layers.ipv6 import IPV6
 from fw.layers.tcp import TCP
 from fw.layers.udp import UDP
 from typing import Dict
@@ -10,7 +11,7 @@ from fw.layers.packet import Packet
 
 class PacketBuilder:
     name = 'packet'
-    layer_types = ['ethernet', 'ipv4', 'tcp', 'udp', 'arp', 'icmp_ping']
+    layer_types = ['ethernet', 'ipv4', 'ipv6', 'tcp', 'udp', 'arp', 'icmp_ping']
 
     def __init__(self) -> None:
         self.layers: Dict[str, Packet] = {}
@@ -19,6 +20,7 @@ class PacketBuilder:
         self.layers[layer.name] = layer
 
     def add(self, layer):
+        # print(f'--> Add protocol: {layer.name}')
         if layer.name in self.layer_types:
             if layer.name == 'ethernet':
                 if self.layers_count == 0:
@@ -34,6 +36,11 @@ class PacketBuilder:
             elif layer.name == 'ipv4':
                 if self.layers_count == 1 and self.has_layer('ethernet'):
                     self.layers.get('ethernet').ether_type = ETHER_TYPE_IPV4
+                    self._add_layer(layer)
+
+            elif layer.name == 'ipv6':
+                if self.layers_count == 1 and self.has_layer('ethernet'):
+                    # self.layers.get('ethernet').ether_type = ETHER_TYPE_IPV6
                     self._add_layer(layer)
 
             elif layer.name == 'tcp':
@@ -70,26 +77,55 @@ class PacketBuilder:
         return packet
 
     def from_bytes(self, raw_packet):
-        e = Ethernet.from_packet(raw_packet[:14])
+        e = Ethernet.from_packet(raw_packet)
+        # print(f'Frametype: {e.frametype.value}')
+        if e.frametype.value == 0x8100:
+            offset = 4
+        else:
+            offset = 0
+        # print(f'Offset: {offset}')
         self.add(e)
         if e.ethertype == ETHER_TYPE_IPV4:
-            print(f'In ipv4 packet: {e.ethertype}')
-            ip = IPV4.from_packet(raw_packet[14:])
-            print(f'IP packet: {ip}')
+            # print(f'In ipv4 packet: {e.ethertype}')
+            ip = IPV4.from_packet(raw_packet[offset + 14:])
+            # print(f'IP packet: {ip}')
 
-            print('Adding ethernet to ipV4')
+            # print('Adding ethernet to ipV4')
             self.add(ip)
             if ip.protocol == IP_PROTO_TCP:
-                tcp = TCP.from_packet(raw_packet[34:])
-                print('Adding to TCP to IP')
+                tcp = TCP.from_packet(raw_packet[offset + 34:])
+                # print('Adding to TCP to IP')
                 self.add(tcp)
             elif ip.protocol == IP_PROTO_UDP:
-                udp = UDP.from_packet(raw_packet[34:])
-                print('Adding to UDP to IP')
+                udp = UDP.from_packet(raw_packet[offset + 34:])
+                # print('Adding to UDP to IP')
                 self.add(udp)
             elif ip.protocol == IP_PROTO_ICMP:
+                pass
                 # udp = UDP.from_packet(raw_packet[34:])
-                print('Adding to ICMP to IP')
+                # print('Adding to ICMP to IP')
+                # self.add(udp)
+
+        if e.ethertype == ETHER_TYPE_IPV6:
+            # print('********* IPV6 **********')
+            # print(f'In ipv4 packet: {e.ethertype}')
+            ip = IPV6.from_packet(raw_packet[offset + 14:])
+            # print_hex(raw_packet[offset + 14:])
+
+            # print('Adding ethernet to ipV4')
+            self.add(ip)
+            if ip.protocol == IP_PROTO_TCP:
+                tcp = TCP.from_packet(raw_packet[offset + 40:])
+                # print('Adding to TCP to IP')
+                self.add(tcp)
+            elif ip.protocol == IP_PROTO_UDP:
+                udp = UDP.from_packet(raw_packet[offset + 40:])
+                # print('Adding to UDP to IP')
+                self.add(udp)
+            elif ip.protocol == IP_PROTO_ICMP:
+                pass
+                # udp = UDP.from_packet(raw_packet[34:])
+                # print('Adding to ICMP to IP')
                 # self.add(udp)
 
     def __str__(self) -> str:
