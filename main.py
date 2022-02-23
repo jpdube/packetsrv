@@ -4,8 +4,9 @@ from datetime import datetime
 from fw.utils.print_hex import print_hex
 from fw.layers.fields import MacAddress, ShortField
 from fw.layers.raw_packet import RawPacket
-from fw.layers.packet_builder import PacketBuilder
+from fw.layers.packet_builder import PacketBuilder, ID_ETHERNET
 from query_processor import QueryProcessor
+from struct import unpack
 
 db_filename = '/Users/jpdube/hull-voip/db.hull/index.db'
 pcap_path = '/Users/jpdube/hull-voip/db.hull/pcap'
@@ -27,11 +28,7 @@ def get_packet(file_id: int, ptr_list):
         for ptr in ptr_list:
             f.seek(ptr)
             header = f.read(PCAP_PACKET_HEADER_SIZE)
-            pkt_len = 0
-            pkt_len += header[8] << 24
-            pkt_len += header[9] << 16
-            pkt_len += header[10] << 8
-            pkt_len += header[11]
+            pkt_len = unpack('!I', header[8:12])[0]
 
             # print(f'Packet header for: {file_id}:{ptr}:{pkt_len}')
             # print_hex(header)
@@ -41,27 +38,11 @@ def get_packet(file_id: int, ptr_list):
             pb = PacketBuilder()
             pb.from_bytes(packet)
 
-            # e = pb.ethernet
-            # ip = pb.ipv4
-            # if e.vlan_id == 51: # and e.ethertype == 0x0806:
-            #     print(f'Ethernet -> {e}, IPV4 -> {ip}')
-            #     # pb.print_layers()
-            #     filter_count += 1
-            #     print(filter_count)
-            #     print('-' * 50)
-
-
-            # e = pb.get_layer('ethernet')
-            # if e.vlan_id == 51: # and e.ethertype == 0x0806:
-            #     pb.print_layers()
-            #     filter_count += 1
-            #     print(filter_count)
-                # print('-' * 50)
-
-            # p = RawPacket(packet)
-            # e = p.get_ethernet()
-            # print(e)
-            # print(p)
+            e = pb.get_layer(ID_ETHERNET)
+            if e.vlan_id == 51: # and e.ethertype == 0x0806:
+                pb.print_layers()
+                filter_count += 1
+                print(filter_count)
 
 
 def sql(start_date: datetime, end_date: datetime) -> list:
@@ -89,6 +70,7 @@ def query(start_date, end_date):
     end = datetime.strptime(end_date, "%Y-%m-%d %H:%M:%S")
 
     packet_list = sql(start, end)
+    start_time = datetime.now()
     count = 0
     current_id = -1
     ptr_list = []
@@ -111,10 +93,9 @@ def query(start_date, end_date):
             # get_packet(p[FILE_ID], p[PACKET_PTR])
 
     print(f'Count: {count}')
+    print(f'Execution time: {datetime.now() - start_time}')
 
 if __name__ == '__main__':
     qp = QueryProcessor()
     qp.get(ip_src='192.168.242.22')
-    start_time = datetime.now()
     query(sys.argv[1], sys.argv[2])
-    print(f'Execution time: {datetime.now() - start_time}')

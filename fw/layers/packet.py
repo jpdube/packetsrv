@@ -1,5 +1,5 @@
 class Packet:
-    name = ''
+    name = '' 
     _fields = []
     _fields_list = {}
 

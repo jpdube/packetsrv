@@ -63,7 +63,7 @@ from fw.layers.packet import Packet
 
 class IPV6(Packet):
 
-    name = 'ipv6'
+    name = 5
 
     def __init__(
         self,
