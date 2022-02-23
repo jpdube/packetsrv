@@ -1,5 +1,6 @@
 from struct import pack
 from time import time_ns
+from fw.utils.print_hex import print_hex
 
 
 class FieldList:
@@ -143,10 +144,24 @@ class MacAddress(Field):
 class IPv4Address(Field):
     def __init__(self, ipaddr):
         super().__init__(ipaddr)
+        if isinstance(ipaddr, bytes):
+            # print(f'**** LEN IP: {len(ipaddr)}')
+            # print_hex(ipaddr)
+            self.value = self.from_array(ipaddr)
         if isinstance(ipaddr, str):
             self.value = self.from_string(ipaddr)
         elif isinstance(ipaddr, int):
             self.value = ipaddr
+
+    def from_array(self, raw_packet):
+        # print('*** FROM ARRAY ***')
+        ip = int(raw_packet[0] << 24)
+        ip += int(raw_packet[1] << 16) & 0x00ff0000
+        ip += int(raw_packet [2] << 8) & 0x0000ff00
+        ip += int(raw_packet [3]) & 0x000000ff
+        # print(f'=== {ip:x}')
+
+        return ip
 
     def from_string(self, address):
         if address.count('.') == 3:
@@ -162,6 +177,7 @@ class IPv4Address(Field):
     def __eq__(self, other) -> bool:
         return self.value == other.value
 
+
     @property
     def ip_str(self):
         byte1 = (self.value & 0xff000000) >> 24
@@ -176,4 +192,7 @@ class IPv4Address(Field):
         return pack('>L', self.value)
 
     def __str__(self) -> str:
-        return f'IPv4 address: {self.value:04X}:{self.ip_str}'
+        if self.value is not None:
+            return f'IPv4 address: {self.ip_str}'
+        else:
+            return f'IPv4 invalid address'

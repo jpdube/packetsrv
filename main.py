@@ -18,8 +18,10 @@ FILE_ID = 8
 PACKET_PTR = 7
 
 
+filter_count = 0
 def get_packet(file_id: int, ptr_list):
-    print(f'Getting from: {file_id}, {ptr_list[0]}')
+    global filter_count
+    print(f'Getting from: {file_id}, {len(ptr_list)}')
     # print('.', end='', flush=True)
     with open(f'{pcap_path}/{file_id}.pcap', 'rb') as f:
         for ptr in ptr_list:
@@ -35,15 +37,26 @@ def get_packet(file_id: int, ptr_list):
             # print_hex(header)
 
             packet = f.read(pkt_len)
-            # print_hex(packet)
+
             pb = PacketBuilder()
             pb.from_bytes(packet)
 
-            e = pb.get_layer('ethernet')
-            if e.vlan_id.value == 51:
-                print(f'==============> {e.vlan_id.value}')
-                pb.print_layers()
-                print('-' * 50)
+            # e = pb.ethernet
+            # ip = pb.ipv4
+            # if e.vlan_id == 51: # and e.ethertype == 0x0806:
+            #     print(f'Ethernet -> {e}, IPV4 -> {ip}')
+            #     # pb.print_layers()
+            #     filter_count += 1
+            #     print(filter_count)
+            #     print('-' * 50)
+
+
+            # e = pb.get_layer('ethernet')
+            # if e.vlan_id == 51: # and e.ethertype == 0x0806:
+            #     pb.print_layers()
+            #     filter_count += 1
+            #     print(filter_count)
+                # print('-' * 50)
 
             # p = RawPacket(packet)
             # e = p.get_ethernet()
@@ -63,7 +76,7 @@ def sql(start_date: datetime, end_date: datetime) -> list:
     # cursor.execute(
     # f'select * from packet where file_id = 0 and file_ptr < 32768 order by timestamp desc')
     cursor.execute(
-        f'select * from packet where timestamp between {int(start_date.timestamp())} and {int(end_date.timestamp())} order by timestamp')
+        f'select * from packet where timestamp between {int(start_date.timestamp())} and {int(end_date.timestamp())}')
     rows = cursor.fetchall()
 
     return rows
@@ -90,6 +103,7 @@ def query(start_date, end_date):
                 get_packet(current_id, ptr_list)
                 current_id = p[FILE_ID]
                 ptr_list = []
+                ptr_list.append(p[PACKET_PTR])
 
             count += 1
             # print(

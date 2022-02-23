@@ -13,10 +13,10 @@ class Ethernet:
     def __init__(self, src, dst, ethertype, vlan_id=1, frametype=ShortField(0x0000)):
         self._src_mac = MacAddress(src)
         self._dst_mac = MacAddress(dst)
-        self._ethertype = ShortField(ethertype)
-        self.frametype = ShortField(frametype)
+        self._ethertype = ShortField(ethertype).value
+        self.frametype = ShortField(frametype).value
         self.offset = 0
-        self.vlan_id = ShortField(vlan_id)
+        self.vlan_id = ShortField(vlan_id).value
 
     @classmethod
     def from_packet(cls, packet):
@@ -30,16 +30,16 @@ class Ethernet:
             return cls(src=packet[:6], dst=packet[6:12], ethertype=packet[12:14])
         # return None
 
-    def to_bytes(self):
-        result = bytearray()
-        for name, value in self.fields.items():
-            print(name, value)
-            result += value.binary
-        return result
+    # def to_bytes(self):
+    #     result = bytearray()
+    #     for name, value in self.fields.items():
+    #         print(name, value)
+    #         result += value.binary
+    #     return result
 
     @property
     def ethertype(self):
-        return self._ethertype.value
+        return self._ethertype
 
     @ethertype.setter
     def ethertype(self, value):
@@ -54,6 +54,6 @@ class Ethernet:
         return self._dst_mac
 
     def __str__(self):
-        return f"src_mac: {self._src_mac}, dst_mac: {self._dst_mac}, protocol: {self._ethertype}, vlan_id: {self.vlan_id.value}"
+        return f"src_mac: {self._src_mac}, dst_mac: {self._dst_mac}, protocol: {self._ethertype}, vlan_id: {self.vlan_id}"
         # return f"src_mac: {self.src}, dst_mac: {self.dst}, ehertype: {self.ether_type}"
         #  return f"src_mac: {self.fields['src']}, dst_mac: {self.fields['dst']}, ehertype: {self.fields['ethertype']}"

@@ -3,6 +3,7 @@ from fw.layers.ipv4 import IPV4, IP_PROTO_UDP, IP_PROTO_TCP, IP_PROTO_ICMP
 from fw.layers.ipv6 import IPV6
 from fw.layers.tcp import TCP
 from fw.layers.udp import UDP
+from fw.layers.arp import ARP
 from typing import Dict
 from fw.layers.fields import ByteField
 from fw.utils.print_hex import print_hex
@@ -15,6 +16,9 @@ class PacketBuilder:
 
     def __init__(self) -> None:
         self.layers: Dict[str, Packet] = {}
+        self.raw_packet = bytearray()
+        self._ethernet = None
+        self._ipv4 = None
 
     def _add_layer(self, layer: Packet):
         self.layers[layer.name] = layer
@@ -28,14 +32,14 @@ class PacketBuilder:
 
             if layer.name == 'arp':
                 if self.layers_count == 1 and self.has_layer('ethernet'):
-                    ethernet = self.layers.get('ethernet')
-                    if ethernet is not None:
-                        ethernet.ether_type = ETHER_TYPE_ARP
-                        self._add_layer(layer)
+                    # ethernet = self.layers.get('ethernet')
+                    # if ethernet is not None:
+                    #     ethernet.ether_type = ETHER_TYPE_ARP
+                    self._add_layer(layer)
 
             elif layer.name == 'ipv4':
                 if self.layers_count == 1 and self.has_layer('ethernet'):
-                    self.layers.get('ethernet').ether_type = ETHER_TYPE_IPV4
+                    # self.layers.get('ethernet').ether_type = ETHER_TYPE_IPV4
                     self._add_layer(layer)
 
             elif layer.name == 'ipv6':
@@ -45,18 +49,18 @@ class PacketBuilder:
 
             elif layer.name == 'tcp':
                 if self.layers_count == 2 and self.has_layer('ipv4'):
-                    self.layers.get('ipv4').protocol = 0x06
+                    # self.layers.get('ipv4').protocol = 0x06
                     self._add_layer(layer)
 
             elif layer.name == 'udp':
                 if self.layers_count == 2 and self.has_layer('ipv4'):
-                    self.layers.get('ipv4').protocol = 0x17
+                    # self.layers.get('ipv4').protocol = 0x17
                     self._add_layer(layer)
 
             # ToDo: Fix this protocol assignation using a property setter
             elif layer.name == 'icmp_echo':
                 if self.layers_count == 2 and self.has_layer('ipv4') and self.has_layer('ethernet'):
-                    self.layers.get('ipv4').protocol = ByteField(0x01)
+                    # self.layers.get('ipv4').protocol = ByteField(0x01)
                     self._add_layer(layer)
 
     def print_layers(self) -> None:
@@ -76,15 +80,35 @@ class PacketBuilder:
 
         return packet
 
+    @property    
+    def ethernet(self):
+        if self._ethernet is None:
+            self._ethernet = Ethernet.from_packet(self.raw_packet)
+        return self._ethernet
+
+    @property
+    def ipv4(self):
+        e = self.ethernet
+        offset = 0
+        if e.frametype == 0x8100:
+            offset = 4
+        return IPV4.from_packet(self.raw_packet[offset + 14:])
+
     def from_bytes(self, raw_packet):
+        # self.raw_packet = raw_packet
+        
         e = Ethernet.from_packet(raw_packet)
         # print(f'Frametype: {e.frametype.value}')
-        if e.frametype.value == 0x8100:
+        if e.frametype == 0x8100:
             offset = 4
         else:
             offset = 0
         # print(f'Offset: {offset}')
         self.add(e)
+        if e.ethertype == ETHER_TYPE_ARP:
+            arp = ARP.from_packet(raw_packet[offset + 14:])
+            self.add(arp)
+
         if e.ethertype == ETHER_TYPE_IPV4:
             # print(f'In ipv4 packet: {e.ethertype}')
             ip = IPV4.from_packet(raw_packet[offset + 14:])

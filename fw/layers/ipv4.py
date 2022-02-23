@@ -33,17 +33,17 @@ class IPV4(Packet):
                  options=0):
         self.src_ip = IPv4Address(src_ip)
         self.dst_ip = IPv4Address(dst_ip)
-        self._protocol = ShortField(protocol)
-        self.version = ByteField(version)
-        self.ihl = ByteField(ihl)
-        self.tos = ByteField(tos)
-        self.total_len = ShortField(total_len)
-        self.identification = ShortField(identification)
-        self.flags = ByteField(flags)
-        self.frag_offset = ShortField(frag_offset)
-        self.ttl = ByteField(ttl)
-        self.checksum = ShortField(checksum)
-        self.options = W24Field(options)
+        self._protocol = protocol
+        self.version = version
+        self.ihl = ihl
+        self.tos = tos
+        self.total_len = total_len
+        self.identification = identification
+        self.flags = flags
+        self.frag_offset = frag_offset
+        self.ttl = ttl
+        self.checksum = checksum
+        self.options = options
 
     @classmethod
     def from_packet(cls, packet):
@@ -94,7 +94,7 @@ class IPV4(Packet):
 
     @property
     def protocol(self) -> int:
-        return self._protocol.value
+        return self._protocol
 
     @protocol.setter
     def protocol(self, protocol):
@@ -103,32 +103,32 @@ class IPV4(Packet):
     #  def packet(self) -> Packet:
         #  return super().packet
 
-    def to_bytes(self) -> bytearray:
-        result = bytearray()
-        print(f'Version: {self.version}, IHL: {self.ihl}')
-        result += pack('B', (self.version.value << 4)
-                       | (self.ihl.value & 0x0f))
-        result += self.tos.binary
-        result += self.total_len.binary
-        result += self.identification.binary
-        flag = self.flags.value
-        flag_and_frag = (flag << 13) | (self.frag_offset.value & 0x1fff)
-        result += pack('>H', flag_and_frag)
-        result += self.ttl.binary
-        result += self.protocol.binary
-        result += pack('>H', 0x0000)
-        result += self.src_ip.binary
-        result += self.dst_ip.binary
-
-        # print(f'IHL: {self.ihl.value}, {self.options.value:x}')
-        if self.ihl.value == IHL_LONG:
-            result += self.options.binary
-
-        checksum = calc_checksum(result)
-        result[10] = (checksum & 0xff00) >> 8
-        result[11] = checksum & 0x00ff
-
-        return result
+    # def to_bytes(self) -> bytearray:
+    #     result = bytearray()
+    #     print(f'Version: {self.version}, IHL: {self.ihl}')
+    #     result += pack('B', (self.version.value << 4)
+    #                    | (self.ihl.value & 0x0f))
+    #     result += self.tos.binary
+    #     result += self.total_len.binary
+    #     result += self.identification.binary
+    #     flag = self.flags.value
+    #     flag_and_frag = (flag << 13) | (self.frag_offset.value & 0x1fff)
+    #     result += pack('>H', flag_and_frag)
+    #     result += self.ttl.binary
+    #     result += self.protocol.binary
+    #     result += pack('>H', 0x0000)
+    #     result += self.src_ip.binary
+    #     result += self.dst_ip.binary
+    #
+    #     # print(f'IHL: {self.ihl.value}, {self.options.value:x}')
+    #     if self.ihl.value == IHL_LONG:
+    #         result += self.options.binary
+    #
+    #     checksum = calc_checksum(result)
+    #     result[10] = (checksum & 0xff00) >> 8
+    #     result[11] = checksum & 0x00ff
+    #
+    #     return result
 
     def __str__(self) -> str:
         return f'IPV4: src_ip: {self.src_ip}, dst_ip: {self.dst_ip}, proto: {self._protocol}'

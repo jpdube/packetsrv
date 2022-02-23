@@ -21,18 +21,18 @@ class TCP(Packet):
                  urgent_ptr: int = 0,
                  options: int = 0):
         super().__init__()
-        self._src_port = ShortField(src_port)
-        self._dst_port = ShortField(dst_port)
+        self._src_port = src_port
+        self._dst_port = dst_port
         self._data = data
-        self._sequence_no = LongField(sequence_no)
-        self._ack_no = LongField(ack_no)
-        self._data_offset = ByteField(data_offset)
-        self._flag_bits = ByteField(flag_bits)
-        self._window = ShortField(window)
-        self._checksum = ShortField(checksum)
-        self._urgent_ptr = ShortField(urgent_ptr)
-        self._options = W24Field(options)
-        self._opt_pad = ByteField(0)
+        self._sequence_no = sequence_no
+        self._ack_no = ack_no
+        self._data_offset = data_offset
+        self._flag_bits = flag_bits
+        self._window = window
+        self._checksum = checksum
+        self._urgent_ptr = urgent_ptr
+        self._options = options
+        self._opt_pad = 0
 
 
 
@@ -61,19 +61,19 @@ class TCP(Packet):
 
     @property
     def src_port(self) -> int:
-        return self._src_port.value
+        return self._src_port
 
     @property
     def dst_port(self) -> int:
-        return self._dst_port.value
+        return self._dst_port
 
     @property
     def seq_no(self) -> int:
-        return self._sequence_no.value
+        return self._sequence_no
 
     @property
     def ack_no(self) -> int:
-        return self._ack_no.value
+        return self._ack_no
 
     @property
     def data_offset(self) -> int:
@@ -85,11 +85,11 @@ class TCP(Packet):
 
     @property
     def flag_cwr(self) -> bool:
-        return self._flag_bits.value & 0x80
+        return self._flag_bits & 0x80
 
     @property
     def flag_ece(self) -> bool:
-        return self._flag_bits.value & 0x40
+        return self._flag_bits & 0x40
 
     @property
     def flag_urg(self) -> bool:
@@ -97,7 +97,7 @@ class TCP(Packet):
 
     @property
     def flag_ack(self) -> bool:
-        return self._flag_bits.value & 0x10
+        return self._flag_bits & 0x10
 
     @property
     def flag_push(self) -> bool:
@@ -109,74 +109,74 @@ class TCP(Packet):
 
     @property
     def flag_syn(self) -> bool:
-        return self._flag_bits.value & 0x02
+        return self._flag_bits & 0x02
 
     @property
     def flag_fin(self) -> bool:
         return self._flag_bits & 0x01
         
 
-    def to_bytes(self, src_ip: IPv4Address, dst_ip: IPv4Address) -> bytearray:
-        print(f'TCP src: {src_ip}, dst: {dst_ip}')
-        result = bytearray()
-        result += self._src_port.binary
-        result += self._dst_port.binary
-        result += self._sequence_no.binary
-        result += self._ack_no.binary
-
-        print(f'Data offset: {self.data_offset.value}')
-        result += self._data_offset.binary
-        result += self._ctrl_bits.binary
-
-        result += self._window.binary
-
-        # --- Set checksum to 0
-        result += ShortField(0).binary
-        result += self._urgent_ptr.binary
-
-        print(f'Length of TCP: {len(result)}')
-
-        result[16] = 0
-        result[17] = 0
-
-        checksum = self.calc_checksum(result, src_ip, dst_ip)
-        result[16] = (checksum & 0xff00) >> 8
-        result[17] = checksum & 0x00ff
-
-        if self.data:
-            result += self.data
-        return result
-
-    def calc_checksum(self,
-                      packet: bytearray,
-                      src_ip: IPv4Address,
-                      dst_ip: IPv4Address) -> int:
-
-        chk_packet = bytearray()
-        chk_packet += src_ip.binary
-        chk_packet += dst_ip.binary
-        chk_packet += ByteField(0).binary
-        chk_packet += ByteField(6).binary
-
-        print(f'Checksum HEADER LEN: {self.data_offset.value >> 4}')
-        data_len = 0
-        if self._data is not None:
-            data_len = len(self.data)
-
-        chk_packet += ShortField((self._data_offset.value >> 4)
-                                 * 4 + data_len).binary
-
-        print_hex(chk_packet)
-        chk_packet += packet
-        print_hex(chk_packet)
-
-        # if len(chk_packet) % 2 != 0:
-        # chk_packet += ByteField(0).binary
-
-        csum = calc_checksum(chk_packet)
-        print(f'{csum:x}')
-
-        return csum
+    # def to_bytes(self, src_ip: IPv4Address, dst_ip: IPv4Address) -> bytearray:
+    #     print(f'TCP src: {src_ip}, dst: {dst_ip}')
+    #     result = bytearray()
+    #     result += self._src_port.binary
+    #     result += self._dst_port.binary
+    #     result += self._sequence_no.binary
+    #     result += self._ack_no.binary
+    #
+    #     print(f'Data offset: {self.data_offset.value}')
+    #     result += self._data_offset.binary
+    #     result += self._ctrl_bits.binary
+    #
+    #     result += self._window.binary
+    #
+    #     # --- Set checksum to 0
+    #     result += ShortField(0).binary
+    #     result += self._urgent_ptr.binary
+    #
+    #     print(f'Length of TCP: {len(result)}')
+    #
+    #     result[16] = 0
+    #     result[17] = 0
+    #
+    #     checksum = self.calc_checksum(result, src_ip, dst_ip)
+    #     result[16] = (checksum & 0xff00) >> 8
+    #     result[17] = checksum & 0x00ff
+    #
+    #     if self.data:
+    #         result += self.data
+    #     return result
+    #
+    # def calc_checksum(self,
+    #                   packet: bytearray,
+    #                   src_ip: IPv4Address,
+    #                   dst_ip: IPv4Address) -> int:
+    #
+    #     chk_packet = bytearray()
+    #     chk_packet += src_ip.binary
+    #     chk_packet += dst_ip.binary
+    #     chk_packet += ByteField(0).binary
+    #     chk_packet += ByteField(6).binary
+    #
+    #     print(f'Checksum HEADER LEN: {self.data_offset.value >> 4}')
+    #     data_len = 0
+    #     if self._data is not None:
+    #         data_len = len(self.data)
+    #
+    #     chk_packet += ShortField((self._data_offset.value >> 4)
+    #                              * 4 + data_len).binary
+    #
+    #     print_hex(chk_packet)
+    #     chk_packet += packet
+    #     print_hex(chk_packet)
+    #
+    #     # if len(chk_packet) % 2 != 0:
+    #     # chk_packet += ByteField(0).binary
+    #
+    #     csum = calc_checksum(chk_packet)
+    #     print(f'{csum:x}')
+    #
+    #     return csum
 
     def __str__(self) -> str:
         return f'{TCP.name}: sport: {self.src_port} dport: {self.dst_port} SYN:{self.flag_syn} ACK:{self.flag_ack}'
