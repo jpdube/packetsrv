@@ -57,47 +57,29 @@
 
 
 """
-from packet.layers.fields import ByteField, ShortField, LongField
+from typing import List
 from packet.layers.packet import Packet
+from struct import unpack
 
 
-class IPV6(Packet):
+class IPV6():
 
     name = 5
 
-    def __init__(
-        self,
-        src_addr,
-        dst_addr,
-        version=0,
-        traffic_cls=0,
-        flow_label=0,
-        payload_len=0,
-        next_hdr=0,
-        hop_limit=0,
-    ):
-        self._version = ByteField(version)
-        self._traffic_cls = ByteField(traffic_cls)
-        self._flow_label = LongField(flow_label)
-        self._payload_len = ShortField(payload_len)
-        self._next_hdr = ByteField(next_hdr)
-        self._hop_limit = ByteField(hop_limit)
-        self._src_addr = src_addr
-        self._dst_addr = dst_addr
+    def __init__(self, packet):
+        self.packet = packet
 
-    @classmethod
-    def from_packet(cls, raw_packet):
-        src_addr = raw_packet[8:24]
-        dst_addr = raw_packet[24:40]
-        next_hdr = raw_packet[6]
+    @property
+    def src_addr(self) -> List[int]:
+        return self.packet[8:24]
 
-        c = cls(src_addr, dst_addr, next_hdr=next_hdr)
-
-        return c
+    @property
+    def dst_addr(self) -> List[int]:
+        return self.packet[24:40]
 
     @property
     def protocol(self) -> int:
-        return self._next_hdr.value
+        return unpack("!B", self.packet[6:7])[0]
 
     def __str__(self) -> str:
-        return f"IPv6 src addr: {self._src_addr}, dst addr: {self._dst_addr} protocol: {self.protocol}"
+        return f"IPv6 src addr: {self.src_addr}, dst addr: {self.dst_addr} protocol: {self.protocol}"

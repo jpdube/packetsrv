@@ -45,31 +45,31 @@ class PacketBuilder:
             offset = 4
         self.add(e)
         if e.ethertype == ETHER_TYPE_ARP:
-            arp = ARP(raw_packet[offset + 14 :])
+            arp = ARP(raw_packet[offset + 14:])
             self.add(arp)
 
         if e.ethertype == ETHER_TYPE_IPV4:
-            ip = IPV4(raw_packet[offset + 14 :])
+            ip = IPV4(raw_packet[offset + 14:])
 
             self.add(ip)
             if ip.protocol == IP_PROTO_TCP:
-                tcp = TCP(raw_packet[offset + 34 :])
+                tcp = TCP(raw_packet[offset + 34:])
                 self.add(tcp)
             elif ip.protocol == IP_PROTO_UDP:
-                udp = UDP(raw_packet[offset + 34 :])
+                udp = UDP(raw_packet[offset + 34:])
                 self.add(udp)
             elif ip.protocol == IP_PROTO_ICMP:
                 pass
 
         if e.ethertype == ETHER_TYPE_IPV6:
-            ip = IPV6.from_packet(raw_packet[offset + 14 :])
+            ip = IPV6(raw_packet[offset + 14:])
 
             self.add(ip)
             if ip.protocol == IP_PROTO_TCP:
-                tcp = TCP(raw_packet[offset + 40 :])
+                tcp = TCP(raw_packet[offset + 40:])
                 self.add(tcp)
             elif ip.protocol == IP_PROTO_UDP:
-                udp = UDP(raw_packet[offset + 40 :])
+                udp = UDP(raw_packet[offset + 40:])
                 self.add(udp)
             elif ip.protocol == IP_PROTO_ICMP:
                 pass
