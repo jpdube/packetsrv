@@ -9,7 +9,7 @@ PYTHON=python3
 
 format:
 	black .	
-	black fw/	
+	black packet/	
 
 check:
 	mypy main.py
