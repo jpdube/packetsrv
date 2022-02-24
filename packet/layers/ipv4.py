@@ -97,7 +97,7 @@ class IPV4:
         offset = 0
         if self.ihl == 6:
             offset = 4
-        return self.packet[20 + offset:]
+        return self.packet[20 + offset :]
 
     def __str__(self) -> str:
         return f"IPV4 -> src_ip: {self.src_ip}, dst_ip: {self.dst_ip}, proto: {self.protocol}"

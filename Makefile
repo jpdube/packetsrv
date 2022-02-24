@@ -10,6 +10,7 @@ PYTHON=python3
 format:
 	black .	
 	black packet/	
+	black db/	
 
 check:
 	mypy main.py
