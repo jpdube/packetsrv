@@ -62,9 +62,10 @@ from packet.layers.packet import Packet
 from struct import unpack
 
 
-class IPV6():
+class IPV6:
 
     name = 5
+    __slots__ = ["packet"]
 
     def __init__(self, packet):
         self.packet = packet

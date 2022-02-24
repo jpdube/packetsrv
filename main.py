@@ -1,4 +1,4 @@
-from db.read_packet import query
+from dbase.read_packet import query
 import sys
 
 if __name__ == "__main__":
