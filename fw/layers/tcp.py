@@ -25,10 +25,10 @@ from struct import unpack
 """
 
 
-class TCP():
+class TCP:
     name = 3
 
-    __slots__ = ['packet']
+    __slots__ = ["packet"]
 
     def __init__(self, packet):
         self.packet = packet
@@ -50,7 +50,7 @@ class TCP():
         return unpack("!I", self.packet[8:12])[0]
 
     @property
-    def data_offset(self) -> int:
+    def header_len(self) -> int:
         return unpack("!B", self.packet[12:13])[0] >> 4
 
     @property
@@ -87,41 +87,41 @@ class TCP():
         else:
             return self.packet[20:]
 
-    # @property
-    # def flag_ns(self) -> bool:
-    #     return False
-    #
-    # @property
-    # def flag_cwr(self) -> bool:
-    #     return self._flag_bits & 0x80
-    #
-    # @property
-    # def flag_ece(self) -> bool:
-    #     return self._flag_bits & 0x40
-    #
-    # @property
-    # def flag_urg(self) -> bool:
-    #     return self._flag_bits & 0x20
-    #
-    # @property
-    # def flag_ack(self) -> bool:
-    #     return self._flag_bits & 0x10
-    #
-    # @property
-    # def flag_push(self) -> bool:
-    #     return self._flag_bits & 0x08
-    #
-    # @property
-    # def flag_rst(self) -> bool:
-    #     return self._flag_bits & 0x04
-    #
-    # @property
-    # def flag_syn(self) -> bool:
-    #     return self._flag_bits & 0x02
-    #
-    # @property
-    # def flag_fin(self) -> bool:
-    #     return self._flag_bits & 0x01
+    @property
+    def flag_ns(self) -> bool:
+        return False
+
+    @property
+    def flag_cwr(self) -> bool:
+        return self.flags & 0x80 == 0x80
+
+    @property
+    def flag_ece(self) -> bool:
+        return self.flags & 0x40 == 0x40
+
+    @property
+    def flag_urg(self) -> bool:
+        return self.flags & 0x20 == 0x20
+
+    @property
+    def flag_ack(self) -> bool:
+        return self.flags & 0x10 == 0x10
+
+    @property
+    def flag_push(self) -> bool:
+        return self.flags & 0x08 == 0x08
+
+    @property
+    def flag_rst(self) -> bool:
+        return self.flags & 0x04 == 0x04
+
+    @property
+    def flag_syn(self) -> bool:
+        return self.flags & 0x02 == 0x02
+
+    @property
+    def flag_fin(self) -> bool:
+        return self.flags & 0x01 == 0x01
 
     def __str__(self) -> str:
         return f"TCP -> sport: {self.src_port} dport: {self.dst_port} SYN:{self.flag_syn} ACK:{self.flag_ack}"
