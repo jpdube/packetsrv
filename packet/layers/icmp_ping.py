@@ -1,7 +1,7 @@
-from fw.layers.packet import Packet
-from fw.layers.fields import ByteField, ShortField, Timestamp
-from fw.utils.print_hex import print_hex
-from fw.utils.calc_checksum import calc_checksum
+from packet.layers.packet import Packet
+from packet.layers.fields import ByteField, ShortField, Timestamp
+from packet.utils.print_hex import print_hex
+from packet.utils.calc_checksum import calc_checksum
 
 from struct import *
 

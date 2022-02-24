@@ -1,4 +1,4 @@
-from fw.layers.fields import IPv4Address, MacAddress
+from packet.layers.fields import IPv4Address, MacAddress
 from struct import unpack
 
 

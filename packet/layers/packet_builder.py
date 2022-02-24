@@ -1,16 +1,16 @@
-from fw.layers.ethernet import (
+from packet.layers.ethernet import (
     ETHER_TYPE_ARP,
     ETHER_TYPE_IPV4,
     ETHER_TYPE_IPV6,
     Ethernet,
 )
-from fw.layers.ipv4 import IPV4, IP_PROTO_UDP, IP_PROTO_TCP, IP_PROTO_ICMP
-from fw.layers.ipv6 import IPV6
-from fw.layers.tcp import TCP
-from fw.layers.udp import UDP
-from fw.layers.arp import ARP
+from packet.layers.ipv4 import IPV4, IP_PROTO_UDP, IP_PROTO_TCP, IP_PROTO_ICMP
+from packet.layers.ipv6 import IPV6
+from packet.layers.tcp import TCP
+from packet.layers.udp import UDP
+from packet.layers.arp import ARP
 from typing import Dict
-from fw.layers.packet import Packet
+from packet.layers.packet import Packet
 
 ID_ETHERNET = 0
 ID_IPV4 = 1
@@ -45,31 +45,31 @@ class PacketBuilder:
             offset = 4
         self.add(e)
         if e.ethertype == ETHER_TYPE_ARP:
-            arp = ARP(raw_packet[offset + 14 :])
+            arp = ARP(raw_packet[offset + 14:])
             self.add(arp)
 
         if e.ethertype == ETHER_TYPE_IPV4:
-            ip = IPV4(raw_packet[offset + 14 :])
+            ip = IPV4(raw_packet[offset + 14:])
 
             self.add(ip)
             if ip.protocol == IP_PROTO_TCP:
-                tcp = TCP(raw_packet[offset + 34 :])
+                tcp = TCP(raw_packet[offset + 34:])
                 self.add(tcp)
             elif ip.protocol == IP_PROTO_UDP:
-                udp = UDP(raw_packet[offset + 34 :])
+                udp = UDP(raw_packet[offset + 34:])
                 self.add(udp)
             elif ip.protocol == IP_PROTO_ICMP:
                 pass
 
         if e.ethertype == ETHER_TYPE_IPV6:
-            ip = IPV6.from_packet(raw_packet[offset + 14 :])
+            ip = IPV6.from_packet(raw_packet[offset + 14:])
 
             self.add(ip)
             if ip.protocol == IP_PROTO_TCP:
-                tcp = TCP(raw_packet[offset + 40 :])
+                tcp = TCP(raw_packet[offset + 40:])
                 self.add(tcp)
             elif ip.protocol == IP_PROTO_UDP:
-                udp = UDP(raw_packet[offset + 40 :])
+                udp = UDP(raw_packet[offset + 40:])
                 self.add(udp)
             elif ip.protocol == IP_PROTO_ICMP:
                 pass

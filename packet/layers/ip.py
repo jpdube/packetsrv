@@ -1,5 +1,5 @@
-from fw.layers.packet import Packet
-from fw.layers.fields import IPv4Address
+from packet.layers.packet import Packet
+from packet.layers.fields import IPv4Address
 
 
 class IP(Packet):

@@ -1,6 +1,6 @@
 from struct import pack
 from time import time_ns
-from fw.utils.print_hex import print_hex
+from packet.utils.print_hex import print_hex
 
 
 class FieldList:

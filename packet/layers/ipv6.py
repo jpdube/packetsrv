@@ -57,8 +57,8 @@
 
 
 """
-from fw.layers.fields import ByteField, ShortField, LongField
-from fw.layers.packet import Packet
+from packet.layers.fields import ByteField, ShortField, LongField
+from packet.layers.packet import Packet
 
 
 class IPV6(Packet):
