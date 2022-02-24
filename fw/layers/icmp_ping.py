@@ -7,17 +7,17 @@ from struct import *
 
 
 class ICMP_Ping(Packet):
-    name = 'icmp_ping'
+    name = "icmp_ping"
 
     def __init__(self):
         super().__init__()
         self.icmp_type = ByteField(0x08)
         self.code = ByteField(0x00)
         self.checksum = ShortField(0x00)
-        self.identifier = ShortField(0x001a)
-        self.sequence = ShortField(0xb2c3)
+        self.identifier = ShortField(0x001A)
+        self.sequence = ShortField(0xB2C3)
         self.timestamp = Timestamp(0)
-        self.data = bytearray(b'\x41') * 48
+        self.data = bytearray(b"\x41") * 48
 
     @property
     def packet(self):
@@ -38,11 +38,11 @@ class ICMP_Ping(Packet):
         result += self.data
 
         checksum = calc_checksum(result)
-        checksum_bytes = pack('>H', checksum)
+        checksum_bytes = pack(">H", checksum)
         result[2] = checksum_bytes[0]
         result[3] = checksum_bytes[1]
 
-        print(f'Checksum: {checksum:04x}')
+        print(f"Checksum: {checksum:04x}")
 
         return result
 

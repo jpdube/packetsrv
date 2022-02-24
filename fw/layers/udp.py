@@ -1,9 +1,9 @@
 from struct import unpack
 
 
-class UDP():
+class UDP:
     name = 4
-    __slots__ = ['packet']
+    __slots__ = ["packet"]
 
     def __init__(self, packet):
         self.packet = packet

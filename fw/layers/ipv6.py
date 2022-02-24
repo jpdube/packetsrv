@@ -69,12 +69,12 @@ class IPV6(Packet):
         self,
         src_addr,
         dst_addr,
-        version = 0,
-        traffic_cls = 0,
-        flow_label = 0,
-        payload_len = 0,
-        next_hdr = 0,
-        hop_limit = 0
+        version=0,
+        traffic_cls=0,
+        flow_label=0,
+        payload_len=0,
+        next_hdr=0,
+        hop_limit=0,
     ):
         self._version = ByteField(version)
         self._traffic_cls = ByteField(traffic_cls)
@@ -91,14 +91,13 @@ class IPV6(Packet):
         dst_addr = raw_packet[24:40]
         next_hdr = raw_packet[6]
 
-        c = cls (src_addr, dst_addr, next_hdr=next_hdr)
+        c = cls(src_addr, dst_addr, next_hdr=next_hdr)
 
         return c
 
     @property
     def protocol(self) -> int:
         return self._next_hdr.value
-
 
     def __str__(self) -> str:
         return f"IPv6 src addr: {self._src_addr}, dst addr: {self._dst_addr} protocol: {self.protocol}"

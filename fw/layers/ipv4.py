@@ -30,9 +30,9 @@ IP_PROTO_ICMP = 0x01
 
 
 class IPV4:
-    name =  1
+    name = 1
 
-    __slots__ = ['packet']
+    __slots__ = ["packet"]
 
     def __init__(self, packet):
         self.packet = packet

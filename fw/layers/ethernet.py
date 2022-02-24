@@ -7,25 +7,25 @@ ETHER_TYPE_IPV6 = 0x86DD
 ETHER_TYPE_ARP = 0x0806
 FRAME_TYPE_8021Q = 0x8100
 
+
 class Ethernet:
     name = 0
 
-    __slots__ = ['packet']
-    
+    __slots__ = ["packet"]
+
     def __init__(self, packet):
         self.packet = packet
 
     @property
     def frametype(self) -> int:
-        return unpack('!H', self.packet[12:14]) [0]
+        return unpack("!H", self.packet[12:14])[0]
 
     @property
     def ethertype(self) -> int:
         if self.frametype == FRAME_TYPE_8021Q:
-            return unpack('!H', self.packet[16:18])[0]
+            return unpack("!H", self.packet[16:18])[0]
         else:
-            return unpack('!H', self.packet[12:14])[0]
-
+            return unpack("!H", self.packet[12:14])[0]
 
     @property
     def src_mac(self) -> MacAddress:
@@ -38,7 +38,7 @@ class Ethernet:
     @property
     def vlan_id(self) -> int:
         if self.frametype == FRAME_TYPE_8021Q:
-            return unpack('!H', self.packet[14:16])[0]
+            return unpack("!H", self.packet[14:16])[0]
         else:
             return 1
 

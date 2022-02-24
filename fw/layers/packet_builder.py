@@ -10,7 +10,6 @@ from fw.layers.tcp import TCP
 from fw.layers.udp import UDP
 from fw.layers.arp import ARP
 from typing import Dict
-from fw.utils.print_hex import print_hex
 from fw.layers.packet import Packet
 
 ID_ETHERNET = 0
