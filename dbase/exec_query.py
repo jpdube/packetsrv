@@ -30,15 +30,22 @@ def build_sql(model):
             
             sql += ' WHERE '
             if m.where_expr is not None:
-                print(f'WHERE EXPR -> {m.where_expr}')
+                # print(f'WHERE EXPR -> {m.where_expr}')
                 sql += interpret_program(m.where_expr)
 
             if m.between_expr is not None:
-                sql += ' AND timestamp BETWEEN '
-                print(f'BETWEEN EXPR -> {m.between_expr}')
+                if m.where_expr is not None:
+                    sql += ' AND '
+                sql += ' timestamp BETWEEN '
+                # print(f'BETWEEN EXPR -> {m.between_expr}')
                 sql += interpret_program(m.between_expr)
+
+            if m.top_expr is not None:
+                sql += ' LIMIT '
+                # print(f'BETWEEN EXPR -> {m.between_expr}')
+                sql += str(interpret_program(m.top_expr))
             sql += ';'
 
     print(f'SQL -> {sql}')
     
-    # query(sql)
+    query(sql)

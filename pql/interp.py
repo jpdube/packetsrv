@@ -112,7 +112,6 @@ def interpret(node, env):
             return not value
 
     elif isinstance(node, Grouping):
-        print(f'Grouping -> {node}')
         return f'({interpret(node.value, env)})'
 
     elif isinstance(node, Boolean):

@@ -34,11 +34,11 @@ def get_packet(file_id: int, ptr_list):
             pb = PacketBuilder()
             pb.from_bytes(packet)
 
-            e = pb.get_layer(ID_ETHERNET)
-            if e.vlan_id == 51:  # and e.ethertype == 0x0806:
-                pb.print_layers()
-                filter_count += 1
-                print(filter_count)
+            # e = pb.get_layer(ID_ETHERNET)
+            # if e.vlan_id == 51:  # and e.ethertype == 0x0806:
+            pb.print_layers()
+            filter_count += 1
+            print(filter_count)
 
 
 def sql(pql: str) -> list:

@@ -119,8 +119,14 @@ def parse_select(tokens):
         tokens.expect("BETWEEN")
         between_value = parse_expression(tokens)
 
+    top_value = None
+    if tokens.peek("TOP"):
+        tokens.expect("TOP")
+        top_value = parse_expression(tokens)
+
+        
     tokens.expect("SEMI")
-    return SelectStatement(fields, from_fields, where_value, between_value)
+    return SelectStatement(fields, from_fields, where_value, between_value, top_value)
 
 
 def parse_print(tokens):
