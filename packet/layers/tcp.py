@@ -56,7 +56,7 @@ class TCP:
     @property
     def flags(self) -> int:
         fl = (unpack("!B", self.packet[12:13])[0] & 0x0F) << 8
-        fl += unpack("!H", self.packet[13:14])
+        fl += unpack("!B", self.packet[13:14])[0]
         return fl
 
     @property
