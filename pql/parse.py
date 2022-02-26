@@ -87,9 +87,9 @@ def parse_select(tokens):
     tokens.expect("SELECT")
     fields = []
     if tokens.peek("WILDCARD"):
-        field = tokens.expect('WILDCARD')
-        print(f'WILDCARD -> Found {field}')
-        fields.append(Label('*'))
+        field = tokens.expect("WILDCARD")
+        print(f"WILDCARD -> Found {field}")
+        fields.append(Label("*"))
     else:
         while True:
             field = tokens.expect("NAME")
@@ -132,9 +132,11 @@ def parse_select(tokens):
         tokens.expect("DELIMITER")
         limit = tokens.expect("INTEGER")
         limit_fields.append(Label(limit.value))
-        
+
     tokens.expect("SEMI")
-    return SelectStatement(fields, from_fields, where_value, between_value, top_value, limit_fields)
+    return SelectStatement(
+        fields, from_fields, where_value, between_value, top_value, limit_fields
+    )
 
 
 def parse_print(tokens):

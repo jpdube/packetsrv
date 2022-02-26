@@ -11,6 +11,8 @@ format:
 	black .	
 	black packet/	
 	black dbase/	
+	black dbase/	
+	black pql/	
 
 check:
 	mypy main.py pql/ dbase/ packet/

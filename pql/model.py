@@ -69,12 +69,14 @@ class VarDecl(Expression):
     def __repr__(self):
         return f"VarDecl {self.name},{self.type},{self.value}"
 
+
 class Label(Expression):
     def __init__(self, value):
         self.value = value
 
     def __repr__(self):
         return f"Label {self.value}"
+
 
 class Date(Expression):
     def __init__(self, value):
@@ -87,17 +89,27 @@ class Date(Expression):
     def __repr__(self):
         return f"Date ({self.value})"
 
+
 class SelectStatement(Statement):
-    def __init__(self, value, from_fields, where_expr, between_expr, top_expr=None, limit_expr=None):
+    def __init__(
+        self,
+        value,
+        from_fields,
+        where_expr,
+        between_expr,
+        top_expr=None,
+        limit_expr=None,
+    ):
         self.value = value
         self.from_fields = from_fields
         self.where_expr = where_expr
-        self.between_expr = between_expr 
+        self.between_expr = between_expr
         self.top_expr = top_expr
         self.limit_expr = limit_expr
 
     def __repr__(self) -> str:
         return f"SelectStatement {repr(self.value)}, From: {repr(self.from_fields)}, Where: {repr(self.where_expr)} Between: {self.between_expr}, Top: {self.top_expr}, Limit: {self.limit_expr}"
+
 
 class PrintStatement(Statement):
     def __init__(self, value):
@@ -113,6 +125,7 @@ class String(Expression):
 
     def __repr__(self):
         return f"String({self.value})"
+
 
 class Char(Expression):
     def __init__(self, value):
@@ -133,7 +146,7 @@ class Float(Expression):
 class IPv4(Expression):
     def __init__(self, value):
         self.ipaddr = IPv4Address(value)
-        print(f'IPV4 -> {value}, {self.ipaddr}')
+        print(f"IPV4 -> {value}, {self.ipaddr}")
 
     @property
     def to_int(self):
