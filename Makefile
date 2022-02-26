@@ -13,7 +13,7 @@ format:
 	black dbase/	
 
 check:
-	mypy main.py
+	mypy main.py pql/ dbase/ packet/
 
 run:
 	$(PYTHON) $(MAIN) "2022-02-12 15:30:00" "2022-02-12 16:00:00"

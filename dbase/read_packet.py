@@ -4,7 +4,6 @@ from datetime import datetime
 from packet.utils.print_hex import print_hex
 from packet.layers.fields import MacAddress, ShortField
 from packet.layers.packet_builder import PacketBuilder, ID_ETHERNET
-from query_processor import QueryProcessor
 from struct import unpack
 
 db_filename = "/Users/jpdube/hull-voip/db.hull/index.db"
