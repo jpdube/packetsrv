@@ -1,5 +1,6 @@
 from datetime import datetime
 from packet.layers.fields import IPv4Address, MacAddress
+from typing import List
 
 
 class Node:
@@ -75,7 +76,7 @@ class Label(Expression):
         self.value = value
 
     def __repr__(self):
-        return f"Label {self.value}"
+        return f"Label({self.value})"
 
 
 class Date(Expression):
@@ -105,10 +106,12 @@ class SelectStatement(Statement):
         self.where_expr = where_expr
         self.between_expr = between_expr
         self.top_expr = top_expr
-        self.limit_expr = limit_expr
+        if isinstance(limit_expr, List) and len(limit_expr) == 2:
+            self.offset = limit_expr[0]
+            self.limit = limit_expr[1]
 
     def __repr__(self) -> str:
-        return f"SelectStatement {repr(self.value)}, From: {repr(self.from_fields)}, Where: {repr(self.where_expr)} Between: {self.between_expr}, Top: {self.top_expr}, Limit: {self.limit_expr}"
+        return f"SelectStatement {repr(self.value)}, From: {repr(self.from_fields)}, Where: {repr(self.where_expr)} Between: {self.between_expr}, Top: {self.top_expr}, Limit: {self.offset},{self.limit}"
 
 
 class PrintStatement(Statement):
@@ -165,10 +168,6 @@ class Mac(Expression):
 
 
 class Integer(Expression):
-    """
-    Example: 42
-    """
-
     def __init__(self, value):
         self.value = value
 
@@ -213,10 +212,6 @@ class BreakStatement(Statement):
 
 
 class BinOp(Expression):
-    """
-    Example: left + right
-    """
-
     def __init__(self, op, left, right):
         self.op = op
         self.left = left
@@ -241,95 +236,3 @@ class Block:
 
     def __repr__(self):
         return f"Block: {self.code}"
-
-
-# ------ Debugging function to convert a model into source code (for easier viewing)
-
-
-def to_source(node, indent=""):
-    print(node)
-    if isinstance(node, Integer):
-        return repr(node.value)
-
-    elif isinstance(node, Float):
-        return repr(node.value)
-
-    elif isinstance(node, Boolean):
-        return repr(node.value)
-
-    elif isinstance(node, Store):
-        return f"{indent}{node.name} = {to_source(node.value, indent)};\n"
-
-    elif isinstance(node, VarDecl):
-        ty = node.type if node.type else ""
-        val = f"= {to_source(node.value, indent)}" if node.value else ""
-        return f"{indent}var {node.name} {ty} {val};\n"
-
-    elif isinstance(node, Load):
-        return f"{node.name}"
-
-    elif isinstance(node, WhileStatement):
-        return (
-            f"while {to_source(node.test, indent)} "
-            + "{\n"
-            + "  "
-            + to_source(node.code_block, indent + "  ")
-            + "\n"
-            + indent
-            + "}\n"
-        )
-
-    elif isinstance(node, Unary):
-        return f"{node.op}{to_source(node.value, indent)}"
-
-    elif isinstance(node, Block):
-        return f'{{  {to_source(node.code, indent + "  ")} }}'
-
-    elif isinstance(node, IfStatement):
-        if node.true_block and node.else_block:
-            return (
-                f"if {to_source(node.test, indent)} "
-                + "{\n"
-                + "  "
-                + to_source(node.true_block, indent + "  ")
-                + " } else {\n"
-                + "  "
-                + to_source(node.else_block, indent + "  ")
-                + " }\n"
-            )
-        else:
-            return (
-                f"if {to_source(node.test, indent)} "
-                + "{\n"
-                + "  "
-                + to_source(node.true_block, indent + "  ")
-                + " }\n"
-            )
-
-    elif isinstance(node, Grouping):
-        return f"({to_source(node.value, indent)})"
-
-    elif isinstance(node, ConstDecl):
-        ty = node.type if node.type else ""
-        val = f"= {to_source(node.value, indent)}"
-        return f"{indent}const {node.name} {ty} {val};\n"
-
-    elif isinstance(node, BinOp):
-        return (
-            f"{to_source(node.left, indent)} {node.op} {to_source(node.right, indent)}"
-        )
-
-    elif isinstance(node, PrintStatement):
-        return f"print {to_source(node.value, indent)};\n"
-
-    elif isinstance(node, ContinueStatement):
-        return f"{indent}continue;\n"
-
-    elif isinstance(node, BreakStatement):
-        return f"{indent}break;\n"
-
-    elif isinstance(node, list):
-        return "".join(to_source(n, indent) for n in node)
-
-    else:
-        raise RuntimeError(f"Can't convert {node} to source")

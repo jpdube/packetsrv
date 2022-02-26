@@ -128,10 +128,10 @@ def parse_select(tokens):
     if tokens.peek("LIMIT"):
         tokens.expect("LIMIT")
         offset = tokens.expect("INTEGER")
-        limit_fields.append(Label(offset.value))
+        limit_fields.append(offset)
         tokens.expect("DELIMITER")
         limit = tokens.expect("INTEGER")
-        limit_fields.append(Label(limit.value))
+        limit_fields.append(limit)
 
     tokens.expect("SEMI")
     return SelectStatement(
