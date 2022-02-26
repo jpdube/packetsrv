@@ -44,6 +44,14 @@ def build_sql(model):
                 sql += ' LIMIT '
                 # print(f'BETWEEN EXPR -> {m.between_expr}')
                 sql += str(interpret_program(m.top_expr))
+
+            if m.limit_expr:
+                sql += ' LIMIT '
+                sql += interpret_program(m.limit_expr[0])
+                sql += ', '
+                sql += interpret_program(m.limit_expr[1])
+
+
             sql += ';'
 
     print(f'SQL -> {sql}')
