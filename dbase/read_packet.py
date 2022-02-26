@@ -42,7 +42,7 @@ def get_packet(file_id: int, ptr_list):
                 print(filter_count)
 
 
-def sql(start_date: datetime, end_date: datetime) -> list:
+def sql(pql: str) -> list:
     conn = sqlite3.connect(db_filename)
     cursor = conn.cursor()
 
@@ -51,19 +51,20 @@ def sql(start_date: datetime, end_date: datetime) -> list:
     conn.execute("""PRAGMA threads = 4;""")
     conn.execute("""PRAGMA temp_store = memory;""")
     conn.execute("""PRAGMA locking_mode = EXCLUSIVE;""")
-    cursor.execute(
-        f"select * from packet where timestamp between {int(start_date.timestamp())} and {int(end_date.timestamp())}"
-    )
+    cursor.execute(pql)
+    # cursor.execute(
+    #     f"select * from packet where timestamp between {int(start_date.timestamp())} and {int(end_date.timestamp())}"
+    # )
     rows = cursor.fetchall()
 
     return rows
 
 
-def query(start_date, end_date):
-    start = datetime.strptime(start_date, "%Y-%m-%d %H:%M:%S")
-    end = datetime.strptime(end_date, "%Y-%m-%d %H:%M:%S")
+def query(pql: str):
+    # start = datetime.strptime(start_date, "%Y-%m-%d %H:%M:%S")
+    # end = datetime.strptime(end_date, "%Y-%m-%d %H:%M:%S")
 
-    packet_list = sql(start, end)
+    packet_list = sql(pql)
     start_time = datetime.now()
     count = 0
     current_id = -1
@@ -82,6 +83,7 @@ def query(start_date, end_date):
                 ptr_list.append(p[PACKET_PTR])
 
             count += 1
+        get_packet(current_id, ptr_list)
 
     print(f"Count: {count}")
     print(f"Execution time: {datetime.now() - start_time}")
