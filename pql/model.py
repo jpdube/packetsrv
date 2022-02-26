@@ -88,15 +88,16 @@ class Date(Expression):
         return f"Date ({self.value})"
 
 class SelectStatement(Statement):
-    def __init__(self, value, from_fields, where_expr, between_expr, top_expr=None):
+    def __init__(self, value, from_fields, where_expr, between_expr, top_expr=None, limit_expr=None):
         self.value = value
         self.from_fields = from_fields
         self.where_expr = where_expr
         self.between_expr = between_expr 
         self.top_expr = top_expr
+        self.limit_expr = limit_expr
 
     def __repr__(self) -> str:
-        return f"SelectStatement {repr(self.value)}, From: {repr(self.from_fields)}, Where: {repr(self.where_expr)} Between: {self.between_expr}, Top: {self.top_expr}"
+        return f"SelectStatement {repr(self.value)}, From: {repr(self.from_fields)}, Where: {repr(self.where_expr)} Between: {self.between_expr}, Top: {self.top_expr}, Limit: {self.limit_expr}"
 
 class PrintStatement(Statement):
     def __init__(self, value):

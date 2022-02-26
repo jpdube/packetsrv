@@ -124,9 +124,17 @@ def parse_select(tokens):
         tokens.expect("TOP")
         top_value = parse_expression(tokens)
 
+    limit_fields = []
+    if tokens.peek("LIMIT"):
+        tokens.expect("LIMIT")
+        offset = tokens.expect("INTEGER")
+        limit_fields.append(Label(offset.value))
+        tokens.expect("DELIMITER")
+        limit = tokens.expect("INTEGER")
+        limit_fields.append(Label(limit.value))
         
     tokens.expect("SEMI")
-    return SelectStatement(fields, from_fields, where_value, between_value, top_value)
+    return SelectStatement(fields, from_fields, where_value, between_value, top_value, limit_fields)
 
 
 def parse_print(tokens):

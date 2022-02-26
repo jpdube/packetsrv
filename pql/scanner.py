@@ -28,7 +28,6 @@ _keywords = {
     "between": "BETWEEN",
     "top": "TOP",
     "limit": "LIMIT",
-    "offset": "OFFSET",
     # "and": "LAND",
     # "or": "LOR",
     "now": "NOW",
