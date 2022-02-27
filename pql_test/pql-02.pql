@@ -1,4 +1,4 @@
 select *
 from packet 
-between 2022-02-12 15:50:50 && 2022-02-12 16:00:00
-limit 10000, 200;
+where ip_dst == 192.168.51.10 && vlan_id == 51
+top 10;

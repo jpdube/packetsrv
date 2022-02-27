@@ -44,14 +44,18 @@ def build_sql(model):
 
             if m.top_expr is not None:
                 sql += " LIMIT "
-                # print(f'BETWEEN EXPR -> {m.between_expr}')
-                sql += str(interpret_program(m.top_expr))
+                sql += m.top_expr.value
+            else:
+                if m.top_expr is not None:
+                    sql += " LIMIT "
+                    # print(f'BETWEEN EXPR -> {m.between_expr}')
+                    sql += str(interpret_program(m.top_expr))
 
-            if m.limit and m.offset:
-                sql += f" LIMIT {m.offset.value}, {m.limit.value}"
+                if m.limit is not None and m.offset is not None:
+                    sql += f" LIMIT {m.offset.value}, {m.limit.value}"
 
             sql += ";"
 
     print(f"SQL -> {sql}")
 
-    # query(sql)
+    query(sql)

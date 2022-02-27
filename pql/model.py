@@ -106,6 +106,8 @@ class SelectStatement(Statement):
         self.where_expr = where_expr
         self.between_expr = between_expr
         self.top_expr = top_expr
+        self.offset = None
+        self.limit = None
         if isinstance(limit_expr, List) and len(limit_expr) == 2:
             self.offset = limit_expr[0]
             self.limit = limit_expr[1]

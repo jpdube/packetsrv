@@ -6,15 +6,15 @@ from packet.layers.fields import MacAddress, ShortField
 from packet.layers.packet_builder import PacketBuilder, ID_ETHERNET
 from struct import unpack
 
-db_filename = "/Users/jpdube/hull-voip/db.hull/index.db"
-pcap_path = "/Users/jpdube/hull-voip/db.hull/pcap"
+db_filename = "/Users/jpdube/hull-voip/db/index.db"
+pcap_path = "/Users/jpdube/hull-voip/db/pcap"
 
 PCAP_GLOBAL_HEADER_SIZE = 24
 PCAP_PACKET_HEADER_SIZE = 16
 
-TIMESTAMP = 9
-FILE_ID = 8
-PACKET_PTR = 7
+TIMESTAMP = 12
+FILE_ID = 11
+PACKET_PTR = 10
 
 filter_count = 0
 
@@ -40,7 +40,19 @@ def get_packet(file_id: int, ptr_list):
             filter_count += 1
             print(filter_count)
 
-
+   # id integer not null primary key,
+   #          ip_src integer,
+   #          ip_dst integer,
+   #          mac_src integer,
+   #          mac_dst integer,
+   #          ether_type integer,
+   #          ip_proto integer,
+   #          vlan_id integer,
+   #          sport integer,
+   #          dport integer,
+   #          file_ptr integer,
+   #          file_id integer,
+   #          timestamp timestamp);
 def sql(pql: str) -> list:
     conn = sqlite3.connect(db_filename)
     cursor = conn.cursor()
