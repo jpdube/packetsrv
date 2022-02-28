@@ -2,10 +2,8 @@ from struct import unpack
 from datetime import datetime
 
 
-
-
 class PcapHeader:
-    name = 0xff
+    name = 0xFF
 
     def __init__(self, header: bytes):
         self.header = header

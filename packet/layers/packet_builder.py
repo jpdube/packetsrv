@@ -41,8 +41,8 @@ class PacketBuilder:
 
     def from_bytes(self, raw_packet, header=None):
         if header is not None:
-            hdr = PcapHeader(header)
-            self.add(hdr)
+            # hdr = PcapHeader(header)
+            self.add(header)
 
         e = Ethernet(raw_packet)
         offset = 0

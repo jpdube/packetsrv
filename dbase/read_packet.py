@@ -1,8 +1,10 @@
 import sys
 import sqlite3
 from datetime import datetime
+from packet.layers import pcap_header
 from packet.utils.print_hex import print_hex
 from packet.layers.fields import MacAddress, ShortField
+from packet.layers.pcap_header import PcapHeader
 from packet.layers.packet_builder import PacketBuilder, ID_ETHERNET
 from struct import unpack
 
@@ -27,32 +29,31 @@ def get_packet(file_id: int, ptr_list):
         for ptr in ptr_list:
             f.seek(ptr)
             header = f.read(PCAP_PACKET_HEADER_SIZE)
-            pkt_len = unpack("!I", header[8:12])[0]
+            pcap_hdr = PcapHeader(header)
 
-            packet = f.read(pkt_len)
+            packet = f.read(pcap_hdr.incl_len)
 
             pb = PacketBuilder()
-            pb.from_bytes(packet, header)
+            pb.from_bytes(packet, pcap_hdr)
 
-            # e = pb.get_layer(ID_ETHERNET)
-            # if e.vlan_id == 51:  # and e.ethertype == 0x0806:
             pb.print_layers()
             filter_count += 1
             print(filter_count)
 
-   # id integer not null primary key,
-   #          ip_src integer,
-   #          ip_dst integer,
-   #          mac_src integer,
-   #          mac_dst integer,
-   #          ether_type integer,
-   #          ip_proto integer,
-   #          vlan_id integer,
-   #          sport integer,
-   #          dport integer,
-   #          file_ptr integer,
-   #          file_id integer,
-   #          timestamp timestamp);
+
+# id integer not null primary key,
+#          ip_src integer,
+#          ip_dst integer,
+#          mac_src integer,
+#          mac_dst integer,
+#          ether_type integer,
+#          ip_proto integer,
+#          vlan_id integer,
+#          sport integer,
+#          dport integer,
+#          file_ptr integer,
+#          file_id integer,
+#          timestamp timestamp);
 def sql(pql: str) -> list:
     conn = sqlite3.connect(db_filename)
     cursor = conn.cursor()

@@ -1,4 +1,4 @@
 select *
 from packet 
-where ip_dst == 192.168.51.10 && vlan_id == 51
-top 10;
+where ip_dst == 192.168.3.235 && vlan_id == 61
+top 100;
