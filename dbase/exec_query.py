@@ -54,4 +54,4 @@ def build_sql(model):
 
     print(f"SQL -> {sql}")
 
-    # query(sql)
+    query(sql)

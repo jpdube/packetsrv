@@ -32,7 +32,7 @@ def get_packet(file_id: int, ptr_list):
             packet = f.read(pkt_len)
 
             pb = PacketBuilder()
-            pb.from_bytes(packet)
+            pb.from_bytes(packet, header)
 
             # e = pb.get_layer(ID_ETHERNET)
             # if e.vlan_id == 51:  # and e.ethertype == 0x0806:
@@ -51,18 +51,12 @@ def sql(pql: str) -> list:
     conn.execute("""PRAGMA temp_store = memory;""")
     conn.execute("""PRAGMA locking_mode = EXCLUSIVE;""")
     cursor.execute(pql)
-    # cursor.execute(
-    #     f"select * from packet where timestamp between {int(start_date.timestamp())} and {int(end_date.timestamp())}"
-    # )
     rows = cursor.fetchall()
 
     return rows
 
 
 def query(pql: str):
-    # start = datetime.strptime(start_date, "%Y-%m-%d %H:%M:%S")
-    # end = datetime.strptime(end_date, "%Y-%m-%d %H:%M:%S")
-
     packet_list = sql(pql)
     start_time = datetime.now()
     count = 0
