@@ -9,6 +9,7 @@ from packet.layers.ipv6 import IPV6
 from packet.layers.tcp import TCP
 from packet.layers.udp import UDP
 from packet.layers.arp import ARP
+from packet.layers.pcap_header import PcapHeader
 from typing import Dict
 from packet.layers.packet import Packet
 
@@ -18,6 +19,7 @@ ID_IPV6 = 2
 ID_TCP = 3
 ID_UDP = 4
 ID_ARP = 5
+ID_HEADER = 1024
 
 
 class PacketBuilder:
@@ -37,7 +39,10 @@ class PacketBuilder:
         for v in self.layers.values():
             print(f"{v}")
 
-    def from_bytes(self, raw_packet):
+    def from_bytes(self, raw_packet, header=None):
+        if header is not None:
+            hdr = PcapHeader(header)
+            self.add(hdr)
 
         e = Ethernet(raw_packet)
         offset = 0
