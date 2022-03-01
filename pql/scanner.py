@@ -28,8 +28,9 @@ _keywords = {
     "between": "BETWEEN",
     "top": "TOP",
     "limit": "LIMIT",
-    # "and": "LAND",
-    # "or": "LOR",
+    "in": "IN",
+    "and": "LAND",
+    "or": "LOR",
     "now": "NOW",
     "var": "VAR",
     "print": "PRINT",
@@ -53,7 +54,12 @@ _token1 = {
     ")": "RPAREN",
 }
 
-_token2 = {"==": "EQ", "<=": "LE", ">=": "GE", "!=": "NE", "&&": "LAND", "||": "LOR"}
+_token2 = {
+    "==": "EQ",
+    "<=": "LE",
+    ">=": "GE",
+    "!=": "NE",
+}  # , "&&": "LAND", "||": "LOR"}
 
 _token_comment = {"//", "/*", "*/"}
 

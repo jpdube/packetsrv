@@ -1,4 +1,4 @@
-def print_hex(byte_array):
+def format_hex(byte_array):
     array_len = len(byte_array)
 
     count = 0
@@ -29,8 +29,11 @@ def print_hex(byte_array):
 
     result += (" " * spacing) + get_char(str_array)
     result += "\n"
-    print(f"\n{result}")
+    # print(f"\n{result}")
+    return result
 
+def print_hex(byte_array):
+    print(f"\n{format_hex(byte_array)}")
 
 def get_char(byte_array):
     result = ""
@@ -43,11 +46,3 @@ def get_char(byte_array):
 
     return result
 
-
-# b = [0xe8,0x1c,0xba,0x35,0x55,0xc6,0xc0,0x74,0xad,0x24,0xdd,0x3a,0x08,0x00,0x45,0x68,0x02,0x52,0xd3,0xb1,0x00,0x00,0x40,0x11,0x56,0xe4,0xc0,0xa8,0x99,0x42,0xc0,0xa8]
-# ba = bytearray(b)
-# ba[1] = 0x65
-# ba[2] = 0x41
-# ba[3] = 0x44
-# ba[4] = 0x24
-# print_hex(ba)

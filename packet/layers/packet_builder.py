@@ -4,22 +4,25 @@ from packet.layers.ethernet import (
     ETHER_TYPE_IPV6,
     Ethernet,
 )
+from packet.layers.icmp_builder import icmp_builder
 from packet.layers.ipv4 import IPV4, IP_PROTO_UDP, IP_PROTO_TCP, IP_PROTO_ICMP
 from packet.layers.ipv6 import IPV6
 from packet.layers.tcp import TCP
 from packet.layers.udp import UDP
 from packet.layers.arp import ARP
-from packet.layers.pcap_header import PcapHeader
 from typing import Dict
 from packet.layers.packet import Packet
+from enum import Enum
 
-ID_ETHERNET = 0
-ID_IPV4 = 1
-ID_IPV6 = 2
-ID_TCP = 3
-ID_UDP = 4
-ID_ARP = 5
-ID_HEADER = 1024
+class LayerID(Enum):
+    ETHERNET = 0
+    IPV4 = 1
+    IPV6 = 2
+    TCP = 3
+    UDP = 4
+    ARP = 5
+    ICMP = 6
+    HEADER = 1024
 
 
 class PacketBuilder:
@@ -64,7 +67,9 @@ class PacketBuilder:
                 udp = UDP(raw_packet[offset + 34 :])
                 self.add(udp)
             elif ip.protocol == IP_PROTO_ICMP:
-                pass
+                icmp = icmp_builder(raw_packet[offset + 34 :])
+                # icmp = IcmpEcho(raw_packet[offset + 34 :])
+                self.add(icmp)
 
         if e.ethertype == ETHER_TYPE_IPV6:
             ip = IPV6(raw_packet[offset + 14 :])
@@ -77,7 +82,8 @@ class PacketBuilder:
                 udp = UDP(raw_packet[offset + 40 :])
                 self.add(udp)
             elif ip.protocol == IP_PROTO_ICMP:
-                pass
+                icmp = icmp_builder(raw_packet[offset + 34 :])
+                self.add(icmp)
 
     def __str__(self) -> str:
         result = ""

@@ -1,6 +1,9 @@
+import ipaddress
 from struct import pack
 from time import time_ns
 from packet.utils.print_hex import print_hex
+from typing import Tuple, List
+from ipaddress import *
 
 
 class FieldList:
@@ -150,15 +153,23 @@ class MacAddress(Field):
 
 class IPv4Address(Field):
     def __init__(self, ipaddr):
-        super().__init__(ipaddr)
+        # super().__init__(ipaddr)
+
         if isinstance(ipaddr, bytes):
-            # print(f'**** LEN IP: {len(ipaddr)}')
-            # print_hex(ipaddr)
             self.value = self.from_array(ipaddr)
         if isinstance(ipaddr, str):
             self.value = self.from_string(ipaddr)
         elif isinstance(ipaddr, int):
             self.value = ipaddr
+
+    def network(self, mask: int) -> Tuple[int, int]:
+        if mask is None and not isinstance(mask, int):
+            return (0, 0)
+
+        ipv4_int = IPv4Interface(self.ip_str + "/" + str(mask))
+        ipv4 = IPv4Network(ipv4_int.network)
+
+        return (int(ipv4.network_address), int(ipv4.broadcast_address))
 
     def from_array(self, raw_packet):
         # print('*** FROM ARRAY ***')
@@ -199,6 +210,6 @@ class IPv4Address(Field):
 
     def __str__(self) -> str:
         if self.value is not None:
-            return f"IPv4 address: {self.ip_str}"
+            return f"{self.ip_str}"
         else:
             return f"IPv4 invalid address"
