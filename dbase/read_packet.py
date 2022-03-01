@@ -1,12 +1,8 @@
 import sys
 import sqlite3
 from datetime import datetime
-from packet.layers import pcap_header
-from packet.utils.print_hex import print_hex
-from packet.layers.fields import MacAddress, ShortField
 from packet.layers.pcap_header import PcapHeader
-from packet.layers.packet_builder import PacketBuilder, ID_ETHERNET
-from struct import unpack
+from packet.layers.packet_builder import PacketBuilder 
 
 db_filename = "/Users/jpdube/hull-voip/db/index.db"
 pcap_path = "/Users/jpdube/hull-voip/db/pcap"
