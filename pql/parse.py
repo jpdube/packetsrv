@@ -58,6 +58,8 @@ def parse_stmt(tokens):
         return parse_continue(tokens)
     elif tokens.peek("BREAK"):
         return parse_break(tokens)
+    # elif tokens.peek("IN"):
+    #     return parse_in(tokens)
     elif tokens.peek("SELECT"):
         return parse_select(tokens)
     else:
@@ -88,7 +90,6 @@ def parse_select(tokens):
     fields = []
     if tokens.peek("WILDCARD"):
         field = tokens.expect("WILDCARD")
-        print(f"WILDCARD -> Found {field}")
         fields.append(Label("*"))
     else:
         while True:
@@ -114,10 +115,10 @@ def parse_select(tokens):
         tokens.expect("WHERE")
         where_value = parse_expression(tokens)
 
-    between_value = None
-    if tokens.peek("BETWEEN"):
-        tokens.expect("BETWEEN")
-        between_value = parse_expression(tokens)
+    # between_value = None
+    # if tokens.peek("BETWEEN"):
+    #     tokens.expect("BETWEEN")
+    #     between_value = parse_expression(tokens)
 
     top_value = None
     if tokens.peek("TOP"):
@@ -134,9 +135,12 @@ def parse_select(tokens):
         limit_fields.append(limit)
 
     tokens.expect("SEMI")
-    return SelectStatement(
-        fields, from_fields, where_value, between_value, top_value, limit_fields
-    )
+    return SelectStatement(fields, from_fields, where_value, top_value, limit_fields)
+
+
+# def parse_in(tokens):
+#     token = tokens.expect("IN")
+#     return InStatement(token.value)
 
 
 def parse_print(tokens):
@@ -173,6 +177,12 @@ def parse_float(tokens):
 
 def parse_ipv4(tokens):
     token = tokens.expect("IPV4")
+    # if tokens.peek("MASK"):
+    #     tokens.expect("MASK")
+    #     mask = tokens.expect("INTEGER")
+    #     return IPv4(token.value, mask.value)
+    # else:
+    print(f"*** -> IPV4 parse: {token.value}")
     return IPv4(token.value)
 
 
@@ -240,7 +250,7 @@ def parse_and(tokens):
 
 def parse_relation(tokens):
     leftval = parse_sum(tokens)
-    optok = tokens.accept("LT", "LE", "GT", "GE", "EQ", "NE")
+    optok = tokens.accept("LT", "LE", "GT", "GE", "EQ", "NE", "IN")
     if not optok:
         return leftval
     return BinOp(optok.value, leftval, parse_sum(tokens))
@@ -263,7 +273,7 @@ def parse_load(tokens):
 def parse_term(tokens):
     leftval = parse_factor(tokens)
     while True:
-        optok = tokens.accept("TIMES", "DIVIDE")
+        optok = tokens.accept("TIMES", "MASK")
         if not optok:
             return leftval
         leftval = BinOp(optok.value, leftval, parse_factor(tokens))
@@ -284,6 +294,8 @@ def parse_factor(tokens):
         return parse_string(tokens)
     elif tokens.peek("DATE"):
         return parse_date(tokens)
+    # elif tokens.peek("IN"):
+    #     return parse_in(tokens)
     elif tokens.peek("TRUE", "FALSE"):
         return parse_bool(tokens)
     elif tokens.peek("PLUS", "MINUS", "LNOT"):

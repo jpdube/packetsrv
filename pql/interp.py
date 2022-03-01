@@ -71,11 +71,11 @@ def interpret(node, env):
     elif isinstance(node, BinOp):
         leftval = interpret(node.left, env)
         rightval = interpret(node.right, env)
+
         if node.op == "/":
-            if rightval == 0:
-                return 0
-            else:
-                return leftval / rightval
+            return f"{IPv4(leftval).to_network(rightval)[0]} AND {IPv4(leftval).to_network(rightval)[1]}"
+        elif node.op == "in":
+            return f" {leftval} BETWEEN {rightval}"
         elif node.op == "*":
             return "*"
             # return leftval * rightval
@@ -93,9 +93,9 @@ def interpret(node, env):
             return f"{leftval} >= {rightval}"
         elif node.op == "==":
             return f"{leftval} == {rightval}"
-        elif node.op == "&&":
+        elif node.op == "and":
             return f"{leftval} AND {rightval}"
-        elif node.op == "||":
+        elif node.op == "or":
             return f"{leftval} OR {rightval}"
         elif node.op == "!=":
             return f"{leftval} <> {rightval}"

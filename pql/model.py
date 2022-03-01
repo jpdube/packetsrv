@@ -2,6 +2,8 @@ from datetime import datetime
 from packet.layers.fields import IPv4Address, MacAddress
 from typing import List
 
+from packet.layers.ip import IP
+
 
 class Node:
     _next_id = 1
@@ -97,14 +99,14 @@ class SelectStatement(Statement):
         value,
         from_fields,
         where_expr,
-        between_expr,
+        # between_expr,
         top_expr=None,
         limit_expr=None,
     ):
         self.value = value
         self.from_fields = from_fields
         self.where_expr = where_expr
-        self.between_expr = between_expr
+        # self.between_expr = between_expr
         self.top_expr = top_expr
         self.offset = None
         self.limit = None
@@ -113,7 +115,15 @@ class SelectStatement(Statement):
             self.limit = limit_expr[1]
 
     def __repr__(self) -> str:
-        return f"SelectStatement {repr(self.value)}, From: {repr(self.from_fields)}, Where: {repr(self.where_expr)} Between: {self.between_expr}, Top: {self.top_expr}, Limit: {self.offset},{self.limit}"
+        return f"SelectStatement {repr(self.value)}, From: {repr(self.from_fields)}, Where: {repr(self.where_expr)}, Top: {self.top_expr}, Limit: {self.offset},{self.limit}"
+
+
+# class InStatement(Expression):
+#     def __init__(self, value):
+#         self.value = value
+#
+#     def __repr__(self) -> str:
+#         return f"In ({self.value})"
 
 
 class PrintStatement(Statement):
@@ -151,11 +161,13 @@ class Float(Expression):
 class IPv4(Expression):
     def __init__(self, value):
         self.ipaddr = IPv4Address(value)
-        print(f"IPV4 -> {value}, {self.ipaddr}")
 
     @property
     def to_int(self):
         return self.ipaddr.value
+
+    def to_network(self, mask):
+        return self.ipaddr.network(mask)
 
     def __repr__(self) -> str:
         return f"IPv4({(self.ipaddr)})"
