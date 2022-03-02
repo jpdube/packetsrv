@@ -1,5 +1,5 @@
-select * 
 from packet 
+include header
 where ip.dst in 192.168.3.0/24
       and ip.proto == 1
-top 10;
+top 1000;

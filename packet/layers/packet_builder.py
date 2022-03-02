@@ -12,21 +12,9 @@ from packet.layers.udp import UDP
 from packet.layers.arp import ARP
 from typing import Dict
 from packet.layers.packet import Packet
-from enum import Enum
-
-class LayerID(Enum):
-    ETHERNET = 0
-    IPV4 = 1
-    IPV6 = 2
-    TCP = 3
-    UDP = 4
-    ARP = 5
-    ICMP = 6
-    HEADER = 1024
 
 
 class PacketBuilder:
-    name = "packet"
 
     def __init__(self) -> None:
         self.layers: Dict[int, Packet] = {}

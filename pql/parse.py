@@ -3,6 +3,7 @@ from pql.model import *
 from pql.scanner import Scanner
 from pql.tokens_list import Tok
 
+
 class Tokenizer:
     def __init__(self, tokens):
         self.tokens = tokens
@@ -59,7 +60,7 @@ def parse_stmt(tokens):
         return parse_continue(tokens)
     elif tokens.peek(Tok.BREAK):
         return parse_break(tokens)
-    elif tokens.peek(Tok.SELECT):
+    elif tokens.peek(Tok.FROM):
         return parse_select(tokens)
     else:
         return None
@@ -83,21 +84,22 @@ def parse_assignment(tokens):
     tokens.expect(Tok.SEMI)
     return Store(var_name.value, value)
 
-def parse_select(tokens):
-    tokens.expect(Tok.SELECT)
-    fields = []
-    if tokens.peek(Tok.WILDCARD):
-        field = tokens.expect(Tok.WILDCARD)
-        fields.append(Label("*"))
-    else:
-        while True:
-            field = tokens.expect(Tok.NAME)
-            # print(f'SELECT fields: {field}')
-            if field:
-                fields.append(Label(field.value))
 
-            if tokens.accept(Tok.DELIMITER) is None:
-                break
+def parse_select(tokens):
+    # tokens.expect(Tok.SELECT)
+    # fields = []
+    # if tokens.peek(Tok.WILDCARD):
+    #     field = tokens.expect(Tok.WILDCARD)
+    #     fields.append(Label("*"))
+    # else:
+    #     while True:
+    #         field = tokens.expect(Tok.NAME)
+    #         # print(f'SELECT fields: {field}')
+    #         if field:
+    #             fields.append(Label(field.value))
+    #
+    #         if tokens.accept(Tok.DELIMITER) is None:
+    #             break
 
     tokens.expect(Tok.FROM)
     from_fields = []
@@ -107,6 +109,9 @@ def parse_select(tokens):
             from_fields.append(Label(ffield.value))
         if tokens.accept(Tok.DELIMITER) is None:
             break
+
+    tokens.expect(Tok.INCLUDE)
+    include_field = tokens.expect(Tok.NAME)
 
     where_value = None
     if tokens.peek(Tok.WHERE):
@@ -128,12 +133,9 @@ def parse_select(tokens):
         limit_fields.append(limit)
 
     tokens.expect(Tok.SEMI)
-    return SelectStatement(fields, from_fields, where_value, top_value, limit_fields)
-
-
-# def parse_in(tokens):
-#     token = tokens.expect("IN")
-#     return InStatement(token.value)
+    return SelectStatement(
+        from_fields, include_field, where_value, top_value, limit_fields
+    )
 
 
 def parse_print(tokens):

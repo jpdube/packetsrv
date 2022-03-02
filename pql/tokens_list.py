@@ -4,6 +4,7 @@ from enum import Enum, auto
 class Tok(Enum):
     SELECT = auto()
     FROM = auto()
+    INCLUDE = auto()
     WHERE = auto()
     ORDER_BY = auto()
     ASC = auto()
