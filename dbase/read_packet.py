@@ -66,7 +66,7 @@ def sql(pql: str) -> Cursor:
     return rows
 
 
-def query(pql: str):
+def query(pql: str, header=False):
     packet_list = sql(pql)
     start_time = datetime.now()
     count = 0

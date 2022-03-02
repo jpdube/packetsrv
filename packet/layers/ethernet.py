@@ -1,5 +1,6 @@
 from packet.layers.fields import MacAddress
 from struct import unpack
+# from packet.layers.layer_type import LayerID
 
 
 ETHER_TYPE_IPV4 = 0x0800

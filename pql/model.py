@@ -109,17 +109,17 @@ class Date(Expression):
 class SelectStatement(Statement):
     def __init__(
         self,
-        value,
+        # value,
         from_fields,
+        include_field,
         where_expr,
-        # between_expr,
         top_expr=None,
         limit_expr=None,
     ):
-        self.value = value
+        # self.value = value
         self.from_fields = from_fields
+        self.include = include_field
         self.where_expr = where_expr
-        # self.between_expr = between_expr
         self.top_expr = top_expr
         self.offset = None
         self.limit = None
@@ -128,7 +128,7 @@ class SelectStatement(Statement):
             self.limit = limit_expr[1]
 
     def __repr__(self) -> str:
-        return f"SelectStatement {repr(self.value)}, From: {repr(self.from_fields)}, Where: {repr(self.where_expr)}, Top: {self.top_expr}, Limit: {self.offset},{self.limit}"
+        return f"SelectStatement From: {repr(self.from_fields)}, Include: {self.include}, Where: {repr(self.where_expr)}, Top: {self.top_expr}, Limit: {self.offset},{self.limit}"
 
 
 # class InStatement(Expression):

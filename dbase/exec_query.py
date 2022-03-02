@@ -14,23 +14,28 @@ def exec_query(filename: str):
 
 def build_sql(model):
     sql = "SELECT "
+    include = 'packet'
 
     for m in model:
         if isinstance(m, SelectStatement):
-            for i, f in enumerate(m.value):
-                if f.index:
-                    sql += f"{f.value} "
-
-                    if i < len(m.value) - 1:
-                        sql += ", "
-
-            if sql.find("*") == -1:
-                sql += "file_ptr, file_id"
+            sql += '*'
+            # for i, f in enumerate(m.value):
+            #     if f.index:
+            #         sql += f"{f.value} "
+            #
+            #         if i < len(m.value) - 1:
+            #             sql += ", "
+            #
+            # if sql.find("*") == -1:
+            #     sql += "file_ptr, file_id"
 
             sql += " FROM "
             for s in m.from_fields:
                 sql += f" packet"
                 # sql += f" {s.value}"
+
+            if m.include is not None:
+                include = m.include.value
 
             sql += " WHERE "
             if m.where_expr is not None:
@@ -59,5 +64,4 @@ def build_sql(model):
             sql += ";"
 
     print(f"SQL -> {sql}")
-
     query(sql)

@@ -107,4 +107,4 @@ class IcmpDestUnreach:
         return IPV4(self.packet[8:])
 
     def __str__(self):
-        return f"ICMP Dest unreachable -> type: {self.type}, code: {self.code}, checksum: {self.checksum:x}, src_ip: {self.datagram.src_ip}, dst_ip: {self.datagram.dst_ip}\nIPv4:\n{format_hex(self.packet[8:])}"
+        return f"ICMP Dest unreachable -> type: {self.type}, code: {self.code}, checksum: {self.checksum:x}, src_ip: {self.datagram.src_ip}, dst_ip: {self.datagram.dst_ip}"
