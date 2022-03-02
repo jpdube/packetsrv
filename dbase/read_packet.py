@@ -1,3 +1,4 @@
+from sqlite3.dbapi2 import Cursor
 import sys
 import sqlite3
 from datetime import datetime
@@ -50,7 +51,7 @@ def get_packet(file_id: int, ptr_list):
 #          file_ptr integer,
 #          file_id integer,
 #          timestamp timestamp);
-def sql(pql: str) -> list:
+def sql(pql: str) -> Cursor:
     conn = sqlite3.connect(db_filename)
     cursor = conn.cursor()
 
@@ -60,7 +61,7 @@ def sql(pql: str) -> list:
     conn.execute("""PRAGMA temp_store = memory;""")
     conn.execute("""PRAGMA locking_mode = EXCLUSIVE;""")
     cursor.execute(pql)
-    rows = cursor.fetchall()
+    rows = cursor
 
     return rows
 

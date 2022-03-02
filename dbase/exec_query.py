@@ -18,17 +18,19 @@ def build_sql(model):
     for m in model:
         if isinstance(m, SelectStatement):
             for i, f in enumerate(m.value):
-                sql += f"{f.value} "
+                if f.index:
+                    sql += f"{f.value} "
 
-                if i < len(m.value) - 1:
-                    sql += ", "
+                    if i < len(m.value) - 1:
+                        sql += ", "
 
-            if not sql.find("*"):
+            if sql.find("*") == -1:
                 sql += "file_ptr, file_id"
 
             sql += " FROM "
             for s in m.from_fields:
-                sql += f" {s.value}"
+                sql += f" packet"
+                # sql += f" {s.value}"
 
             sql += " WHERE "
             if m.where_expr is not None:

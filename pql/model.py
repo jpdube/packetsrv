@@ -1,6 +1,8 @@
 from datetime import datetime
 from packet.layers.fields import IPv4Address, MacAddress
 from typing import List
+from pql import fields_list
+from pql.fields_list import field_list, Field
 
 from packet.layers.ip import IP
 
@@ -75,10 +77,21 @@ class VarDecl(Expression):
 
 class Label(Expression):
     def __init__(self, value):
-        self.value = value
+        self._value = value
+        f = field_list.get(self._value, None)
+        if f is not None:
+            self.index = f.index
+
+    @property
+    def value(self) -> str:
+        f = field_list.get(self._value, None)
+        if f is not None:
+            return f.field
+        else:
+            return f'Invalid field near {self._value}'
 
     def __repr__(self):
-        return f"Label({self.value})"
+        return f"Label({self._value})"
 
 
 class Date(Expression):
