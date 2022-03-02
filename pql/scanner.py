@@ -1,75 +1,57 @@
-from enum import Enum, auto
-
-itoa_counter = 0
-
-
-def itoa(reset=False):
-    global itoa_counter
-    if reset:
-        itoa_counter = 0
-    result = itoa_counter
-    itoa_counter += 1
-
-    return result
-
-
-class Keywords(Enum):
-    SELECT = auto()
-    FROM = auto()
-
+from pql.tokens_list import Tok
 
 _keywords = {
-    "select": "SELECT",
-    "from": "FROM",
-    "where": "WHERE",
-    "order by": "ORDER BY",
-    "asc": "ASC",
-    "desc": "DESC",
-    "between": "BETWEEN",
-    "top": "TOP",
-    "limit": "LIMIT",
-    "in": "IN",
-    "and": "LAND",
-    "or": "LOR",
-    "now": "NOW",
-    "var": "VAR",
-    "print": "PRINT",
-    "if": "IF",
-    "else": "ELSE",
+    "select": Tok.SELECT,
+    "from": Tok.FROM,
+    "where": Tok.WHERE,
+    "order by": Tok.ORDER_BY,
+    "asc": Tok.ASC,
+    "desc": Tok.DESC,
+    "between": Tok.BETWEEN,
+    "top": Tok.TOP,
+    "limit": Tok.LIMIT,
+    "in": Tok.IN,
+    "and": Tok.LAND,
+    "or": Tok.LOR,
+    "now": Tok.NOW,
+    "var": Tok.VAR,
+    "print": Tok.PRINT,
+    "if": Tok.IF,
+    "else": Tok.ELSE,
 }
 
 _token1 = {
-    "=": "ASSIGN",
-    "/": "MASK",
-    "*": "WILDCARD",
-    ";": "SEMI",
-    ",": "DELIMITER",
-    ">": "GT",
-    "<": "LT",
-    "{": "LBRACE",
-    "}": "RBRACE",
-    "+": "PLUS",
-    "-": "MINUS",
-    "(": "LPAREN",
-    ")": "RPAREN",
+    "=": Tok.ASSIGN,
+    "/": Tok.MASK,
+    "*": Tok.WILDCARD,
+    ";": Tok.SEMI,
+    ",": Tok.DELIMITER,
+    ">": Tok.GT,
+    "<": Tok.LT,
+    "{": Tok.LBRACE,
+    "}": Tok.RBRACE,
+    "+": Tok.PLUS,
+    "-": Tok.MINUS,
+    "(": Tok.LPAREN,
+    ")": Tok.RPAREN,
 }
 
 _token2 = {
-    "==": "EQ",
-    "<=": "LE",
-    ">=": "GE",
-    "!=": "NE",
-}  # , "&&": "LAND", "||": "LOR"}
+    "==": Tok.EQ,
+    "<=": Tok.LE,
+    ">=": Tok.GE,
+    "!=": Tok.NE,
+}
 
 _token_comment = {"//", "/*", "*/"}
 
 
 class Token:
-    def __init__(self, type, value, line, col):
-        self.type = type
-        self.value = value
-        self.line = line
-        self.col = col
+    def __init__(self, type: Tok, value: str, line: int, col: int):
+        self.type: Tok = type
+        self.value: str = value
+        self.line: int = line
+        self.col: int = col
 
     def __repr__(self):
         return f"({self.type}, {self.value}, {self.line}, {self.col})"
@@ -106,16 +88,18 @@ class Scanner:
                     self.pos = len(self.text)
                 continue
 
+            #--- String
             elif self.text[self.pos] == "'":
                 tok_start = self.pos
                 self.pos += 1
                 while self.pos < self.text_len and self.text[self.pos] != "'":
                     self.pos += 1
                 value = self.text[tok_start + 1 : self.pos]
-                token = Token("STRING", value, self.line, self.col)
+                token = Token(Tok.STRING, value, self.line, self.col)
                 self.col += self.pos - tok_start
                 self.pos += 1
 
+            #--- Token 2 characters
             elif self.text[self.pos : self.pos + 2] in _token2:
                 token = Token(
                     _token2[self.text[self.pos : self.pos + 2]],
@@ -126,13 +110,14 @@ class Scanner:
                 self.pos += 2
                 self.col += 2
 
+            #--- Date
             elif (
                 (self.pos + 18) < self.text_len
                 and self.text[self.pos : self.pos + 19].count("-") == 2
                 and self.text[self.pos : self.pos + 19].count(":") == 2
             ):
                 value = self.text[self.pos : self.pos + 19]
-                token = Token("DATE", value, self.line, self.col)
+                token = Token(Tok.DATE, value, self.line, self.col)
                 self.pos += 19
                 self.col += 19
 
@@ -146,6 +131,7 @@ class Scanner:
                 self.pos += 1
                 self.col += 1
 
+            #--- Integer, Float, Mac, IPv4
             elif (self.pos + 16) < self.text_len and self.text[
                 self.pos : self.pos + 16
             ].count(":") == 5:
@@ -156,7 +142,7 @@ class Scanner:
                     self.pos += 1
 
                 value = self.text[tok_start : self.pos]
-                token = Token("MAC", value, self.line, self.col)
+                token = Token(Tok.MAC, value, self.line, self.col)
                 self.col += self.pos - tok_start
 
             elif self.text[self.pos].isdigit():
@@ -168,11 +154,11 @@ class Scanner:
 
                 value = self.text[tok_start : self.pos]
                 if value.count(".") == 3:
-                    token = Token("IPV4", value, self.line, self.col)
+                    token = Token(Tok.IPV4, value, self.line, self.col)
                 elif "." in value:
-                    token = Token("FLOAT", value, self.line, self.col)
+                    token = Token(Tok.FLOAT, value, self.line, self.col)
                 else:
-                    token = Token("INTEGER", value, self.line, self.col)
+                    token = Token(Tok.INTEGER, value, self.line, self.col)
                 self.col += self.pos - tok_start
 
             elif self.text[self.pos].isalpha() or self.text[self.pos] == "_" or self.text[self.pos] == '.':
@@ -187,7 +173,7 @@ class Scanner:
                     token = Token(_keywords[value], value, self.line, self.col)
                     # token = Token(value.upper(), value)
                 else:
-                    token = Token("NAME", value, self.line, self.col)
+                    token = Token(Tok.NAME, value, self.line, self.col)
                 self.col += self.pos - tok_start
             else:
                 self.pos += 1
@@ -197,7 +183,7 @@ class Scanner:
             yield (token)
 
         # --- End of file parsing
-        yield (Token("EOF", "EOF", self.line, self.col))
+        yield (Token(Tok.EOF, "EOF", self.line, self.col))
 
     def is_ipv4(self):
         if (
