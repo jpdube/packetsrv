@@ -2,5 +2,4 @@ select *
 from packet 
 where ip_dst in 192.168.3.0/24
       and ip_proto == 1
-      and icmp.type == 8
 top 150;
