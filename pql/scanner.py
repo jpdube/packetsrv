@@ -175,10 +175,10 @@ class Scanner:
                     token = Token("INTEGER", value, self.line, self.col)
                 self.col += self.pos - tok_start
 
-            elif self.text[self.pos].isalpha() or self.text[self.pos] == "_":
+            elif self.text[self.pos].isalpha() or self.text[self.pos] == "_" or self.text[self.pos] == '.':
                 tok_start = self.pos
                 while self.pos < self.text_len and (
-                    self.text[self.pos].isalnum() or self.text[self.pos] == "_"
+                    self.text[self.pos].isalnum() or self.text[self.pos] == "_" or self.text[self.pos] == '.'
                 ):
                     self.pos += 1
 
