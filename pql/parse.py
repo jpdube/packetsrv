@@ -83,7 +83,6 @@ def parse_assignment(tokens):
     tokens.expect(Tok.SEMI)
     return Store(var_name.value, value)
 
-
 def parse_select(tokens):
     tokens.expect(Tok.SELECT)
     fields = []
@@ -96,6 +95,7 @@ def parse_select(tokens):
             # print(f'SELECT fields: {field}')
             if field:
                 fields.append(Label(field.value))
+
             if tokens.accept(Tok.DELIMITER) is None:
                 break
 
@@ -103,7 +103,6 @@ def parse_select(tokens):
     from_fields = []
     while True:
         ffield = tokens.expect(Tok.NAME)
-        # print(f'FROM fields: {ffield}')
         if ffield:
             from_fields.append(Label(ffield.value))
         if tokens.accept(Tok.DELIMITER) is None:
@@ -113,11 +112,6 @@ def parse_select(tokens):
     if tokens.peek(Tok.WHERE):
         tokens.expect(Tok.WHERE)
         where_value = parse_expression(tokens)
-
-    # between_value = None
-    # if tokens.peek("BETWEEN"):
-    #     tokens.expect("BETWEEN")
-    #     between_value = parse_expression(tokens)
 
     top_value = None
     if tokens.peek(Tok.TOP):
@@ -250,7 +244,6 @@ def parse_and(tokens):
 def parse_relation(tokens):
     leftval = parse_sum(tokens)
     optok = tokens.accept(Tok.LT, Tok.LE, Tok.GT, Tok.GE, Tok.EQ, Tok.NE, Tok.IN)
-    # optok = tokens.accept("LT", "LE", "GT", "GE", "EQ", "NE", "IN")
     if not optok:
         return leftval
     return BinOp(optok.value, leftval, parse_sum(tokens))
@@ -294,8 +287,6 @@ def parse_factor(tokens):
         return parse_string(tokens)
     elif tokens.peek(Tok.DATE):
         return parse_date(tokens)
-    # elif tokens.peek("IN"):
-    #     return parse_in(tokens)
     elif tokens.peek(Tok.TRUE, Tok.FALSE):
         return parse_bool(tokens)
     elif tokens.peek(Tok.PLUS, Tok.MINUS, Tok.LNOT):
