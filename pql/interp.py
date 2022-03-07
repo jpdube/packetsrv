@@ -92,7 +92,7 @@ def interpret(node, env):
         elif node.op == ">=":
             return f"{leftval} >= {rightval}"
         elif node.op == "==":
-            return f"{leftval} == {rightval}"
+            return f"{leftval} = {rightval}"
         elif node.op == "and":
             return f"{leftval} AND {rightval}"
         elif node.op == "or":

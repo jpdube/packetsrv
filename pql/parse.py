@@ -60,7 +60,7 @@ def parse_stmt(tokens):
         return parse_continue(tokens)
     elif tokens.peek(Tok.BREAK):
         return parse_break(tokens)
-    elif tokens.peek(Tok.FROM):
+    elif tokens.peek(Tok.SELECT):
         return parse_select(tokens)
     else:
         return None
@@ -86,20 +86,20 @@ def parse_assignment(tokens):
 
 
 def parse_select(tokens):
-    # tokens.expect(Tok.SELECT)
-    # fields = []
-    # if tokens.peek(Tok.WILDCARD):
-    #     field = tokens.expect(Tok.WILDCARD)
-    #     fields.append(Label("*"))
-    # else:
-    #     while True:
-    #         field = tokens.expect(Tok.NAME)
-    #         # print(f'SELECT fields: {field}')
-    #         if field:
-    #             fields.append(Label(field.value))
-    #
-    #         if tokens.accept(Tok.DELIMITER) is None:
-    #             break
+    tokens.expect(Tok.SELECT)
+    fields = []
+    if tokens.peek(Tok.WILDCARD):
+        field = tokens.expect(Tok.WILDCARD)
+        fields.append(Label("*"))
+    else:
+        while True:
+            field = tokens.expect(Tok.NAME)
+            # print(f'SELECT fields: {field}')
+            if field:
+                fields.append(Label(field.value))
+
+            if tokens.accept(Tok.DELIMITER) is None:
+                break
 
     tokens.expect(Tok.FROM)
     from_fields = []
@@ -133,7 +133,7 @@ def parse_select(tokens):
         limit_fields.append(limit)
 
     tokens.expect(Tok.SEMI)
-    return SelectStatement(
+    return SelectStatement(fields,
         from_fields, include_field, where_value, top_value, limit_fields
     )
 
