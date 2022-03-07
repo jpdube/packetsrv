@@ -1,4 +1,5 @@
 from struct import unpack
+from packet.layers.packet import Packet
 
 """
 Echo or Echo Reply Message
@@ -68,7 +69,7 @@ IP Fields:
 """
 
 
-class IcmpEcho:
+class IcmpEcho(Packet):
     name = 6
 
     def __init__(self, packet: bytes):

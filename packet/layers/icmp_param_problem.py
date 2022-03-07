@@ -1,4 +1,5 @@
 from struct import unpack
+from packet.layers.packet import Packet
 
 """
 Parameter Problem Message
@@ -69,7 +70,7 @@ Parameter Problem Message
 """
 
 
-class IcmpParamProblem:
+class IcmpParamProblem(Packet):
     name = 6
 
     def __init__(self, packet):

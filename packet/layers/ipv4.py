@@ -1,4 +1,5 @@
 from packet.layers.fields import IPv4Address
+from packet.layers.packet import Packet
 
 
 from struct import unpack
@@ -29,7 +30,7 @@ IP_PROTO_ICMP = 0x01
 """
 
 
-class IPV4:
+class IPV4(Packet):
     name = 1
 
     __slots__ = ["packet"]

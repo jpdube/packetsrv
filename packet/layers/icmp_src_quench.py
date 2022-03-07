@@ -1,4 +1,5 @@
 from struct import unpack
+from packet.layers.packet import Packet
 
 """
 Source Quench Message
@@ -72,7 +73,7 @@ Source Quench Message
 """
 
 
-class IcmpSrcQuench:
+class IcmpSrcQuench(Packet):
     name = 7
 
     def __init__(self, packet):

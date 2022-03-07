@@ -7,6 +7,7 @@ from packet.layers.icmp_redirect import IcmpRedirect
 from packet.layers.icmp_src_quench import IcmpSrcQuench
 from packet.layers.icmp_time_exceeded import IcmpTimeExceeded
 from packet.layers.icmp_timestamp import IcmpTimestamp
+from packet.layers.packet import Packet
 
 ICMP_DEST_UNREACHABLE = 3
 ICMP_TIME_EXCEEDED = 11
@@ -21,7 +22,7 @@ ICMP_INFO_REQ = 15
 ICMP_INFO_REPLY = 16
 
 
-def icmp_builder(packet):
+def icmp_builder(packet) -> Packet:
     icmp_type = unpack("!B", packet[0:1])[0]
     if icmp_type == ICMP_ECHO_MSG or icmp_type == ICMP_ECHO_REPLY:
         return IcmpEcho(packet)
@@ -39,3 +40,5 @@ def icmp_builder(packet):
         return IcmpTimestamp(packet)
     elif icmp_type == ICMP_INFO_REQ or icmp_type == ICMP_INFO_REPLY:
         return IcmpInfoReq(packet)
+
+    return Packet()

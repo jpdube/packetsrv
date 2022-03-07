@@ -82,9 +82,10 @@ from struct import pack, unpack
 from packet.layers.ipv4 import IPV4
 from pql.model import IPv4
 from packet.utils.print_hex import format_hex
+from packet.layers.packet import Packet
 
 
-class IcmpDestUnreach:
+class IcmpDestUnreach(Packet):
     name = 7
 
     def __init__(self, packet):

@@ -1,4 +1,5 @@
 from struct import unpack
+from packet.layers.packet import Packet
 
 """
 Information Request or Information Reply Message
@@ -70,7 +71,7 @@ Information Request or Information Reply Message
 """
 
 
-class IcmpInfoReq:
+class IcmpInfoReq(Packet):
     name = 6
 
     def __init__(self, packet: bytes):

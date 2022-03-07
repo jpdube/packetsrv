@@ -19,11 +19,8 @@ class PacketBuilder:
     def __init__(self) -> None:
         self.layers: Dict[int, Packet] = {}
 
-    def _add_layer(self, layer: Packet):
+    def add(self, layer: Packet):
         self.layers[layer.name] = layer
-
-    def add(self, layer):
-        self._add_layer(layer)
 
     def print_layers(self) -> None:
         print("-" * 40)
@@ -32,7 +29,6 @@ class PacketBuilder:
 
     def from_bytes(self, raw_packet, header=None):
         if header is not None:
-            # hdr = PcapHeader(header)
             self.add(header)
 
         e = Ethernet(raw_packet)
@@ -56,7 +52,6 @@ class PacketBuilder:
                 self.add(udp)
             elif ip.protocol == IP_PROTO_ICMP:
                 icmp = icmp_builder(raw_packet[offset + 34 :])
-                # icmp = IcmpEcho(raw_packet[offset + 34 :])
                 self.add(icmp)
 
         if e.ethertype == ETHER_TYPE_IPV6:
@@ -87,5 +82,5 @@ class PacketBuilder:
         result = self.layers.get(layer_name, None)
         return result is not None
 
-    def get_layer(self, layer_name):
-        return self.layers.get(layer_name, None)
+    def get_layer(self, layer_id) -> Packet | None:
+        return self.layers.get(layer_id, None)

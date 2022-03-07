@@ -33,7 +33,7 @@ def get_packet(file_id: int, ptr_list):
             pb = PacketBuilder()
             pb.from_bytes(packet, pcap_hdr)
 
-            pb.print_layers()
+            # pb.print_layers()
             filter_count += 1
             # print(filter_count)
 

@@ -1,4 +1,5 @@
 from struct import unpack
+from packet.layers.packet import Packet
 
 """
 Redirect Message
@@ -79,7 +80,7 @@ Redirect Message
 """
 
 
-class IcmpRedirect:
+class IcmpRedirect(Packet):
     name = 7
 
     def __init__(self, packet):
