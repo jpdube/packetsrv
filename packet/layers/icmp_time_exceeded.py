@@ -1,4 +1,5 @@
 from struct import unpack
+from packet.layers.packet import Packet
 
 """
 Time Exceeded Message
@@ -64,7 +65,7 @@ Time Exceeded Message
 """
 
 
-class IcmpTimeExceeded:
+class IcmpTimeExceeded(Packet):
 
     name = 7
 

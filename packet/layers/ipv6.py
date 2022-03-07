@@ -60,9 +60,10 @@
 from typing import List
 from packet.layers.packet import Packet
 from struct import unpack
+from packet.layers.packet import Packet
 
 
-class IPV6:
+class IPV6(Packet):
 
     name = 5
     __slots__ = ["packet"]

@@ -1,5 +1,7 @@
-from packet 
-include header
-where ip.dst in 192.168.3.0/24
-      and ip.proto == 1
-top 1000;
+
+select ip.src, ip.dst, tcp.sport
+from packet
+where 
+    ip.src in 192.168.3.0/24
+top 200000;
+

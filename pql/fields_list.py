@@ -28,4 +28,6 @@ field_list = {
     "ip.checksum":          Field("ip_checksum", False),
     "ip.checksum":          Field("ip_checksum", False),
     "ip.options":           Field("ip_options", False),
+    "icmp.type":            Field("icmp_type", False),
+    "icmp.code":            Field("icmp_code", False),
 }

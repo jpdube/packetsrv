@@ -1,4 +1,5 @@
 from packet.layers.fields import MacAddress
+from packet.layers.packet import Packet
 from struct import unpack
 # from packet.layers.layer_type import LayerID
 
@@ -9,7 +10,7 @@ ETHER_TYPE_ARP = 0x0806
 FRAME_TYPE_8021Q = 0x8100
 
 
-class Ethernet:
+class Ethernet(Packet):
     name = 0
 
     __slots__ = ["packet"]

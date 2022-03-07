@@ -1,8 +1,9 @@
 from packet.layers.fields import IPv4Address, MacAddress
 from struct import unpack
+from packet.layers.packet import Packet
 
 
-class ARP:
+class ARP(Packet):
     name = 5
     __slots__ = ["packet"]
 

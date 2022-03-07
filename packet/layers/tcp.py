@@ -1,4 +1,5 @@
 from struct import unpack
+from packet.layers.packet import Packet
 
 """
     0               1               2               3
@@ -25,7 +26,7 @@ from struct import unpack
 """
 
 
-class TCP:
+class TCP(Packet):
     name = 3
 
     __slots__ = ["packet"]

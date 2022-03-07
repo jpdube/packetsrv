@@ -20,7 +20,7 @@ filter_count = 0
 
 def get_packet(file_id: int, ptr_list):
     global filter_count
-    print(f"Getting from: {file_id}, {len(ptr_list)}")
+    # print(f"Getting from: {file_id}, {len(ptr_list)}")
     # print('.', end='', flush=True)
     with open(f"{pcap_path}/{file_id}.pcap", "rb") as f:
         for ptr in ptr_list:
@@ -33,9 +33,9 @@ def get_packet(file_id: int, ptr_list):
             pb = PacketBuilder()
             pb.from_bytes(packet, pcap_hdr)
 
-            pb.print_layers()
+            # pb.print_layers()
             filter_count += 1
-            print(filter_count)
+            # print(filter_count)
 
 
 # id integer not null primary key,

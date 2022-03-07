@@ -1,7 +1,8 @@
 from struct import unpack
+from packet.layers.packet import Packet
 
 
-class UDP:
+class UDP(Packet):
     name = 4
     __slots__ = ["packet"]
 

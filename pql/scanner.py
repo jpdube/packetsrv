@@ -1,7 +1,7 @@
 from pql.tokens_list import Tok
 
 _keywords = {
-    # "select": Tok.SELECT,
+    "select": Tok.SELECT,
     "from": Tok.FROM,
     "include": Tok.INCLUDE,
     "where": Tok.WHERE,

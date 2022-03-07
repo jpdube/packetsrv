@@ -1,4 +1,5 @@
 from struct import unpack
+from packet.layers.packet import Packet
 
 """
 Timestamp or Timestamp Reply Message
@@ -85,7 +86,7 @@ Timestamp or Timestamp Reply Message
 """
 
 
-class IcmpTimestamp:
+class IcmpTimestamp(Packet):
     name = 6
 
     def __init__(self, packet: bytes):
