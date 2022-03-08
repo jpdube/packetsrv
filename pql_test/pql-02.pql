@@ -1,7 +1,11 @@
-
 select ip.src, ip.dst, tcp.sport
 from packet
 where 
-    ip.src in 192.168.3.0/24
-top 200000;
+    ip.proto == 17 and
+    (udp.sport == 68 and udp.dport == 67) or
+    (udp.sport == 67 and udp.dport == 68) and
+    ip.src in 192.168.53.0/24 and
+    ether.vlan == 51
+
+top 200;
 
