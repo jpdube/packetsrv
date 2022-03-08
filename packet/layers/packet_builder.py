@@ -10,6 +10,7 @@ from packet.layers.ipv6 import IPV6
 from packet.layers.tcp import TCP
 from packet.layers.udp import UDP
 from packet.layers.arp import ARP
+from packet.layers.dhcp import Dhcp
 from typing import Dict
 from packet.layers.packet import Packet
 
@@ -50,6 +51,9 @@ class PacketBuilder:
             elif ip.protocol == IP_PROTO_UDP:
                 udp = UDP(raw_packet[offset + 34 :])
                 self.add(udp)
+                if udp.src_port in [67,68] and udp.dst_port in [67, 68]:
+                    dhcp = Dhcp(udp.payload)
+                    self.add(dhcp)
             elif ip.protocol == IP_PROTO_ICMP:
                 icmp = icmp_builder(raw_packet[offset + 34 :])
                 self.add(icmp)
