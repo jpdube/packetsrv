@@ -20,7 +20,9 @@ filter_count = 0
 
 def get_packet(file_id: int, ptr_list):
     global filter_count
-    print(f"Getting from: {file_id}, {len(ptr_list)}")
+    print(f"=============================================")
+    print(f"===> Getting from: {file_id}, {len(ptr_list)}")
+    print(f"=============================================")
     # print('.', end='', flush=True)
     with open(f"{pcap_path}/{file_id}.pcap", "rb") as f:
         for ptr in ptr_list:
