@@ -11,6 +11,7 @@ from packet.layers.tcp import TCP
 from packet.layers.udp import UDP
 from packet.layers.arp import ARP
 from packet.layers.dhcp import Dhcp
+from packet.layers.dns import Dns
 from typing import Dict
 from packet.layers.packet import Packet
 
@@ -54,6 +55,9 @@ class PacketBuilder:
                 if udp.src_port in [67,68] and udp.dst_port in [67, 68]:
                     dhcp = Dhcp(udp.payload)
                     self.add(dhcp)
+                elif udp.dst_port == 53 or udp.src_port == 53:
+                    dns = Dns(udp.payload)
+                    self.add(dns)
             elif ip.protocol == IP_PROTO_ICMP:
                 icmp = icmp_builder(raw_packet[offset + 34 :])
                 self.add(icmp)

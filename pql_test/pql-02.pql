@@ -2,10 +2,8 @@ select ip.src, ip.dst, tcp.sport
 from packet
 where 
     ip.proto == 17 and
-    (udp.sport == 68 and udp.dport == 67) or
-    (udp.sport == 67 and udp.dport == 68) and
-    ip.src in 192.168.53.0/24 and
+    (udp.sport == 53 or udp.dport == 53) and
     ether.vlan == 51
 
-top 200;
+top 2000;
 
