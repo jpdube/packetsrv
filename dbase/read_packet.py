@@ -61,7 +61,7 @@ def sql(pql: str) -> Cursor:
     conn.execute("""PRAGMA journal_mode = MEMORY;""")
     conn.execute("""PRAGMA threads = 4;""")
     conn.execute("""PRAGMA temp_store = memory;""")
-    conn.execute("""PRAGMA locking_mode = EXCLUSIVE;""")
+    # conn.execute("""PRAGMA locking_mode = EXCLUSIVE;""")
     cursor.execute(pql)
     rows = cursor
 
