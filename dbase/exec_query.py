@@ -3,8 +3,11 @@ from pql.model import *
 from pql.interp import *
 from dbase.read_packet import query
 
+def exec_query (pql: str):
+    model = parse_source(pql)
+    return build_sql(model)
 
-def exec_query(filename: str):
+def exec_from_file(filename: str):
     model = parse_file(filename)
     for m in model:
         print(m)
@@ -64,4 +67,4 @@ def build_sql(model):
             sql += ";"
 
     print(f"SQL -> {sql}")
-    query(sql)
+    return query(sql)

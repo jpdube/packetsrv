@@ -4,6 +4,7 @@ from time import time_ns
 from packet.utils.print_hex import print_hex
 from typing import Tuple, List
 from ipaddress import *
+import json
 
 
 class FieldList:
@@ -135,6 +136,9 @@ class MacAddress(Field):
 
     def __eq__(self, other) -> bool:
         return other.value == self.value
+
+    def toJSON(self):
+        return json.dumps({'mac': self.__str__()})
 
     @property
     def binary(self):

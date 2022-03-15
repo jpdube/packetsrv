@@ -2,8 +2,7 @@ select ip.src, ip.dst, tcp.sport
 from packet
 where 
     ip.proto == 17 and
-    (udp.sport == 53 or udp.dport == 53) and
-    ether.vlan == 51
+    (udp.sport == 53 or udp.dport == 53)
 
-top 2000;
+top 20000;
 

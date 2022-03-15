@@ -1,3 +1,4 @@
+from os import wait
 from packet.layers.ethernet import (
     ETHER_TYPE_ARP,
     ETHER_TYPE_IPV4,
@@ -14,12 +15,17 @@ from packet.layers.dhcp import Dhcp
 from packet.layers.dns import Dns
 from typing import Dict
 from packet.layers.packet import Packet
+from packet.layers.layer_type import LayerID
+from json import dumps
+import base64
+
+from packet.utils.print_hex import print_hex
 
 
 class PacketBuilder:
-
     def __init__(self) -> None:
         self.layers: Dict[int, Packet] = {}
+        self.packet = None
 
     def add(self, layer: Packet):
         self.layers[layer.name] = layer
@@ -30,6 +36,7 @@ class PacketBuilder:
             print(f"{v}")
 
     def from_bytes(self, raw_packet, header=None):
+        self.packet = raw_packet
         if header is not None:
             self.add(header)
 
@@ -52,7 +59,7 @@ class PacketBuilder:
             elif ip.protocol == IP_PROTO_UDP:
                 udp = UDP(raw_packet[offset + 34 :])
                 self.add(udp)
-                if udp.src_port in [67,68] and udp.dst_port in [67, 68]:
+                if udp.src_port in [67, 68] and udp.dst_port in [67, 68]:
                     dhcp = Dhcp(udp.payload)
                     self.add(dhcp)
                 elif udp.dst_port == 53 or udp.src_port == 53:
@@ -81,6 +88,26 @@ class PacketBuilder:
         for l in self.layers.values():
             result += f"{l}\n"
         return str(result)
+
+    def export(self) -> Dict:
+        eth = self.layers[0]
+        ipv4 = self.layers[1]
+        header = self.layers[0xff]
+
+        r = bytearray(header.header) + bytearray(self.packet)
+
+        result = {
+            "ether.src": str(eth.src_mac),
+            "ether.dst": str(eth.dst_mac),
+            "ether.ethertype": eth.ethertype,
+            "ether.vlan": eth.vlan_id,
+            "ip.src": str(ipv4.src_ip),
+            "ip.dst": str(ipv4.dst_ip),
+            "ip.proto": ipv4.protocol,
+            "packet": str(base64.b64encode(r), "ascii"),
+        }
+
+        return result
 
     @property
     def layers_count(self) -> int:
