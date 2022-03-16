@@ -118,6 +118,12 @@ class Timestamp(Field):
 class MacAddress(Field):
     def __init__(self, mac) -> None:
         super().__init__(mac)
+        # mac_addr = ((raw_mac[0] as u64) & 0x00000000000000ff) << 40;
+        # mac_addr += ((raw_mac[1] as u64) & 0x00000000000000ff) << 32;
+        # mac_addr += ((raw_mac[2] as u64) & 0x00000000000000ff) << 24;
+        # mac_addr += ((raw_mac[3] as u64) & 0x00000000000000ff) << 16;
+        # mac_addr += ((raw_mac[4] as u64) & 0x00000000000000ff) << 8;
+        # mac_addr += (raw_mac[5] as u64) & 0x00000000000000ff;
 
         if isinstance(mac, str):
             self.value = self.from_string(mac)
@@ -136,6 +142,16 @@ class MacAddress(Field):
 
     def __eq__(self, other) -> bool:
         return other.value == self.value
+
+    def to_int(self) -> int:
+        response =  (self.value[0] << 40) & 0x00_00_FF_00_00_00_00_00
+        response += (self.value[1] << 32) & 0x00_00_00_FF_00_00_00_00
+        response += (self.value[2] << 24) & 0x00_00_00_00_FF_00_00_00
+        response += (self.value[3] << 16) & 0x00_00_00_00_00_FF_00_00
+        response += (self.value[4] << 8)  & 0x00_00_00_00_00_00_FF_00
+        response += self.value[5] & 0x00_00_00_00_00_00_00_FF
+
+        return response
 
     def toJSON(self):
         return json.dumps({'mac': self.__str__()})

@@ -10,4 +10,4 @@ class PqlRequest(BaseModel):
 @app.post("/pql")
 async def exec_pql(pql: PqlRequest):
     result = exec_query(pql.query)
-    return {"message": result}
+    return {"result": result}
