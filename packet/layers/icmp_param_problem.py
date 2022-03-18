@@ -1,5 +1,6 @@
 from struct import unpack
 from packet.layers.packet import Packet
+from typing import Dict
 
 """
 Parameter Problem Message
@@ -96,5 +97,15 @@ class IcmpParamProblem(Packet):
     def datagram(self) -> bytes:
         return self.packet[8:]
 
+
     def __str__(self):
         return f"ICMP Param Problem -> type: {self.type}, code: {self.code}, checksum: {self.checksum}, pointer: {self.pointer}"
+
+    def summary(self, offset: int) -> str:
+        result =  f'{" " * offset}ICMP-Parameter problem ->\n'
+        result += f'{" " * offset}   Type.......: {self.type}\n'
+        result += f'{" " * offset}   Code.......: {self.code}\n'
+        result += f'{" " * offset}   Checksum...: {self.checksum},0x{self.checksum:04x}\n'
+        result += f'{" " * offset}   Pointer....: {self.pointer}\n'
+
+        return result

@@ -1,8 +1,9 @@
 from struct import unpack
 from datetime import datetime
+from packet.layers.packet import Packet
 
 
-class PcapHeader:
+class PcapHeader(Packet):
     name = 0xFF
 
     def __init__(self, header: bytes):
@@ -30,3 +31,12 @@ class PcapHeader:
 
     def __str__(self) -> str:
         return f"Packet info -> Time sec: {self.ts_format},{self.ts_sec}, Time usec: {self.ts_usec}, Orig len: {self.orig_len}, Incl len: {self.incl_len}"
+
+    def summary(self, offset: int) -> str:
+        result =  f'{" " * offset}Frame ->\n'
+        result += f'{" " * offset}   Time......: {self.ts_format}\n'
+        result += f'{" " * offset}   Offset ms.: {self.ts_usec}\n'
+        result += f'{" " * offset}   Orig len..: {self.orig_len},0x{self.orig_len:04x} \n'
+        result += f'{" " * offset}   Incl len..: {self.incl_len},0x{self.incl_len:04x} \n'
+
+        return result

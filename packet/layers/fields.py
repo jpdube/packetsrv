@@ -4,6 +4,7 @@ from time import time_ns
 from packet.utils.print_hex import print_hex
 from typing import Tuple, List
 from ipaddress import *
+import json
 
 
 class FieldList:
@@ -117,6 +118,12 @@ class Timestamp(Field):
 class MacAddress(Field):
     def __init__(self, mac) -> None:
         super().__init__(mac)
+        # mac_addr = ((raw_mac[0] as u64) & 0x00000000000000ff) << 40;
+        # mac_addr += ((raw_mac[1] as u64) & 0x00000000000000ff) << 32;
+        # mac_addr += ((raw_mac[2] as u64) & 0x00000000000000ff) << 24;
+        # mac_addr += ((raw_mac[3] as u64) & 0x00000000000000ff) << 16;
+        # mac_addr += ((raw_mac[4] as u64) & 0x00000000000000ff) << 8;
+        # mac_addr += (raw_mac[5] as u64) & 0x00000000000000ff;
 
         if isinstance(mac, str):
             self.value = self.from_string(mac)
@@ -135,6 +142,19 @@ class MacAddress(Field):
 
     def __eq__(self, other) -> bool:
         return other.value == self.value
+
+    def to_int(self) -> int:
+        response =  (self.value[0] << 40) & 0x00_00_FF_00_00_00_00_00
+        response += (self.value[1] << 32) & 0x00_00_00_FF_00_00_00_00
+        response += (self.value[2] << 24) & 0x00_00_00_00_FF_00_00_00
+        response += (self.value[3] << 16) & 0x00_00_00_00_00_FF_00_00
+        response += (self.value[4] << 8)  & 0x00_00_00_00_00_00_FF_00
+        response += self.value[5] & 0x00_00_00_00_00_00_00_FF
+
+        return response
+
+    def toJSON(self):
+        return json.dumps({'mac': self.__str__()})
 
     @property
     def binary(self):
@@ -172,14 +192,15 @@ class IPv4Address(Field):
         return (int(ipv4.network_address), int(ipv4.broadcast_address))
 
     def from_array(self, raw_packet):
-        # print('*** FROM ARRAY ***')
-        ip = int(raw_packet[0] << 24)
-        ip += int(raw_packet[1] << 16) & 0x00FF0000
-        ip += int(raw_packet[2] << 8) & 0x0000FF00
-        ip += int(raw_packet[3]) & 0x000000FF
-        # print(f'=== {ip:x}')
+        if len(raw_packet) == 4:
+            ip = int(raw_packet[0] << 24)
+            ip += int(raw_packet[1] << 16) & 0x00FF0000
+            ip += int(raw_packet[2] << 8) & 0x0000FF00
+            ip += int(raw_packet[3]) & 0x000000FF
 
-        return ip
+            return ip
+        else:
+            return None
 
     def from_string(self, address):
         if address.count(".") == 3:

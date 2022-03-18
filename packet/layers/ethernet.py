@@ -1,7 +1,7 @@
 from packet.layers.fields import MacAddress
 from packet.layers.packet import Packet
 from struct import unpack
-# from packet.layers.layer_type import LayerID
+from packet.layers.layer_type import LayerID
 
 
 ETHER_TYPE_IPV4 = 0x0800
@@ -11,7 +11,7 @@ FRAME_TYPE_8021Q = 0x8100
 
 
 class Ethernet(Packet):
-    name = 0
+    name = LayerID.ETHERNET
 
     __slots__ = ["packet"]
 
@@ -50,6 +50,15 @@ class Ethernet(Packet):
             return self.packet[18:]
         else:
             return self.packet[14:]
+
+    def summary(self, offset: int) -> str:
+        result =  f'{" " * offset}Ethernet ->\n'
+        result += f'{" " * offset}   Dst Mac..: {self.dst_mac}\n'
+        result += f'{" " * offset}   Src Mac..: {self.src_mac}\n'
+        result += f'{" " * offset}   Ethertype: {self.ethertype},0x{self.ethertype:04x} \n'
+        result += f'{" " * offset}   Vlan ID..: {self.vlan_id}\n'
+
+        return result
 
     def __str__(self):
         return f"Ethernet -> src_mac: {self.src_mac}, dst_mac: {self.dst_mac}, protocol: {self.ethertype}, vlan_id: {self.vlan_id}"

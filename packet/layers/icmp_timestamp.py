@@ -1,5 +1,6 @@
 from struct import unpack
 from packet.layers.packet import Packet
+from typing import Dict
 
 """
 Timestamp or Timestamp Reply Message
@@ -124,5 +125,21 @@ class IcmpTimestamp(Packet):
     def xmit_ts(self) -> bytes:
         return unpack("!I", self.packet[16:20])[0]
 
+    def summary(self) -> str:
+        return 'a'
+
     def __str__(self):
         return f"ICMP Timestamp -> type: {self.type}, code: {self.code}, checksum: {self.checksum}, identifier: {self.identifier}, sequence: {self.sequence_no}, Origin ts:{self.origin_ts}, Recv ts: {self.received_ts}, Xmit ts: {self.xmit_ts}"
+
+    def summary(self, offset: int) -> str:
+        result =  f'{" " * offset}ICMP-Timestamp ->\n'
+        result += f'{" " * offset}   Type...: {self.type}\n'
+        result += f'{" " * offset}   Code...: {self.code}\n'
+        result += f'{" " * offset}   Seq no.....: {self.sequence_no},0x{self.sequence_no:04x} \n'
+        result += f'{" " * offset}   Identifier.: {self.identifier},0x{self.identifier:04x} \n'
+        result += f'{" " * offset}   Checksum...: {self.checksum},0x{self.checksum:04x}\n'
+        result += f'{" " * offset}   Origin ts..: {self.origin_ts},0x{self.origin_ts:04x}\n'
+        result += f'{" " * offset}   Recv ts....: {self.received_ts},0x{self.received_ts:04x}\n'
+        result += f'{" " * offset}   Xmit ts....: {self.xmit_ts},0x{self.xmit_ts:04x}\n'
+
+        return result

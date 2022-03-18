@@ -1,6 +1,7 @@
 from packet.layers.fields import IPv4Address, MacAddress
 from struct import unpack
 from packet.layers.packet import Packet
+from typing import Dict
 
 
 class ARP(Packet):
@@ -45,6 +46,9 @@ class ARP(Packet):
     @property
     def target_ip(self) -> IPv4Address:
         return IPv4Address(self.packet[24:28])
+
+    def summary(self) -> str:
+        return 'a'
 
     def __str__(self):
         return f"ARP -> Opcode: {self.opcode}, Htype: {self.htype}, PType: {self.ptype}, smac: {self.src_mac}, sip: {self.src_ip}, tmac: {self.target_mac}, tip: {self.target_ip}"

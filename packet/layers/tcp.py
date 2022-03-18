@@ -1,5 +1,6 @@
 from struct import unpack
 from packet.layers.packet import Packet
+from typing import Dict
 
 """
     0               1               2               3
@@ -123,6 +124,18 @@ class TCP(Packet):
     @property
     def flag_fin(self) -> bool:
         return self.flags & 0x01 == 0x01
+
+    def summary(self, offset: int) -> str:
+        result =  f'{" " * offset}TCP ->\n'
+        result += f'{" " * offset}   Src port...: {self.src_port}\n'
+        result += f'{" " * offset}   Dst port...: {self.dst_port}\n'
+        result += f'{" " * offset}   Seq no.....: {self.seq_no},0x{self.seq_no:04x} \n'
+        result += f'{" " * offset}   Ack no.....: {self.ack_no}\n'
+        result += f'{" " * offset}   Header len.: {self.header_len}\n'
+        result += f'{" " * offset}   Flags......: {self.flags}\n'
+        result += f'{" " * offset}   Checksum...: {self.checksum},0x{self.checksum:04x}\n'
+
+        return result
 
     def __str__(self) -> str:
         return f"TCP -> sport: {self.src_port} dport: {self.dst_port} SYN:{self.flag_syn} ACK:{self.flag_ack}"

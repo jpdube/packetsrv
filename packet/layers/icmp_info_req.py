@@ -1,5 +1,6 @@
 from struct import unpack
 from packet.layers.packet import Packet
+from typing import Dict
 
 """
 Information Request or Information Reply Message
@@ -99,3 +100,13 @@ class IcmpInfoReq(Packet):
 
     def __str__(self):
         return f"ICMP Info request -> type: {self.type}, code: {self.code}, checksum: {self.checksum}, identifier: {self.identifier}"
+
+    def summary(self, offset: int) -> str:
+        result =  f'{" " * offset}ICMP-Info request ->\n'
+        result += f'{" " * offset}   Type...: {self.type}\n'
+        result += f'{" " * offset}   Code...: {self.code}\n'
+        result += f'{" " * offset}   Seq no.....: {self.sequence_no},0x{self.sequence_no:04x} \n'
+        result += f'{" " * offset}   Identifier.: {self.identifier},0x{self.identifier:04x} \n'
+        result += f'{" " * offset}   Checksum...: {self.checksum},0x{self.checksum:04x}\n'
+
+        return result
