@@ -47,8 +47,19 @@ class ARP(Packet):
     def target_ip(self) -> IPv4Address:
         return IPv4Address(self.packet[24:28])
 
-    def summary(self) -> str:
-        return 'a'
+    def summary(self, offset: int) -> str:
+        result = f'{" " * offset}ARP ->\n'
+        result += f'{" " * offset}   Hardware type.: {self.htype}\n'
+        result += f'{" " * offset}   Hardware len..: {self.hlen}\n'
+        result += f'{" " * offset}   Protocl type..: {self.ptype}\n'
+        result += f'{" " * offset}   Protocol len..: {self.plen}\n'
+        result += f'{" " * offset}   Opcode........: {self.opcode}\n'
+        result += f'{" " * offset}   Src MAC.......: {self.src_mac}\n'
+        result += f'{" " * offset}   Target MAC....: {self.target_mac}\n'
+        result += f'{" " * offset}   Src IP........: {self.src_ip}\n'
+        result += f'{" " * offset}   Target IP.....: {self.target_ip}\n'
+
+        return result
 
     def __str__(self):
         return f"ARP -> Opcode: {self.opcode}, Htype: {self.htype}, PType: {self.ptype}, smac: {self.src_mac}, sip: {self.src_ip}, tmac: {self.target_mac}, tip: {self.target_ip}"
