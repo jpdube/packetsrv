@@ -48,7 +48,7 @@ class ARP(Packet):
         return IPv4Address(self.packet[24:28])
 
     def summary(self, offset: int) -> str:
-        result =  f'{" " * offset}ARP ->\n'
+        result = f'{" " * offset}ARP ->\n'
         result += f'{" " * offset}   Hardware type.: {self.htype}\n'
         result += f'{" " * offset}   Hardware len..: {self.hlen}\n'
         result += f'{" " * offset}   Protocl type..: {self.ptype}\n'
