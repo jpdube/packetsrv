@@ -1,5 +1,7 @@
+from ipaddress import IPv4Address
 from struct import unpack
 from packet.layers.packet import Packet
+from typing import Dict
 
 """
 Redirect Message
@@ -100,11 +102,20 @@ class IcmpRedirect(Packet):
 
     @property
     def gw_ip_addr(self) -> int:
-        return unpack("!I", self.packet[4:8])[0]
+        return IPv4Address(unpack("!I", self.packet[4:8])[0])
 
     @property
     def datagram(self) -> bytes:
         return self.packet[8:]
+
+    def summary(self, offset: int) -> str:
+        result =  f'{" " * offset}ICMP-Redirect ->\n'
+        result += f'{" " * offset}   Type.......: {self.type}\n'
+        result += f'{" " * offset}   Code.......: {self.code}\n'
+        result += f'{" " * offset}   Gateway IP.: {self.gw_ip_addr}\n'
+        result += f'{" " * offset}   Checksum...: {self.checksum},0x{self.checksum:04x}\n'
+
+        return result
 
     def __str__(self):
         return f"ICMP Redirect -> type: {self.type}, code: {self.code}, checksum: {self.checksum}, Gateway: {self.gw_ip_addr}"

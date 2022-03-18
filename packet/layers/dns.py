@@ -2,7 +2,6 @@ from packet.layers.packet import Packet
 from packet.layers.fields import IPv4Address
 from packet.utils.print_hex import format_hex, print_hex
 from struct import pack, unpack
-from typing import List
 
 type_values = {
     1: "1: Type(A)",
@@ -105,6 +104,16 @@ class DnsQuery:
     def __str__(self) -> str:
         return f'Labels: {self.label_list}, Type: {type_values.get(self.qtype, "Unknow")}, Class: {self.qclass}'
 
+    def summary(self, offset: int) -> str:
+        result =  f'{" " * offset}  Query ->\n'
+        result += f'{" " * offset}   Type.....: {type_values.get(self.qtype, "Undefined")}\n'
+        result += f'{" " * offset}   Class....: {self.qclass}\n'
+
+        for l in self.label_list:
+            result += f'{" " * offset}   Label....: {l}\n'
+
+        return result
+
 
 class DnsAnswer:
     def __init__(self, qtype, qclass, ttl, data_len, result) -> None:
@@ -116,6 +125,16 @@ class DnsAnswer:
 
     def __str__(self) -> str:
         return f'Answer -> Type: {type_values.get(self.qtype,"Unknow")}, Class: {self.qclass}, Ttl: {self.ttl}, Len: {self.data_len}, Data: {self.result}'
+
+    def summary(self, offset: int) -> str:
+        result =  f'{" " * offset}  Answer ->\n'
+        result += f'{" " * offset}   Type.....: {type_values.get(self.qtype, "Undefined")}\n'
+        result += f'{" " * offset}   Class....: {self.qclass}\n'
+        result += f'{" " * offset}   TTL......: {self.ttl}\n'
+        result += f'{" " * offset}   Length...: {self.data_len}\n'
+        result += f'{" " * offset}   Result...: {self.result}\n'
+
+        return result
 
 
 class Dns(Packet):
@@ -137,7 +156,7 @@ class Dns(Packet):
 
     def decode_answer(self, answer):
         for a in range(self.header.answer_rr):
-            result = 'Type not implemented yet'
+            result = "Type not implemented yet"
             start = unpack("!H", answer[0:2])[0]
             # print(f'******* Decode answer: {start:x}')
             if (start & 0xFF00) == 0xC000:
@@ -149,9 +168,9 @@ class Dns(Packet):
                 if qtype == 1:
                     result = IPv4Address(unpack("!I", answer[12 : 12 + data_len])[0])
                 elif qtype == 33:
-                    result = self.get_srv(answer[12: 12 + data_len], data_len)
+                    result = self.get_srv(answer[12 : 12 + data_len], data_len)
                 elif qtype in [5, 6]:
-                    result = self.get_labels(answer[12 : 12 + data_len ]) # -1
+                    result = self.get_labels(answer[12 : 12 + data_len])  # -1
 
                 dns_answer = DnsAnswer(qtype, qclass, ttl, data_len, result)
                 self.answer_list.append(dns_answer)
@@ -159,14 +178,13 @@ class Dns(Packet):
                 answer = answer[12 + data_len :]
 
     def get_srv(self, packet, data_len):
-        priority = unpack('!H', packet[0:2])[0]
-        weight = unpack('!H', packet[2:4])[0]
-        port = unpack('!H', packet[4:6])[0]
-        target = self.get_labels(packet[6: 6 + (data_len - 6)])
+        priority = unpack("!H", packet[0:2])[0]
+        weight = unpack("!H", packet[2:4])[0]
+        port = unpack("!H", packet[4:6])[0]
+        target = self.get_labels(packet[6 : 6 + (data_len - 6)])
         # target = unpack(f'!{data_len - 6}s', packet[6: 6 + (data_len - 6)])
 
-        return f'Priority: {priority}, Weight: {weight}, Port: {port}, Target: {target}'
-
+        return f"Priority: {priority}, Weight: {weight}, Port: {port}, Target: {target}"
 
     def get_labels(self, packet) -> str:
         result = ""
@@ -174,7 +192,7 @@ class Dns(Packet):
         pos = 0
 
         # print(f'^^^^^^ {self.header.id:x} ^^^^^^^')
-        while pos < len(packet) and packet[pos] not in [0x00, 0xc0, 0xc1]:
+        while pos < len(packet) and packet[pos] not in [0x00, 0xC0, 0xC1]:
             # print(f'====== {pos}, ')
             # print_hex(packet)
             label_len = packet[pos]
@@ -190,6 +208,16 @@ class Dns(Packet):
             result += l
             if i < len(label_list) - 1:
                 result += "."
+
+        return result
+
+    def summary(self, offset: int) -> str:
+        result = f'{" " * offset}DNS ->\n'
+
+        result += self.queries.summary(offset)
+
+        for answer in self.answer_list:
+            result += answer.summary(offset)
 
         return result
 

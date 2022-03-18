@@ -1,5 +1,6 @@
 from struct import unpack
 from packet.layers.packet import Packet
+from typing import Dict
 
 """
 Source Quench Message
@@ -97,3 +98,11 @@ class IcmpSrcQuench(Packet):
 
     def __str__(self):
         return f"ICMP Source quench -> type: {self.type}, code: {self.code}, checksum: {self.checksum}"
+
+    def summary(self, offset: int) -> str:
+        result =  f'{" " * offset}ICMP-Source quench ->\n'
+        result += f'{" " * offset}   Type...: {self.type}\n'
+        result += f'{" " * offset}   Code...: {self.code}\n'
+        result += f'{" " * offset}   Checksum...: {self.checksum},0x{self.checksum:04x}\n'
+
+        return result

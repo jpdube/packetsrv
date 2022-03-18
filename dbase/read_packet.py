@@ -35,7 +35,8 @@ def get_packet(file_id: int, ptr_list):
 
             pb = PacketBuilder()
             pb.from_bytes(packet, pcap_hdr)
-            packet_list.append(pb.export())
+            pb.summary()
+            # packet_list.append(pb.export())
             filter_count += 1
     return packet_list
 
@@ -47,7 +48,6 @@ def sql(pql: str) -> Cursor:
     conn.execute("""PRAGMA journal_mode = MEMORY;""")
     conn.execute("""PRAGMA threads = 4;""")
     conn.execute("""PRAGMA temp_store = memory;""")
-    # conn.execute("""PRAGMA locking_mode = EXCLUSIVE;""")
     cursor.execute(pql)
     rows = cursor
 
@@ -55,8 +55,8 @@ def sql(pql: str) -> Cursor:
 
 
 def query(pql: str, header=False):
-    packet_list = sql(pql)
     start_time = datetime.now()
+    packet_list = sql(pql)
     return_list = []
     count = 0
     current_id = -1

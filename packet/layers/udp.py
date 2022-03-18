@@ -1,5 +1,6 @@
 from struct import unpack
 from packet.layers.packet import Packet
+from typing import Dict
 
 
 class UDP(Packet):
@@ -28,6 +29,15 @@ class UDP(Packet):
     @property
     def payload(self) -> bytes:
         return self.packet[8:]
+
+    def summary(self, offset: int) -> str:
+        result =  f'{" " * offset}UDP ->\n'
+        result += f'{" " * offset}   Src port...: {self.src_port}\n'
+        result += f'{" " * offset}   Dst port...: {self.dst_port}\n'
+        result += f'{" " * offset}   Lenght.....: {self.length}\n'
+        result += f'{" " * offset}   Checksum...: {self.checksum},0x{self.checksum:04x}\n'
+
+        return result
 
     def __str__(self) -> str:
         return f"UDP -> Src port: {self.src_port}, Dst Port: {self.dst_port}"

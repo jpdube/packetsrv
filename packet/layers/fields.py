@@ -192,14 +192,15 @@ class IPv4Address(Field):
         return (int(ipv4.network_address), int(ipv4.broadcast_address))
 
     def from_array(self, raw_packet):
-        # print('*** FROM ARRAY ***')
-        ip = int(raw_packet[0] << 24)
-        ip += int(raw_packet[1] << 16) & 0x00FF0000
-        ip += int(raw_packet[2] << 8) & 0x0000FF00
-        ip += int(raw_packet[3]) & 0x000000FF
-        # print(f'=== {ip:x}')
+        if len(raw_packet) == 4:
+            ip = int(raw_packet[0] << 24)
+            ip += int(raw_packet[1] << 16) & 0x00FF0000
+            ip += int(raw_packet[2] << 8) & 0x0000FF00
+            ip += int(raw_packet[3]) & 0x000000FF
 
-        return ip
+            return ip
+        else:
+            return None
 
     def from_string(self, address):
         if address.count(".") == 3:

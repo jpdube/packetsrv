@@ -40,8 +40,8 @@ def build_sql(model):
             if m.include is not None:
                 include = m.include.value
 
-            sql += " WHERE "
             if m.where_expr is not None:
+                sql += " WHERE "
                 # print(f'WHERE EXPR -> {m.where_expr}')
                 sql += interpret_program(m.where_expr)
 

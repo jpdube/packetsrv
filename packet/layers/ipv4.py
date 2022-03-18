@@ -1,5 +1,6 @@
 from packet.layers.fields import IPv4Address
 from packet.layers.packet import Packet
+from typing import Dict
 
 
 from struct import unpack
@@ -99,6 +100,18 @@ class IPV4(Packet):
         if self.ihl == 6:
             offset = 4
         return self.packet[20 + offset :]
+
+    def summary(self, offset: int) -> str:
+        result =  f'{" " * offset}IPv4 ->\n'
+        result += f'{" " * offset}   Dst Addr...: {self.dst_ip}\n'
+        result += f'{" " * offset}   Src Addr...: {self.src_ip}\n'
+        result += f'{" " * offset}   Protocol...: {self.protocol},0x{self.protocol:02x} \n'
+        result += f'{" " * offset}   IHL........: {self.ihl}\n'
+        result += f'{" " * offset}   TTL........: {self.ttl}\n'
+        result += f'{" " * offset}   Flags......: {self.flags}\n'
+        result += f'{" " * offset}   Checksum...: {self.checksum},0x{self.checksum:04x}\n'
+
+        return result
 
     def __str__(self) -> str:
         return f"IPV4 -> src_ip: {self.src_ip}, dst_ip: {self.dst_ip}, proto: {self.protocol}"

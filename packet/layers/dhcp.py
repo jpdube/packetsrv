@@ -2,45 +2,47 @@ from packet.layers.fields import IPv4Address, MacAddress
 from struct import unpack
 from packet.layers.ip import IP
 from packet.layers.packet import Packet
-from packet.utils.print_hex import format_hex, print_hex
-from typing import List, Tuple
-from datetime import datetime
+from packet.utils.print_hex import format_hex
+from typing import Tuple
+
+from pql.pql import Result
 
 params_req_list = {
-    1:      'Subnet mask',
-    2:      'Time offset',
-    3:      'Router',
-    6:      'Domain name server',
-    7:      'Log server',
-    15:     'Domain name',
-    31:     'Perform router discover',
-    33:     'Static route',
-    35:     'ARP cache timeout',
-    42:     'NTP Network time protocol',
-    43:     'Vendor specific information',
-    44:     'NetBIOS over TCP/IP name server',
-    46:     'NetBIOS over TCP/IP node type',
-    47:     'NetBIOS over TCP/IP scope',
-    58:     'Renewal time value',
-    59:     'Rebinding time value',
-    66:     'TFTP server name',
-    119:    'Domain search',
-    121:    'Classless staic route',
-    150:    'TFTP server address',
-    159:    'Portparams',
-    160:    'Unassigned (ex DHCP Captive-Portal)',
-    249:    'Private/Classless static route (Microsoft)',
-    252:    'Private/Proxy autodiscovery'
+    1: "Subnet mask",
+    2: "Time offset",
+    3: "Router",
+    6: "Domain name server",
+    7: "Log server",
+    15: "Domain name",
+    31: "Perform router discover",
+    33: "Static route",
+    35: "ARP cache timeout",
+    42: "NTP Network time protocol",
+    43: "Vendor specific information",
+    44: "NetBIOS over TCP/IP name server",
+    46: "NetBIOS over TCP/IP node type",
+    47: "NetBIOS over TCP/IP scope",
+    58: "Renewal time value",
+    59: "Rebinding time value",
+    66: "TFTP server name",
+    119: "Domain search",
+    121: "Classless staic route",
+    150: "TFTP server address",
+    159: "Portparams",
+    160: "Unassigned (ex DHCP Captive-Portal)",
+    249: "Private/Classless static route (Microsoft)",
+    252: "Private/Proxy autodiscovery",
 }
 
 
 def print_bytes(bytes_list):
-    result = ''
+    result = ""
     for i, b in enumerate(bytes_list):
-        result += f'{b:02x}'
+        result += f"{b:02x}"
         if i < len(bytes_list) - 1:
-            result += ','
-    return result    
+            result += ","
+    return result
+
 
 class DHCPOption:
     def __init__(self, opt_len, option, option_no, option_name):
@@ -51,6 +53,9 @@ class DHCPOption:
 
     def decode(self):
         pass
+
+    def summary(self, offset: int) -> str:
+        return ""
 
     def __str__(self) -> str:
         return f"{self.option_no:02}: {self.option_name} -> "
@@ -115,8 +120,14 @@ class Router(DHCPOption):
     def __str__(self) -> str:
         result = f"{super().__str__()}"
         for i, r in enumerate(self.router_list):
-            result += f"{i}: {r}, "
+            result += f"{i}: {r}"
+            if i < len(self.router_list) - 1:
+                result += ', '
 
+        return result
+
+    def summary(self, offset: int) -> str:
+        result = f'{" " * offset}   {self.__str__()}\n'
         return result
 
 
@@ -139,8 +150,14 @@ class DomainNameServer(DHCPOption):
     def __str__(self) -> str:
         result = f"{super().__str__()}"
         for i, r in enumerate(self.dns_list):
-            result += f"{i}: {r}, "
+            result += f"{i}: {r}"
+            if i < len(self.dns_list) - 1:
+                result += ', '
 
+        return result
+
+    def summary(self, offset: int) -> str:
+        result = f'{" " * offset}   {self.__str__()}\n'
         return result
 
 
@@ -153,12 +170,14 @@ class Hostname(DHCPOption):
         self.decode()
 
     def decode(self):
-        self.hostname = unpack(f"!{self.opt_len}s", self.option)[0].decode(
-            "utf-8"
-        )
+        self.hostname = unpack(f"!{self.opt_len}s", self.option)[0].decode("utf-8")
 
     def __str__(self) -> str:
         return f"{super().__str__()}{self.hostname}"
+
+    def summary(self, offset: int) -> str:
+        result = f'{" " * offset}   {self.__str__()}\n'
+        return result
 
 
 # 15
@@ -177,6 +196,10 @@ class DomainName(DHCPOption):
     def __str__(self) -> str:
         return f"{super().__str__()}{self.domain_name}"
 
+    def summary(self, offset: int) -> str:
+        result = f'{" " * offset}   {self.__str__()}\n'
+        return result
+
 
 # 50
 class RequestedIPAddr(DHCPOption):
@@ -191,6 +214,10 @@ class RequestedIPAddr(DHCPOption):
 
     def __str__(self) -> str:
         return f"{super().__str__()}{self.ip_address}"
+
+    def summary(self, offset: int) -> str:
+        result = f'{" " * offset}   {self.__str__()}\n'
+        return result
 
 
 # 51
@@ -207,10 +234,15 @@ class IPAddrLeaseTime(DHCPOption):
     def __str__(self) -> str:
         return f"{super().__str__()}{self.time}"
 
+    def summary(self, offset: int) -> str:
+        result = f'{" " * offset}   {self.__str__()}\n'
+        return result
+
+
 # 55
 class ParamReqList(DHCPOption):
     def __init__(self, opt_len, option):
-        super().__init__(opt_len, option, 55, 'Parameter request list')
+        super().__init__(opt_len, option, 55, "Parameter request list")
         self.params = []
 
         self.decode()
@@ -219,11 +251,18 @@ class ParamReqList(DHCPOption):
         self.params = unpack(f"!{self.opt_len}B", self.option)
 
     def __str__(self) -> str:
-        result = ''
-        for p in self.params:
-            result += f'{p:03} {params_req_list.get(p, "Undefined param")}\n'
+        result = ""
+        for i,p in enumerate(self.params):
+            result += f'{p:03}:{params_req_list.get(p, "Undefined param")}'
+            if i < len(self.params) - 1:
+                result += ', '
 
-        return f"{super().__str__()}\n{result}"
+        return f"{super().__str__()} {result}"
+
+    def summary(self, offset: int) -> str:
+        result = f'{" " * offset}   {self.__str__()}\n'
+        return result
+
 
 # 58
 class RenewalTime(DHCPOption):
@@ -238,6 +277,10 @@ class RenewalTime(DHCPOption):
 
     def __str__(self) -> str:
         return f"{super().__str__()}{self.time}"
+
+    def summary(self, offset: int) -> str:
+        result = f'{" " * offset}   {self.__str__()}\n'
+        return result
 
 
 # 59
@@ -254,6 +297,10 @@ class RebindingTime(DHCPOption):
     def __str__(self) -> str:
         return f"{super().__str__()}{self.time}"
 
+    def summary(self, offset: int) -> str:
+        result = f'{" " * offset}   {self.__str__()}\n'
+        return result
+
 
 # 60
 class VendorClassId(DHCPOption):
@@ -268,6 +315,10 @@ class VendorClassId(DHCPOption):
 
     def __str__(self) -> str:
         return f"{super().__str__()}{self.vci}"
+
+    def summary(self, offset: int) -> str:
+        result = f'{" " * offset}   {self.__str__()}\n'
+        return result
 
 
 # 61
@@ -286,6 +337,10 @@ class ClientIdentifier(DHCPOption):
     def __str__(self) -> str:
         return f"{super().__str__()}Hw Type: {self.hw_type}, Mac: {self.mac_addr}"
 
+    def summary(self, offset: int) -> str:
+        result = f'{" " * offset}   {self.__str__()}\n'
+        return result
+
 
 # 81
 class ClientFQDN(DHCPOption):
@@ -296,17 +351,20 @@ class ClientFQDN(DHCPOption):
         self.a_rr = 0
         self.ptr_rr = 0
 
-
         self.decode()
 
     def decode(self):
-        self.flag = unpack('!B', self.option[0:1])[0]
-        self.a_rr = unpack('!B', self.option[1:2])[0]
-        self.ptr_rr = unpack('!B', self.option[2:3])[0]
-        self.fqdn = unpack(f'!{self.opt_len - 3}s', self.option[3:])[0].decode('utf-8') 
+        self.flag = unpack("!B", self.option[0:1])[0]
+        self.a_rr = unpack("!B", self.option[1:2])[0]
+        self.ptr_rr = unpack("!B", self.option[2:3])[0]
+        self.fqdn = unpack(f"!{self.opt_len - 3}s", self.option[3:])[0].decode("utf-8")
 
     def __str__(self) -> str:
         return f"{super().__str__()}Flag: {self.flag} A-RR: {self.a_rr} PTR-RR: {self.ptr_rr} FQDN: {self.fqdn}"
+
+    def summary(self, offset: int) -> str:
+        result = f'{" " * offset}   {self.__str__()}\n'
+        return result
 
 
 # 125
@@ -322,6 +380,10 @@ class VendorSpecInfo(DHCPOption):
 
     def __str__(self) -> str:
         return f"{super().__str__()}{self.vci}"
+
+    def summary(self, offset: int) -> str:
+        result = f'{" " * offset}   {self.__str__()}\n'
+        return result
 
 
 # 255
@@ -488,59 +550,6 @@ class Dhcp(Packet):
     def filename(self) -> str:
         return str(self.packet[108:236])
 
-    # @property
-    # def magic_no(self) -> int:
-    #     return unpack('!I', self.packet[0xec:0xf0])[0]
-    #
-    # @property
-    # def opcode(self) -> int:
-    #     return unpack('!B', self.packet[0xf2:0xf3])[0]
-    #
-    # @property
-    # def has_ack(self) -> bool:
-    #     return self.packet[0xf2] == 0x05
-    #
-    # @property
-    # def server_ip(self) -> IPv4Address:
-    #     if self.has_ack and self.packet[0xf3] == 0x36:
-    #         nbr_ip = self.packet[0xf3] / 4
-    #         return IPv4Address(self.packet[0xf5:0xfa])
-    #     else:
-    #         return IPv4Address(0)
-    #
-    # @property
-    # def netmask(self) -> IPv4Address:
-    #     if self.has_ack and self.packet[0xf9] == 0x01:
-    #         nbr_ip = self.packet[0xfa] / 4
-    #         return IPv4Address(self.packet[0xfb:0xff])
-    #     else:
-    #         return IPv4Address(0)
-    #
-    # @property
-    # def gateway(self) -> IPv4Address:
-    #     if self.has_ack and self.packet[0x106] == 0x03:
-    #         nbr_ip = self.packet[0x107] / 4
-    #         return IPv4Address(self.packet[0x108:0x10c])
-    #     else:
-    #         return IPv4Address(0)
-    #
-    # @property
-    # def dns_servers(self) -> List[IPv4Address]:
-    #     dns_list = []
-    #     if self.has_ack and self.packet[0x10c] == 0x06:
-    #
-    #         nbr_ip = self.packet[0x10d] / 4
-    #         print(f'*** NBR IP: {nbr_ip}')
-    #         offset = 0
-    #         for i in range(int(nbr_ip)):
-    #             dns_ip = IPv4Address(self.packet[0x10e + offset:0x10e + offset + 4])
-    #             dns_list.append(dns_ip)
-    #             offset += 4
-    #
-    #         return dns_list
-    #     else:
-    #         return [IPv4Address(0)]
-    #
     """    
     00e0: 00 00 00 00 00 00 00 00  00 00 00 00 63 82 53 63   ············c·Sc
     00f0: 35 01 05 3a 04 00 03 f4  80 3b 04 00 06 eb e0 33   5··:·····;·····3
@@ -549,6 +558,15 @@ class Dhcp(Packet):
     0120: 03 e6 c0 a8 02 e6 0f 0e  6c 61 6c 6c 69 65 72 2e   ········lallier.
     0130: 6c 6f 63 61 6c 00 ff                               local··
     """
+
+    def summary(self, offset: int) -> str:
+        result = f'{" " * offset}DHCP ->\n'
+        result += f'{" " * offset}   Opcode.....: {self.msg_type}\n'
+
+        for opt in self.option_list:
+            result += opt.summary(offset)
+
+        return result
 
     def __str__(self):
         result = f"DHCP -> Opcode: {self.msg_type}, Xid: {self.xid:x}, Lease sec: {self.sec}\n{format_hex(self.packet)}\n********\n"

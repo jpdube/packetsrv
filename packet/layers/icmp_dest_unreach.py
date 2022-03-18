@@ -83,6 +83,7 @@ from packet.layers.ipv4 import IPV4
 from pql.model import IPv4
 from packet.utils.print_hex import format_hex
 from packet.layers.packet import Packet
+from typing import Dict
 
 
 class IcmpDestUnreach(Packet):
@@ -107,5 +108,17 @@ class IcmpDestUnreach(Packet):
     def datagram(self) -> IPV4:
         return IPV4(self.packet[8:])
 
+    def summary(self, offset: int) -> str:
+        return 'a'
+
     def __str__(self):
         return f"ICMP Dest unreachable -> type: {self.type}, code: {self.code}, checksum: {self.checksum:x}, src_ip: {self.datagram.src_ip}, dst_ip: {self.datagram.dst_ip}"
+
+    def summary(self, offset: int) -> str:
+        result =  f'{" " * offset}ICMP-Destination unreachable ->\n'
+        result += f'{" " * offset}   Type.......: {self.type}\n'
+        result += f'{" " * offset}   Code.......: {self.code}\n'
+        result += f'{" " * offset}   Checksum...: {self.checksum},0x{self.checksum:04x}\n'
+        result += f'{" " * offset}   Datagram...: {self.datagram}\n'
+
+        return result

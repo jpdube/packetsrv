@@ -4,3 +4,4 @@ uvicorn==0.17.5
 mypy==0.931
 black==22.1.0
 pytest
+numpy

@@ -21,6 +21,7 @@ from packet.layers.layer_type import LayerID
 from json import dumps
 import base64
 
+
 from packet.utils.print_hex import print_hex
 
 
@@ -46,6 +47,7 @@ class PacketBuilder:
         offset = 0
         if e.frametype == 0x8100:
             offset = 4
+
         self.add(e)
         if e.ethertype == ETHER_TYPE_ARP:
             arp = ARP(raw_packet[offset + 14:])
@@ -53,8 +55,8 @@ class PacketBuilder:
 
         if e.ethertype == ETHER_TYPE_IPV4:
             ip = IPV4(raw_packet[offset + 14:])
-
             self.add(ip)
+
             if ip.protocol == IP_PROTO_TCP:
                 tcp = TCP(raw_packet[offset + 34:])
                 self.add(tcp)
@@ -131,6 +133,10 @@ class PacketBuilder:
                 result["incl_len"] = layer.incl_len
 
         return result
+
+    def summary(self):
+        for i,p in enumerate(self.layers.values()):
+            print(f'{i}:{p.summary(offset=i * 2)}')
 
     @property
     def layers_count(self) -> int:
