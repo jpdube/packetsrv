@@ -1,5 +1,4 @@
 select ip.src, ip.dst, tcp.sport
 from packet
-where udp.sport == 67
-
-top 150;
+where ether.vlan == 61
+top 5000;

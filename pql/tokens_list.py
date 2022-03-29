@@ -27,6 +27,9 @@ class Tok(Enum):
     BREAK = auto()
     EOL = auto()
     EOF = auto()
+    WITH = auto()
+    FILTER = auto()
+    OUTPUT = auto()
 
     #--- Types
     INTEGER = auto()

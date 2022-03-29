@@ -55,8 +55,8 @@ def sql(pql: str) -> Cursor:
 
 
 def query(pql: str, header=False):
-    start_time = datetime.now()
     packet_list = sql(pql)
+    start_time = datetime.now()
     return_list = []
     count = 0
     current_id = -1

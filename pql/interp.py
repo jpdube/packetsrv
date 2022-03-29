@@ -27,7 +27,7 @@ def interpret(node, env):
     elif isinstance(node, IPv4):
         return node.to_int
 
-    elif isinstance(node, SelectStatement):
+    elif isinstance(node, WithStatement):
         value = interpret(node.value, env)
         print(value)
         return None

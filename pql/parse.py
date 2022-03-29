@@ -1,6 +1,6 @@
 from packet.layers.ipv4 import IPV4
 from pql.model import *
-from pql.scanner import Scanner
+from pql.lexer import Lexer
 from pql.tokens_list import Tok
 
 
@@ -26,12 +26,13 @@ class Tokenizer:
 
     def expect(self, *token_type):
         token = self.peek(*token_type)
-        if not token:
-            print(
-                f"**** SYNTAX ERROR AT:{token_type},{self.lookahead.line}:{self.lookahead.col}"
-            )
-            # raise SyntaxError()
-        else:
+        # if not token:
+        #     print(
+        #         f"**** SYNTAX ERROR EXPECTED:{token_type},{self.lookahead.line}:{self.lookahead.col}"
+        #     )
+        #     raise SyntaxError()
+        # else:
+        if token:
             self.lookahead = None
             return token
 
@@ -60,8 +61,10 @@ def parse_stmt(tokens):
         return parse_continue(tokens)
     elif tokens.peek(Tok.BREAK):
         return parse_break(tokens)
-    elif tokens.peek(Tok.SELECT):
-        return parse_select(tokens)
+    elif tokens.peek(Tok.WITH):
+        return parse_with(tokens)
+    # elif tokens.peek(Tok.SELECT):
+    #     return parse_select(tokens)
     else:
         return None
 
@@ -83,6 +86,56 @@ def parse_assignment(tokens):
     value = parse_expression(tokens)
     tokens.expect(Tok.SEMI)
     return Store(var_name.value, value)
+
+def parse_with(tokens):
+    tokens.expect(Tok.WITH)
+    sniffer = None
+    if tokens.peek(Tok.NAME):
+        sniffer = tokens.expect(Tok.NAME)
+
+    where_value = None
+    tok_where = tokens.expect(Tok.FILTER)
+    if tok_where:
+        where_value = parse_expression(tokens)
+    else:
+        print(f'SYNTAX ERROR EXPECTED FILTER AT') # {tok_where.line}:{tok_where.col}')
+        return
+
+    tokens.expect(Tok.OUTPUT)
+    fields = []
+    if tokens.peek(Tok.WILDCARD):
+        field = tokens.expect(Tok.WILDCARD)
+        fields.append(Label("*"))
+    else:
+        while True:
+            field = tokens.expect(Tok.NAME)
+            # print(f'SELECT fields: {field}')
+            if field:
+                fields.append(Label(field.value))
+
+            if tokens.accept(Tok.DELIMITER) is None:
+                break
+
+    top_value = None
+    if tokens.peek(Tok.TOP):
+        tokens.expect(Tok.TOP)
+        top_value = parse_expression(tokens)
+
+    limit_fields = []
+    if tokens.peek(Tok.LIMIT):
+        tokens.expect(Tok.LIMIT)
+        offset = tokens.expect(Tok.INTEGER)
+        limit_fields.append(offset)
+        tokens.expect(Tok.DELIMITER)
+        limit = tokens.expect(Tok.INTEGER)
+        limit_fields.append(limit)
+
+    tokens.expect(Tok.SEMI)
+    return WithStatement(sniffer, fields, where_value, top_value, limit_fields)
+    # return SelectStatement(fields,
+    #     from_fields, include_field, where_value, top_value, limit_fields
+    # )
+
 
 
 def parse_select(tokens):
@@ -349,11 +402,11 @@ def parse_continue(tokens):
 
 
 def parse_source(text):
-    scanner = Scanner(text)
-    tokens = scanner.tokenize()
+    lexer = Lexer(text)
+    tokens = lexer.tokenize()
     for t in tokens:
         print(t)
-    tokens = scanner.tokenize()
+    tokens = lexer.tokenize()
     model = parse_prog(Tokenizer(tokens))  # You need to implement this part
     return model
 

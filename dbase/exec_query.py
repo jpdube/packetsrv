@@ -20,7 +20,7 @@ def build_sql(model):
     include = 'packet'
 
     for m in model:
-        if isinstance(m, SelectStatement):
+        if isinstance(m, WithStatement):
             sql += '*'
             # for i, f in enumerate(m.value):
             #     if f.index:
@@ -33,17 +33,17 @@ def build_sql(model):
             #     sql += "file_ptr, file_id"
 
             sql += " FROM "
-            for s in m.from_fields:
-                sql += f" packet"
+            # for s in m.from_fields:
+            sql += f" packet"
                 # sql += f" {s.value}"
 
-            if m.include is not None:
-                include = m.include.value
+            # if m.include is not None:
+            #     include = m.include.value
 
-            if m.where_expr is not None:
+            if m.filter_expr is not None:
                 sql += " WHERE "
                 # print(f'WHERE EXPR -> {m.where_expr}')
-                sql += interpret_program(m.where_expr)
+                sql += interpret_program(m.filter_expr)
 
             # if m.between_expr is not None:
             #     if m.where_expr is not None:

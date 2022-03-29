@@ -106,6 +106,29 @@ class Date(Expression):
         return f"Date ({self.value})"
 
 
+class WithStatement(Statement):
+    def __init__(
+        self,
+        with_fields,
+        include_field,
+        filter_expr,
+        top_expr=None,
+        limit_expr=None,
+    ):
+        self.with_field = with_fields
+        self.include = include_field
+        self.filter_expr = filter_expr
+        self.top_expr = top_expr
+        self.offset = None
+        self.limit = None
+        if isinstance(limit_expr, List) and len(limit_expr) == 2:
+            self.offset = limit_expr[0]
+            self.limit = limit_expr[1]
+
+    def __repr__(self) -> str:
+        return f"With: {repr(self.with_field)}, Include: {self.include}, Filter: {repr(self.filter_expr)}, Top: {self.top_expr}, Limit: {self.offset},{self.limit}"
+
+
 class SelectStatement(Statement):
     def __init__(
         self,
