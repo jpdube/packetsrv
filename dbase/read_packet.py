@@ -35,7 +35,7 @@ def get_packet(file_id: int, ptr_list):
 
             pb = PacketBuilder()
             pb.from_bytes(packet, pcap_hdr)
-            pb.summary()
+            # pb.summary()
             # packet_list.append(pb.export())
             filter_count += 1
     return packet_list

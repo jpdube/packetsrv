@@ -1,6 +1,6 @@
 # This is a comment
 with sniffer_01
-filter ip.src in 192.168.3.0/24 and (udp.sport == 53)
+filter ip.src in 192.168.3.0/24
 output summary 
-top 3;
+top 500;
 

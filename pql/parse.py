@@ -94,12 +94,13 @@ def parse_with(tokens):
         sniffer = tokens.expect(Tok.NAME)
 
     where_value = None
-    tok_where = tokens.expect(Tok.FILTER)
-    if tok_where:
-        where_value = parse_expression(tokens)
-    else:
-        print(f'SYNTAX ERROR EXPECTED FILTER AT') # {tok_where.line}:{tok_where.col}')
-        return
+    if tokens.peek(Tok.FILTER):
+        tok_where = tokens.expect(Tok.FILTER)
+        if tok_where:
+            where_value = parse_expression(tokens)
+        else:
+            print(f'SYNTAX ERROR EXPECTED FILTER AT') # {tok_where.line}:{tok_where.col}')
+            return
 
     tokens.expect(Tok.OUTPUT)
     fields = []
