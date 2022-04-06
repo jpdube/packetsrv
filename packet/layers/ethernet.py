@@ -2,6 +2,7 @@ from packet.layers.fields import MacAddress
 from packet.layers.packet import Packet
 from struct import unpack
 from packet.layers.layer_type import LayerID
+from typing import Dict
 
 
 ETHER_TYPE_IPV4 = 0x0800
@@ -30,11 +31,11 @@ class Ethernet(Packet):
             return unpack("!H", self.packet[12:14])[0]
 
     @property
-    def src_mac(self) -> MacAddress:
+    def dst_mac(self) -> MacAddress:
         return MacAddress(self.packet[:6])
 
     @property
-    def dst_mac(self) -> MacAddress:
+    def src_mac(self) -> MacAddress:
         return MacAddress(self.packet[6:12])
 
     @property
@@ -57,8 +58,25 @@ class Ethernet(Packet):
         result += f'{" " * offset}   Src Mac..: {self.src_mac}\n'
         result += f'{" " * offset}   Ethertype: {self.ethertype},0x{self.ethertype:04x} \n'
         result += f'{" " * offset}   Vlan ID..: {self.vlan_id}\n'
-
         return result
 
     def __str__(self):
         return f"Ethernet -> src_mac: {self.src_mac}, dst_mac: {self.dst_mac}, protocol: {self.ethertype}, vlan_id: {self.vlan_id}"
+
+    def get_field(self, fieldname: str):
+        field = fieldname.split('.')[1]
+        if field:
+            match field:
+                case 'dst':
+                    return self.dst_mac
+                case 'src':
+                    return self.src_mac
+                case 'vlan':
+                    return self.vlan_id
+                case 'ethertype':
+                    return self.ethertype
+                case _:
+                    return 0
+        else:
+            return 0
+            
