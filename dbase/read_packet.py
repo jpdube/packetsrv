@@ -36,7 +36,8 @@ def get_packet(file_id: int, ptr_list):
             pb = PacketBuilder()
             pb.from_bytes(packet, pcap_hdr)
             # pb.summary()
-            # packet_list.append(pb.export())
+            # print(f'ETH -> dst: {pb.get_field("eth.dst")}, Src: {pb.get_field("eth.src")}, Vlan: {pb.get_field("eth.vlan")}, Ethertype: {pb.get_field("eth.ethertype"):04x}, Src IP: {pb.get_field("ip.src")} Dst IP: {pb.get_field("ip.dst")}, UDP Dst: {pb.get_field("udp.dst")}, UDP Src: {pb.get_field("udp.src")}')
+            packet_list.append(pb.export())
             filter_count += 1
     return packet_list
 
@@ -49,14 +50,14 @@ def sql(pql: str) -> Cursor:
     conn.execute("""PRAGMA threads = 4;""")
     conn.execute("""PRAGMA temp_store = memory;""")
     cursor.execute(pql)
-    rows = cursor
+    # rows = cursor.fetchall()
 
-    return rows
+    return cursor
 
 
 def query(pql: str, header=False):
-    packet_list = sql(pql)
     start_time = datetime.now()
+    packet_list = sql(pql)
     return_list = []
     count = 0
     current_id = -1
