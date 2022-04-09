@@ -51,18 +51,18 @@ class PacketBuilder:
 
         self.add(e)
         if e.ethertype == ETHER_TYPE_ARP:
-            arp = ARP(raw_packet[offset + 14 :])
+            arp = ARP(raw_packet[offset + 14:])
             self.add(arp)
 
         if e.ethertype == ETHER_TYPE_IPV4:
-            ip = IPV4(raw_packet[offset + 14 :])
+            ip = IPV4(raw_packet[offset + 14:])
             self.add(ip)
 
             if ip.protocol == IP_PROTO_TCP:
-                tcp = TCP(raw_packet[offset + 34 :])
+                tcp = TCP(raw_packet[offset + 34:])
                 self.add(tcp)
             elif ip.protocol == IP_PROTO_UDP:
-                udp = UDP(raw_packet[offset + 34 :])
+                udp = UDP(raw_packet[offset + 34:])
                 self.add(udp)
                 if udp.src_port in [67, 68] and udp.dst_port in [67, 68]:
                     dhcp = Dhcp(udp.payload)
@@ -71,21 +71,21 @@ class PacketBuilder:
                     dns = Dns(udp.payload)
                     self.add(dns)
             elif ip.protocol == IP_PROTO_ICMP:
-                icmp = icmp_builder(raw_packet[offset + 34 :])
+                icmp = icmp_builder(raw_packet[offset + 34:])
                 self.add(icmp)
 
         if e.ethertype == ETHER_TYPE_IPV6:
-            ip = IPV6(raw_packet[offset + 14 :])
+            ip = IPV6(raw_packet[offset + 14:])
 
             self.add(ip)
             if ip.protocol == IP_PROTO_TCP:
-                tcp = TCP(raw_packet[offset + 40 :])
+                tcp = TCP(raw_packet[offset + 40:])
                 self.add(tcp)
             elif ip.protocol == IP_PROTO_UDP:
-                udp = UDP(raw_packet[offset + 40 :])
+                udp = UDP(raw_packet[offset + 40:])
                 self.add(udp)
             elif ip.protocol == IP_PROTO_ICMP:
-                icmp = icmp_builder(raw_packet[offset + 34 :])
+                icmp = icmp_builder(raw_packet[offset + 34:])
                 self.add(icmp)
 
     def __str__(self) -> str:
@@ -151,7 +151,7 @@ class PacketBuilder:
     def get_layer(self, layer_id) -> Packet | None:
         return self.layers.get(layer_id, None)
 
-    def get_field(self, field: str) -> int | None:
+    def get_field(self, field: str) -> int | str | None:
         pkt_name = field.split('.')[0]
         match pkt_name:
             case 'eth':
@@ -162,7 +162,7 @@ class PacketBuilder:
                 ip = self.get_layer(LayerID.IPV4)
                 if ip:
                     return ip.get_field(field)
-                
+
             case 'tcp':
                 tcp = self.get_layer(LayerID.TCP)
                 if tcp:
