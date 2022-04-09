@@ -1,6 +1,7 @@
 from packet.layers.fields import IPv4Address
 from packet.layers.packet import Packet
 from typing import Dict
+from packet.layers.layer_type import LayerID
 
 
 from struct import unpack
@@ -32,7 +33,7 @@ IP_PROTO_ICMP = 0x01
 
 
 class IPV4(Packet):
-    name = 1
+    name = LayerID.IPV4
 
     __slots__ = ["packet"]
 
@@ -115,3 +116,34 @@ class IPV4(Packet):
 
     def __str__(self) -> str:
         return f"IPV4 -> src_ip: {self.src_ip}, dst_ip: {self.dst_ip}, proto: {self.protocol}"
+
+    def get_field(self, fieldname: str):
+        field = fieldname.split('.')[1]
+        if field:
+            match field:
+                case 'version':
+                    return self.version
+                case 'tos':
+                    return self.tos
+                case 'length':
+                    return self.total_len
+                case 'id':
+                    return self.identification
+                case 'flags':
+                    return self.flags
+                case 'frag_offset':
+                    return self.frag_offset
+                case 'ttl':
+                    return self.ttl
+                case 'protocol':
+                    return self.protocol
+                case 'checksum':
+                    return self.checksum
+                case 'src':
+                    return self.src_ip
+                case 'dst':
+                    return self.dst_ip
+                case _:
+                    return 0
+        else:
+            return 0
