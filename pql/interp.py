@@ -1,6 +1,7 @@
 # interp.py
 
 from pql.model import *
+from datetime import datetime, timedelta
 
 
 def interpret_program(model):
@@ -27,7 +28,23 @@ def interpret(node, env):
     elif isinstance(node, IPv4):
         return node.to_int
 
-    elif isinstance(node, SelectStatement):
+    elif isinstance(node, Now):
+        time_result = datetime.fromtimestamp(node.value)
+        match node.modifier:
+            case "s":
+                time_result -= timedelta(seconds=node.offset)
+            case "m":
+                time_result -= timedelta(minutes=node.offset)
+            case "h":
+                time_result -= timedelta(hours=node.offset)
+            case "d":
+                time_result -= timedelta(days=node.offset)
+            case "w":
+                time_result -= timedelta(weeks=node.offset)
+
+        return int(round(time_result.timestamp()))
+
+    elif isinstance(node, WithStatement):
         value = interpret(node.value, env)
         print(value)
         return None

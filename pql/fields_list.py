@@ -8,6 +8,7 @@ class Field:
 
 field_list = {
     "packet":               Field("packet", False),
+    "timestamp":            Field("timestamp", True),
     "*":                    Field("*", True),
     "ether.mac.src":        Field("mac_src", True),
     "ether.mac.dst":        Field("mac_dst", True),

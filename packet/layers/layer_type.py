@@ -11,3 +11,5 @@ class LayerID(Enum):
     ARP = auto()
     ICMP = auto()
     HEADER = auto()
+    UNDEFINED = auto()
+    DHCP = auto()

@@ -1,0 +1,6 @@
+# This is a comment
+with sniffer_01
+filter timestamp >= now(-4w) and timestamp <= now()
+output summary
+top 100000;
+

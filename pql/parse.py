@@ -1,6 +1,6 @@
 from packet.layers.ipv4 import IPV4
 from pql.model import *
-from pql.scanner import Scanner
+from pql.lexer import Lexer
 from pql.tokens_list import Tok
 
 
@@ -26,12 +26,13 @@ class Tokenizer:
 
     def expect(self, *token_type):
         token = self.peek(*token_type)
-        if not token:
-            print(
-                f"**** SYNTAX ERROR AT:{token_type},{self.lookahead.line}:{self.lookahead.col}"
-            )
-            # raise SyntaxError()
-        else:
+        # if not token:
+        #     print(
+        #         f"**** SYNTAX ERROR EXPECTED:{token_type},{self.lookahead.line}:{self.lookahead.col}"
+        #     )
+        #     raise SyntaxError()
+        # else:
+        if token:
             self.lookahead = None
             return token
 
@@ -60,8 +61,10 @@ def parse_stmt(tokens):
         return parse_continue(tokens)
     elif tokens.peek(Tok.BREAK):
         return parse_break(tokens)
-    elif tokens.peek(Tok.SELECT):
-        return parse_select(tokens)
+    elif tokens.peek(Tok.WITH):
+        return parse_with(tokens)
+    # elif tokens.peek(Tok.NOW):
+    #     return parse_now(tokens)
     else:
         return None
 
@@ -85,8 +88,23 @@ def parse_assignment(tokens):
     return Store(var_name.value, value)
 
 
-def parse_select(tokens):
-    tokens.expect(Tok.SELECT)
+def parse_with(tokens):
+    tokens.expect(Tok.WITH)
+    sniffer = None
+    if tokens.peek(Tok.NAME):
+        sniffer = tokens.expect(Tok.NAME)
+
+    where_value = None
+    if tokens.peek(Tok.FILTER):
+        tok_where = tokens.expect(Tok.FILTER)
+        if tok_where:
+            where_value = parse_expression(tokens)
+        else:
+            # {tok_where.line}:{tok_where.col}')
+            print(f'SYNTAX ERROR EXPECTED FILTER AT')
+            return
+
+    tokens.expect(Tok.OUTPUT)
     fields = []
     if tokens.peek(Tok.WILDCARD):
         field = tokens.expect(Tok.WILDCARD)
@@ -100,23 +118,6 @@ def parse_select(tokens):
 
             if tokens.accept(Tok.DELIMITER) is None:
                 break
-
-    tokens.expect(Tok.FROM)
-    from_fields = []
-    while True:
-        ffield = tokens.expect(Tok.NAME)
-        if ffield:
-            from_fields.append(Label(ffield.value))
-        if tokens.accept(Tok.DELIMITER) is None:
-            break
-
-    tokens.expect(Tok.INCLUDE)
-    include_field = tokens.expect(Tok.NAME)
-
-    where_value = None
-    if tokens.peek(Tok.WHERE):
-        tokens.expect(Tok.WHERE)
-        where_value = parse_expression(tokens)
 
     top_value = None
     if tokens.peek(Tok.TOP):
@@ -133,9 +134,7 @@ def parse_select(tokens):
         limit_fields.append(limit)
 
     tokens.expect(Tok.SEMI)
-    return SelectStatement(fields,
-        from_fields, include_field, where_value, top_value, limit_fields
-    )
+    return WithStatement(sniffer, fields, where_value, top_value, limit_fields)
 
 
 def parse_print(tokens):
@@ -172,11 +171,6 @@ def parse_float(tokens):
 
 def parse_ipv4(tokens):
     token = tokens.expect(Tok.IPV4)
-    # if tokens.peek("MASK"):
-    #     tokens.expect("MASK")
-    #     mask = tokens.expect("INTEGER")
-    #     return IPv4(token.value, mask.value)
-    # else:
     print(f"*** -> IPV4 parse: {token.value}")
     return IPv4(token.value)
 
@@ -245,7 +239,8 @@ def parse_and(tokens):
 
 def parse_relation(tokens):
     leftval = parse_sum(tokens)
-    optok = tokens.accept(Tok.LT, Tok.LE, Tok.GT, Tok.GE, Tok.EQ, Tok.NE, Tok.IN)
+    optok = tokens.accept(Tok.LT, Tok.LE, Tok.GT,
+                          Tok.GE, Tok.EQ, Tok.NE, Tok.IN)
     if not optok:
         return leftval
     return BinOp(optok.value, leftval, parse_sum(tokens))
@@ -297,6 +292,27 @@ def parse_factor(tokens):
         return parse_load(tokens)
     elif tokens.peek(Tok.LPAREN):
         return parse_grouping(tokens)
+    elif tokens.peek(Tok.NOW):
+        return parse_now(tokens)
+
+
+def parse_now(tokens):
+    modifier = 'h'
+    offset = 0
+
+    now_tok = tokens.expect(Tok.NOW)
+    tokens.expect(Tok.LPAREN)
+
+    if not tokens.peek(Tok.RPAREN):
+        tokens.expect(Tok.MINUS)
+        offset = tokens.expect(Tok.INTEGER).value
+
+        if tokens.peek(Tok.NAME):
+            modifier = tokens.expect(Tok.NAME).value
+
+    tokens.expect(Tok.RPAREN)
+
+    return Now(int(offset), modifier)
 
 
 def parse_bool(tokens):
@@ -349,11 +365,11 @@ def parse_continue(tokens):
 
 
 def parse_source(text):
-    scanner = Scanner(text)
-    tokens = scanner.tokenize()
+    lexer = Lexer(text)
+    tokens = lexer.tokenize()
     for t in tokens:
         print(t)
-    tokens = scanner.tokenize()
+    tokens = lexer.tokenize()
     model = parse_prog(Tokenizer(tokens))  # You need to implement this part
     return model
 

@@ -4,7 +4,7 @@ import sqlite3
 import json
 from datetime import datetime
 from packet.layers.pcap_header import PcapHeader
-from packet.layers.packet_builder import PacketBuilder 
+from packet.layers.packet_builder import PacketBuilder
 
 db_filename = "/Users/jpdube/hull-voip/db/index.db"
 pcap_path = "/Users/jpdube/hull-voip/db/pcap"
@@ -17,6 +17,7 @@ FILE_ID = 11
 PACKET_PTR = 10
 
 filter_count = 0
+
 
 def get_packet(file_id: int, ptr_list):
     global filter_count
@@ -35,10 +36,12 @@ def get_packet(file_id: int, ptr_list):
 
             pb = PacketBuilder()
             pb.from_bytes(packet, pcap_hdr)
-            pb.summary()
+            # pb.summary()
+            # print(f"""ETH -> Dst: {pb.get_field("eth.dst")}, Src: {pb.get_field("eth.src")}, Vlan: {pb.get_field("eth.vlan")}, Ethertype: {pb.get_field("eth.ethertype"):04x}, Src IP: {pb.get_field("ip.src")}\tDst IP: {pb.get_field("ip.dst")},\tUDP Dst: {pb.get_field("udp.dst")}, UDP Src: {pb.get_field("udp.src")}""")
             # packet_list.append(pb.export())
             filter_count += 1
     return packet_list
+
 
 def sql(pql: str) -> Cursor:
     conn = sqlite3.connect(db_filename)
@@ -49,9 +52,9 @@ def sql(pql: str) -> Cursor:
     conn.execute("""PRAGMA threads = 4;""")
     conn.execute("""PRAGMA temp_store = memory;""")
     cursor.execute(pql)
-    rows = cursor
+    # rows = cursor.fetchall()
 
-    return rows
+    return cursor
 
 
 def query(pql: str, header=False):

@@ -101,7 +101,7 @@ class IcmpRedirect(Packet):
         return unpack("!H", self.packet[2:4])[0]
 
     @property
-    def gw_ip_addr(self) -> int:
+    def gw_ip_addr(self) -> IPv4Address:
         return IPv4Address(unpack("!I", self.packet[4:8])[0])
 
     @property
