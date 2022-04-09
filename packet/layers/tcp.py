@@ -1,5 +1,6 @@
 from struct import unpack
 from packet.layers.packet import Packet
+from packet.layers.layer_type import LayerID
 from typing import Dict
 
 """
@@ -28,7 +29,7 @@ from typing import Dict
 
 
 class TCP(Packet):
-    name = 3
+    name = LayerID.TCP
 
     __slots__ = ["packet"]
 
@@ -139,3 +140,34 @@ class TCP(Packet):
 
     def __str__(self) -> str:
         return f"TCP -> sport: {self.src_port} dport: {self.dst_port} SYN:{self.flag_syn} ACK:{self.flag_ack}"
+
+    def get_field(self, fieldname: str):
+        field = fieldname.split('.')[1]
+        if field:
+            match field:
+                case 'seq_no':
+                    return self.seq_no
+                case 'ack_no':
+                    return self.ack_no
+                case 'length':
+                    return self.header_len
+                case 'window':
+                    return self.window
+                case 'checksum':
+                    return self.checksum
+                case 'urgent_ptr':
+                    return self.urgent_ptr
+                case 'flag_syn':
+                    return self.flag_syn
+                case 'flag_ack':
+                    return self.flag_ack
+                case 'checksum':
+                    return self.checksum
+                case 'src':
+                    return self.src_port
+                case 'dst':
+                    return self.dst_port
+                case _:
+                    return 0
+        else:
+            return 0

@@ -1,10 +1,11 @@
 from struct import unpack
 from packet.layers.packet import Packet
+from packet.layers.layer_type import LayerID
 from typing import Dict
 
 
 class UDP(Packet):
-    name = 4
+    name = LayerID.UDP
     __slots__ = ["packet"]
 
     def __init__(self, packet):
@@ -41,3 +42,20 @@ class UDP(Packet):
 
     def __str__(self) -> str:
         return f"UDP -> Src port: {self.src_port}, Dst Port: {self.dst_port}"
+
+    def get_field(self, fieldname: str):
+        field = fieldname.split('.')[1]
+        if field:
+            match field:
+                case 'length':
+                    return self.length
+                case 'checksum':
+                    return self.checksum
+                case 'src':
+                    return self.src_port
+                case 'dst':
+                    return self.dst_port
+                case _:
+                    return 0
+        else:
+            return 0

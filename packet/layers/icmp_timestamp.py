@@ -114,19 +114,16 @@ class IcmpTimestamp(Packet):
         return unpack("!H", self.packet[6:8])[0]
 
     @property
-    def origin_ts(self) -> bytes:
+    def origin_ts(self) -> int:
         return unpack("!I", self.packet[8:12])[0]
 
     @property
-    def received_ts(self) -> bytes:
+    def received_ts(self) -> int:
         return unpack("!I", self.packet[12:16])[0]
 
     @property
-    def xmit_ts(self) -> bytes:
+    def xmit_ts(self) -> int:
         return unpack("!I", self.packet[16:20])[0]
-
-    def summary(self) -> str:
-        return 'a'
 
     def __str__(self):
         return f"ICMP Timestamp -> type: {self.type}, code: {self.code}, checksum: {self.checksum}, identifier: {self.identifier}, sequence: {self.sequence_no}, Origin ts:{self.origin_ts}, Recv ts: {self.received_ts}, Xmit ts: {self.xmit_ts}"

@@ -1,9 +1,10 @@
 from packet.layers.fields import IPv4Address, MacAddress
 from struct import unpack
 from packet.layers.ip import IP
+from packet.layers.layer_type import LayerID
 from packet.layers.packet import Packet
 from packet.utils.print_hex import format_hex
-from typing import Tuple
+from typing import Tuple, List
 
 from pql.pql import Result
 
@@ -396,7 +397,8 @@ class MagicCookie(DHCPOption):
 
 
 class Dhcp(Packet):
-    name = 5
+    name = LayerID.DHCP
+
     __slots__ = ["packet"]
 
     def __init__(self, packet):
