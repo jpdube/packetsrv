@@ -93,6 +93,10 @@ class Lexer:
                     self.pos = len(self.text)
                 continue
 
+            # --- Timespan
+            elif self.is_timespan():
+                print(f'TIMESPAN FOUND')
+
             # --- String
             elif self.is_string():
                 token = self.read_string()
@@ -216,3 +220,5 @@ class Lexer:
         self.col += self.pos - (self.pos - len(value))
         return token
         
+    def is_timespan(self) -> bool:
+        return False

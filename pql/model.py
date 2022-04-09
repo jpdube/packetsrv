@@ -93,6 +93,13 @@ class Label(Expression):
     def __repr__(self):
         return f"Label({self._value})"
 
+class Function(Statement):
+    def __init__(self, name: str, params) -> None:
+        self.name = name
+        self.params = params
+
+    def __repr__(self) -> str:
+        return f"Function {self.name} ({self.params})"
 
 class Date(Expression):
     def __init__(self, value):
@@ -105,6 +112,14 @@ class Date(Expression):
     def __repr__(self):
         return f"Date ({self.value})"
 
+class Now(Expression):
+    def __init__(self, offset=0, modifier='h'):
+        self.value = int(datetime.now().timestamp())
+        self.offset = offset
+        self.modifier = modifier
+
+    def __repr__(self) -> str:
+        return f"Now ({self.value}, {self.offset}, {self.modifier})"
 
 class WithStatement(Statement):
     def __init__(
