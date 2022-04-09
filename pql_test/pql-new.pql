@@ -1,6 +1,6 @@
 # This is a comment
 with sniffer_01
-filter ip.src in 192.168.3.0/24
-output summary 
-top 500;
+filter timestamp >= now(-4w) and timestamp <= now()
+output summary
+top 100000;
 
