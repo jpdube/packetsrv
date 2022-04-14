@@ -8,6 +8,7 @@ class Tokenizer:
     def __init__(self, tokens):
         self.tokens = tokens
         self.lookahead = None
+        self.prev_token = None
 
     def peek(self, *token_type):
         if self.lookahead is None:
@@ -24,15 +25,22 @@ class Tokenizer:
             self.lookahead = None
         return token
 
-    def expect(self, *token_type):
+    def expect(self, *token_type, error_msg=""):
         token = self.peek(*token_type)
-        # if not token:
-        #     print(
-        #         f"**** SYNTAX ERROR EXPECTED:{token_type},{self.lookahead.line}:{self.lookahead.col}"
-        #     )
-        #     raise SyntaxError()
-        # else:
-        if token:
+        line = 0
+        col = 0
+        if token is None:
+            if self.prev_token is not None:
+                line = self.prev_token.line
+                col = self.prev_token.col
+
+            print(
+                f"Syntax error at line: {line} column: {col}"
+            )
+            raise SyntaxError 
+        else:
+            # if token:
+            self.prev_token = self.lookahead
             self.lookahead = None
             return token
 
@@ -89,22 +97,18 @@ def parse_assignment(tokens):
 
 
 def parse_with(tokens):
-    tokens.expect(Tok.WITH)
-    sniffer = None
-    if tokens.peek(Tok.NAME):
-        sniffer = tokens.expect(Tok.NAME)
+    tokens.expect(Tok.WITH, error_msg="Expected with statement")
+    sniffer = tokens.expect(Tok.NAME, error_msg="Expected name")
 
     where_value = None
-    if tokens.peek(Tok.FILTER):
-        tok_where = tokens.expect(Tok.FILTER)
-        if tok_where:
-            where_value = parse_expression(tokens)
-        else:
-            # {tok_where.line}:{tok_where.col}')
-            print(f'SYNTAX ERROR EXPECTED FILTER AT')
-            return
+    tok_where = tokens.expect(
+        Tok.FILTER, error_msg="Filter token expected")
+    if tok_where:
+        where_value = parse_expression(tokens)
+    else:
+        return
 
-    tokens.expect(Tok.OUTPUT)
+    tokens.expect(Tok.OUTPUT, error_msg="Must specify output mode")
     fields = []
     if tokens.peek(Tok.WILDCARD):
         field = tokens.expect(Tok.WILDCARD)
@@ -366,9 +370,6 @@ def parse_continue(tokens):
 
 def parse_source(text):
     lexer = Lexer(text)
-    tokens = lexer.tokenize()
-    for t in tokens:
-        print(t)
     tokens = lexer.tokenize()
     model = parse_prog(Tokenizer(tokens))  # You need to implement this part
     return model
