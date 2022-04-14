@@ -38,7 +38,7 @@ def get_packet(file_id: int, ptr_list):
             pb.from_bytes(packet, pcap_hdr)
             # pb.summary()
             # print(f"""ETH -> Dst: {pb.get_field("eth.dst")}, Src: {pb.get_field("eth.src")}, Vlan: {pb.get_field("eth.vlan")}, Ethertype: {pb.get_field("eth.ethertype"):04x}, Src IP: {pb.get_field("ip.src")}\tDst IP: {pb.get_field("ip.dst")},\tUDP Dst: {pb.get_field("udp.dst")}, UDP Src: {pb.get_field("udp.src")}""")
-            # packet_list.append(pb.export())
+            packet_list.append(pb.export())
             filter_count += 1
     return packet_list
 
