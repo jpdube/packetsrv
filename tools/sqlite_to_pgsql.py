@@ -16,14 +16,18 @@ def convert():
     # rows = cursor.fetchall()
 
     count = 0
+    batch = 0
+    sql = ""
     for r in cursor:
-        sql = f"insert into packet (ip_src, ip_dst, mac_src, mac_dst, ether_type, ip_proto, vlan_id, sport, dport, file_ptr, file_id, timestamp) values ({r[1]},{r[2]},{r[3]},{r[4]},{r[5]},{r[6]},{r[7]},{r[8]},{r[9]},{r[10]},{r[11]},{r[12]})"
-        # print(sql)
-        cur.execute(sql)
-        count += 1
-        if count % 100 == 0:
-            print('.', end='', flush=True)
-            conn.commit()
+        sql += f"insert into packet (ip_src, ip_dst, mac_src, mac_dst, ether_type, ip_proto, vlan_id, sport, dport, file_ptr, file_id, timestamp) values ({r[1]},{r[2]},{r[3]},{r[4]},{r[5]},{r[6]},{r[7]},{r[8]},{r[9]},{r[10]},{r[11]},{r[12]});"
+        if batch % 100 == 0:
+            # print(sql)
+            cur.execute(sql)
+            count += 1
+            sql = ""
+            if count % 100 == 0:
+                print('.', end='', flush=True)
+                conn.commit()
 
     cur.close()
     conn.commit()
