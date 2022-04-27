@@ -130,6 +130,7 @@ class WithStatement(Statement):
         top_expr=None,
         limit_expr=None,
     ):
+        self.index_only = False
         self.with_field = with_fields
         self.include = include_field
         self.filter_expr = filter_expr
