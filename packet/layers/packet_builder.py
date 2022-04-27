@@ -1,3 +1,4 @@
+from ipaddress import IPv4Address
 from os import wait
 from packet.layers.ethernet import (
     ETHER_TYPE_ARP,
@@ -26,10 +27,13 @@ from packet.utils.print_hex import print_hex
 
 
 class PacketBuilder:
-    def __init__(self) -> None:
+    __slots__ = ["packet", "layers", "fields_list"]
+
+    def __init__(self, packet) -> None:
         self.layers: Dict[int, Packet] = {}
-        self.packet = None
+        self.packet = packet
         self.fields_list = {}
+        self.from_bytes(packet)
 
     def add(self, layer: Packet):
         self.layers[layer.name] = layer
@@ -127,7 +131,7 @@ class PacketBuilder:
                 result["icmp.seq"] = layer.sequence_no
 
             elif isinstance(layer, PcapHeader):
-                r = bytearray(self.packet)
+                # r = bytearray(self.packet)
                 # r = bytearray(layer.header) + bytearray(self.packet)
                 # result["packet"] = str(base64.b64encode(r), "ascii")
                 result["orig_len"] = layer.orig_len
@@ -151,7 +155,7 @@ class PacketBuilder:
     def get_layer(self, layer_id) -> Packet | None:
         return self.layers.get(layer_id, None)
 
-    def get_field(self, field: str) -> int | str | None:
+    def get_field(self, field: str) -> int | str | IPv4Address | None:
         pkt_name = field.split('.')[0]
         match pkt_name:
             case 'eth':
@@ -162,7 +166,6 @@ class PacketBuilder:
                 ip = self.get_layer(LayerID.IPV4)
                 if ip:
                     return ip.get_field(field)
-
             case 'tcp':
                 tcp = self.get_layer(LayerID.TCP)
                 if tcp:
