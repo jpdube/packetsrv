@@ -1,4 +1,4 @@
-import ipaddress
+# import ipaddress
 from struct import pack
 from time import time_ns
 from packet.utils.print_hex import print_hex
@@ -171,9 +171,10 @@ class MacAddress(Field):
         return result
 
 
-class IPv4Address(Field):
+class IPv4Address():
     def __init__(self, ipaddr):
         # super().__init__(ipaddr)
+        self.value = 0
 
         if isinstance(ipaddr, bytes):
             self.value = self.from_array(ipaddr)
@@ -213,8 +214,12 @@ class IPv4Address(Field):
             # print(f'IPV4 Address: {bin_addr:04X}')
             return bin_addr
 
-    def __eq__(self, other) -> bool:
-        return self.value == other.value
+
+    def __eq__(self, other: IPv4Address) -> bool:
+        if isinstance(other, IPv4Address):
+            return self.value == other.value
+        else:
+            return False
 
     @property
     def ip_str(self):
