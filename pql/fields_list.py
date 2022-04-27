@@ -33,4 +33,6 @@ field_list = {
     "icmp.code":            Field("icmp_code", False),
     "udp.sport":            Field("sport", True),
     "udp.dport":            Field("dport", True),
+    "tcp.sport":            Field("sport", True),
+    "tcp.dport":            Field("dport", True),
 }
