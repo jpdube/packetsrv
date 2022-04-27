@@ -7,12 +7,6 @@ APPNAME=pcapdbapi
 MAIN=main.py
 PYTHON=python3
 
-format:
-	black .	
-	black packet/	
-	black dbase/	
-	black dbase/	
-	black pql/	
 
 check:
 	mypy main.py pql/ dbase/ packet/ api/
