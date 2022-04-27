@@ -1,4 +1,5 @@
 from sqlite3.dbapi2 import Cursor
+
 import sys
 import sqlite3
 import json
@@ -31,9 +32,7 @@ def get_packet(file_id: int, ptr_list):
             f.seek(ptr)
             header = f.read(PCAP_PACKET_HEADER_SIZE)
             pcap_hdr = PcapHeader(header)
-
             packet = f.read(pcap_hdr.incl_len)
-
             pb = PacketBuilder()
             pb.from_bytes(packet, pcap_hdr)
             # pb.summary()
@@ -57,9 +56,10 @@ def sql(pql: str) -> Cursor:
     return cursor
 
 
-def query(pql: str, header=False):
+def query(pql: str):
     start_time = datetime.now()
     packet_list = sql(pql)
+    # print(f"*** PACKET LIST: {len(list(packet_list))}")
     return_list = []
     count = 0
     current_id = -1
@@ -78,7 +78,8 @@ def query(pql: str, header=False):
                 ptr_list.append(p[PACKET_PTR])
 
             count += 1
-        return_list.extend(get_packet(current_id, ptr_list))
+        if current_id != -1:
+            return_list.extend(get_packet(current_id, ptr_list))
 
     print(f'*** Packet list length: {len(return_list)}')
 
