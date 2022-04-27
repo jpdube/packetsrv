@@ -371,6 +371,10 @@ def parse_continue(tokens):
 def parse_source(text):
     lexer = Lexer(text)
     tokens = lexer.tokenize()
+    # for t in tokens:
+    #     print(t)
+    #
+    # tokens = lexer.tokenize()
     model = parse_prog(Tokenizer(tokens))  # You need to implement this part
     return model
 

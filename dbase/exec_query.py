@@ -22,35 +22,13 @@ def build_sql(model):
     for m in model:
         if isinstance(m, WithStatement):
             sql += '*'
-            # for i, f in enumerate(m.value):
-            #     if f.index:
-            #         sql += f"{f.value} "
-            #
-            #         if i < len(m.value) - 1:
-            #             sql += ", "
-            #
-            # if sql.find("*") == -1:
-            #     sql += "file_ptr, file_id"
-
             sql += " FROM "
-            # for s in m.from_fields:
             sql += f" packet"
-                # sql += f" {s.value}"
-
-            # if m.include is not None:
-            #     include = m.include.value
 
             if m.filter_expr is not None:
                 sql += " WHERE "
                 # print(f'WHERE EXPR -> {m.where_expr}')
                 sql += interpret_program(m.filter_expr)
-
-            # if m.between_expr is not None:
-            #     if m.where_expr is not None:
-            #         sql += " AND "
-            #     sql += " timestamp BETWEEN "
-            #     # print(f'BETWEEN EXPR -> {m.between_expr}')
-            #     sql += interpret_program(m.between_expr)
 
             if m.top_expr is not None:
                 sql += " LIMIT "
