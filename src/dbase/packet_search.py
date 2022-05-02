@@ -10,8 +10,8 @@ from multiprocessing import Pool
 from datetime import datetime
 from packet.layers.packet_decode import PacketDecode
 
-db_filename = "/Users/jpdube/hull-voip/db/index.db"
-pcap_path = "/Users/jpdube/hull-voip/db/pcap"
+db_filename = "/home/jpdube/hull-voip/db/index.db"
+pcap_path = "/home/jpdube/hull-voip/db/pcap"
 
 PCAP_GLOBAL_HEADER_SIZE = 24
 PCAP_PACKET_HEADER_SIZE = 16
@@ -51,7 +51,7 @@ def search_parallel():
     flist = []
     for i in range(25):
         params = {
-            "file": f"/Users/jpdube/hull-voip/db/pcap/{i}.pcap",
+            "file": f"{pcap_path}/{i}.pcap",
             "filter": ("ip.src", 0xc0a803e6)
         }
         flist.append(params)
