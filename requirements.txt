@@ -5,3 +5,4 @@ black==22.1.0
 pytest
 numpy
 mypy==0.942
+psutil==5.9.0
