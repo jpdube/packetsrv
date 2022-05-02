@@ -8,7 +8,8 @@ __pycache__/
 # virtualenv
 .venv/
 venv/
-config/ping_collector.yaml
+pvenv/
+config/
 ENV/
 *.log
 .idea*
