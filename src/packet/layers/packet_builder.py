@@ -29,11 +29,9 @@ from packet.utils.print_hex import print_hex
 class PacketBuilder:
     __slots__ = ["packet", "layers", "fields_list"]
 
-    def __init__(self, packet) -> None:
+    def __init__(self) -> None:
         self.layers: Dict[int, Packet] = {}
-        self.packet = packet
         self.fields_list = {}
-        self.from_bytes(packet)
 
     def add(self, layer: Packet):
         self.layers[layer.name] = layer
