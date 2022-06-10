@@ -1,19 +1,21 @@
 from ipaddress import IPv4Address
-from pql.lexer import Lexer 
+from pql.lexer import Lexer
 from pql.tokens_list import Tok
-from packet.layers.fields import IPv4Address 
+from packet.layers.fields import IPv4Address
 
 
 def test_date():
-    src = '02-02-2022 14:30:45'
+    src = '2022-02-01 14:30:45'
     lexer = Lexer(src)
     tokens = lexer.tokenize()
     tok_date = next(tokens)
+    print(tok_date)
     if tok_date:
         assert(tok_date.type == Tok.DATE)
         assert(tok_date.value == src)
     else:
         assert(False)
+
 
 def test_integer():
     src = '80'
@@ -26,6 +28,7 @@ def test_integer():
     else:
         assert(False)
 
+
 def test_float():
     src = '80.45'
     lexer = Lexer(src)
@@ -36,6 +39,7 @@ def test_float():
         assert(tok_date.value == src)
     else:
         assert(False)
+
 
 def test_ipv4():
     src = '192.168.3.124'

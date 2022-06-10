@@ -4,7 +4,6 @@ from pydantic import BaseModel
 
 app = FastAPI()
 
-
 class PqlRequest(BaseModel):
     query: str
 
