@@ -1,11 +1,11 @@
+import json
+import sqlite3
+import sys
+from datetime import datetime
 from sqlite3.dbapi2 import Cursor
 
-import sys
-import sqlite3
-import json
-from datetime import datetime
-from packet.layers.pcap_header import PcapHeader
 from packet.layers.packet_builder import PacketBuilder
+from packet.layers.pcap_header import PcapHeader
 
 db_filename = "/Users/jpdube/hull-voip/db/index.db"
 pcap_path = "/Users/jpdube/hull-voip/db/pcap"
