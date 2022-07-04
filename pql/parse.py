@@ -193,7 +193,11 @@ def parse_select(tokens):
 
     tokens.expect(Tok.SEMI)
     return SelectStatement(fields,
-                           from_fields, None, where_value, top_value, limit_fields
+                           from_fields,
+                           None,
+                           where_value,
+                           top_value,
+                           limit_fields
                            )
 
 
