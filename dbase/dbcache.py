@@ -1,8 +1,7 @@
 import sqlite3
 
 from packet.layers.packet_builder import PacketBuilder
-
-db_filename = "/Users/jpdube/hull-voip/db/index.db"
+from server.config import config
 
 
 class IndexCache:
@@ -29,7 +28,7 @@ class IndexCache:
             timestamp timestamp,
             UNIQUE(id))""", [],)
 
-        _ = cls.cursor.execute(f"attach '{db_filename}' as A;")
+        _ = cls.cursor.execute(f"attach '{config.db_filename}' as A;")
 
     @classmethod
     def clear(cls):

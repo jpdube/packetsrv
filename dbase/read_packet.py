@@ -3,12 +3,11 @@ from datetime import datetime
 from sqlite3.dbapi2 import Cursor
 
 from dbase.dbcache import IndexCache
+from dbase.sql_statement import SqlStatement
 # from dbengine import Index
 from packet.layers.packet_builder import PacketBuilder
 from packet.layers.pcap_header import PcapHeader
-
-db_filename = "/Users/jpdube/hull-voip/db/index.db"
-pcap_path = "/Users/jpdube/hull-voip/db/pcap"
+from server.config import config
 
 PCAP_GLOBAL_HEADER_SIZE = 24
 PCAP_PACKET_HEADER_SIZE = 16
@@ -30,7 +29,7 @@ def get_packet(file_id: int, ptr_list):
     packet_list = []
     cache_hit = 0
     file_hit = 0
-    with open(f"{pcap_path}/{file_id}.pcap", "rb") as f:
+    with open(f"{config.pcap_path}/{file_id}.pcap", "rb") as f:
         for ptr in ptr_list:
             # print(f"ID: {ptr[1]}")
             cached_packet = IndexCache.get_packet(ptr[1])
@@ -46,8 +45,6 @@ def get_packet(file_id: int, ptr_list):
                 packet = f.read(pcap_hdr.incl_len)
                 pb = PacketBuilder()
                 pb.from_bytes(packet, pcap_hdr)
-                # pb.summary()
-                # print(f"""ETH -> Dst: {pb.get_field("eth.dst")}, Src: {pb.get_field("eth.src")}, Vlan: {pb.get_field("eth.vlan")}, Ethertype: {pb.get_field("eth.ethertype"):04x}, Src IP: {pb.get_field("ip.src")}\tDst IP: {pb.get_field("ip.dst")},\tUDP Dst: {pb.get_field("udp.dst")}, UDP Src: {pb.get_field("udp.src")}""")
                 packet_list.append(pb.export())
                 IndexCache.save_packet(ptr[1], pb)
             filter_count += 1
@@ -56,8 +53,8 @@ def get_packet(file_id: int, ptr_list):
     return packet_list
 
 
-def sql(pql: str) -> Cursor:
-    conn = sqlite3.connect(db_filename)
+def sql(pql: SqlStatement) -> Cursor:
+    conn = sqlite3.connect(config.db_filename)
     cursor = conn.cursor()
 
     conn.execute("""PRAGMA synchronous = OFF""")
