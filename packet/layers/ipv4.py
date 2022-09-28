@@ -100,10 +100,10 @@ class IPV4(Packet):
         offset = 0
         if self.ihl == 6:
             offset = 4
-        return self.packet[20 + offset :]
+        return self.packet[20 + offset:]
 
     def summary(self, offset: int) -> str:
-        result =  f'{" " * offset}IPv4 ->\n'
+        result = f'{" " * offset}IPv4 ->\n'
         result += f'{" " * offset}   Dst Addr...: {self.dst_ip}\n'
         result += f'{" " * offset}   Src Addr...: {self.src_ip}\n'
         result += f'{" " * offset}   Protocol...: {self.protocol},0x{self.protocol:02x} \n'

@@ -6,8 +6,8 @@ from typing import Dict
 from packet.layers.packet_decode import PacketDecode
 from packet.utils.print_hex import format_hex
 
-db_filename = "/home/jpdube/hull-voip/db/index.db"
-pcap_path = "/home/jpdube/hull-voip/db/pcap"
+db_filename = "/Users/jpdube/hull-voip/db/index.db"
+pcap_path = "/Users/jpdube/hull-voip/db/pcap"
 
 PCAP_GLOBAL_HEADER_SIZE = 24
 PCAP_PACKET_HEADER_SIZE = 16
@@ -37,15 +37,17 @@ def packet_search(params):
             packet = f.read(incl_len)
 
             pd.packet = packet
+            if pd.ip_src == 0xc0a803e6:
+                result.append(True)
 
             # if unpack("!I", packet[30:34])[0] == value:
-            if pd.search_field(field, value):
+            # if pd.search_field(field, value):
                 # pb = PacketBuilder()
                 # pb.from_bytes(packet)
                 # result.append(pb)
-                result.append(True)
+                # result.append(True)
 
-    # print(f"Found:{len(result)}, Time:{datetime.now() - start_time}")
+    print(f"Found:{len(result)}, Time:{datetime.now() - start_time}")
     return result
 
 
@@ -53,7 +55,7 @@ def search_parallel():
     pool = Pool()
     flist = []
     start_time = datetime.now()
-    for i in range(400):
+    for i in range(95):
         params = {
             "file": i,
             "filter": ("ip.src", 0xc0a80301)

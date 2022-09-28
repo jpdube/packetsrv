@@ -4,8 +4,10 @@ from pydantic import BaseModel
 
 app = FastAPI()
 
+
 class PqlRequest(BaseModel):
     query: str
+
 
 class SnifferStart(BaseModel):
     alias: str
@@ -14,23 +16,28 @@ class SnifferStart(BaseModel):
     file_count: int
     filter: str
 
+
 class SnifferStop(BaseModel):
     alias: str
+
 
 @app.post("/pql")
 async def exec_pql(pql: PqlRequest):
     result = exec_query(pql.query)
     return {"result": result}
 
+
 @app.post("/sniffer/start")
 async def sniffer_start(cmd: SnifferStart):
-    result = cmd 
+    result = cmd
     return {"result": result}
+
 
 @app.post("/sniffer/stop")
 async def sniffer_stop(cmd: SnifferStop):
     result = cmd
     return {"result": result}
+
 
 @app.get("/sniffer/show")
 async def sniffer_show():
@@ -51,5 +58,5 @@ async def sniffer_show():
             "rotation_count": 16,
             "alias": "firewall"
         }
-    ] 
+    ]
     return {"result": result}
