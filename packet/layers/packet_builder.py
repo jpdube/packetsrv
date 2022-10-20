@@ -37,6 +37,7 @@ class PacketBuilder:
             print(f"{v}")
 
     def from_bytes(self, raw_packet, header=None):
+        self.layers: Dict[int, Packet] = {}
         self.packet = raw_packet
         if header is not None:
             self.add(header)
