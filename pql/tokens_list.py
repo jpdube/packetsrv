@@ -7,6 +7,7 @@ class Tok(Enum):
     INCLUDE = auto()
     WHERE = auto()
     ORDER_BY = auto()
+    GROUP_BY = auto()
     ASC = auto()
     DESC = auto()
     BETWEEN = auto()
