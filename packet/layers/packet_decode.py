@@ -7,13 +7,15 @@ FRAME_TYPE_8021Q = 0x8100
 
 class PacketDecode:
 
-    __slots__ = ["packet"]
+    # __slots__ = ["packet", "offset"]
 
-    # def __init__(self):
-    #     self.packet = bytes()
+    def __init__(self):
+        self.packet = bytes()
+        self.offset = 0
 
     def decode(self, packet: bytes):
         self.packet = packet
+        self.offset = 18 if self.has_vlan else 14
         # print_hex(self.packet)
 
     def search_field(self, field_name: str, value: int) -> bool:
@@ -30,17 +32,15 @@ class PacketDecode:
     def has_vlan(self):
         return unpack("!H", self.packet[12:14])[0] == FRAME_TYPE_8021Q
 
-
-
     def search_eth(self, field: str, value: int) -> bool:
         vlan_flag = self.has_vlan
 
         match field:
             case "dst":
-                return self.dst_mac == value
+                return self.mac_dst == value
 
             case "src":
-                return self.src_mac == value
+                return self.mac_src == value
 
             case "type":
                 return self.ethertype == value
@@ -55,14 +55,14 @@ class PacketDecode:
                 return False
 
     def search_ipv4(self, field: str, value: int) -> bool:
-        offset = 18 if self.has_vlan() else 14
+        # offset = 18 if self.has_vlan() else 14
 
         match field:
             case "src":
-                return unpack("!I", self.packet[offset + 12:offset + 16])[0] == value
+                return self.ip_src == value
 
             case "dst":
-                return unpack("!I", self.packet[offset + 16:offset + 20])[0] == value
+                return self.ip_dst == value
 
             case _:
                 return False
@@ -77,9 +77,9 @@ class PacketDecode:
 
         return response
 
-    @property
-    def offset(self) -> int:
-        return 18 if self.has_vlan else 14
+    # @property
+    # def offset(self) -> int:
+    #     return 18 if self.has_vlan else 14
 
     @property
     def mac_dst(self) -> int:
@@ -114,10 +114,11 @@ class PacketDecode:
     @property
     def ip_offset(self) -> int:
         # print(f"V:{self.ip_version}, HL:{self.ip_hdr_len}")
-        return self.offset + self.ip_hdr_len 
+        return self.offset + self.ip_hdr_len
 
     @property
     def ip_src(self) -> int:
+        # print(self.offset)
         return unpack("!I", self.packet[self.offset + 12:self.offset + 16])[0]
 
     @property
@@ -135,7 +136,6 @@ class PacketDecode:
     @property
     def dport(self) -> int:
         return unpack("!H", self.packet[self.offset + 36:self.offset + 38])[0]
-
 
     @property
     def tcp_seq_no(self) -> int:
@@ -157,7 +157,8 @@ class PacketDecode:
     def tcp_flag(self) -> int:
         if self.ip_proto == 0x06:
             # print_hex(self.packet)
-            flag = unpack("!H", self.packet[self.ip_offset + 12:self.ip_offset + 14])[0]
+            flag = unpack(
+                "!H", self.packet[self.ip_offset + 12:self.ip_offset + 14])[0]
             # print(f"EO: {self.offset}, IPO: {self.ip_offset}, FLAG: {flag:x}")
             return flag
         else:
@@ -179,4 +180,3 @@ class PacketDecode:
             return (unpack("!H", self.packet[self.ip_offset + 12:self.ip_offset + 14])[0] & 0x10) == 0x10
         else:
             return False
-
