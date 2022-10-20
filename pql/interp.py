@@ -46,22 +46,8 @@ def interpret(node, env):
         return int(round(time_result.timestamp()))
 
     elif isinstance(node, SelectStatement):
-        # elif isinstance(node, WithStatement):
         value = interpret(node.value, env)
         print(value)
-        return None
-
-    elif isinstance(node, PrintStatement):
-        value = interpret(node.value, env)
-        print(value)
-        return None
-
-    elif isinstance(node, (VarDecl, ConstDecl)):
-        if node.value:
-            val = interpret(node.value, env)
-        else:
-            val = None
-        env[node.name] = val
         return None
 
     elif isinstance(node, Load):
@@ -118,32 +104,6 @@ def interpret(node, env):
             return f"{leftval} OR {rightval}"
         elif node.op == "!=":
             return f"{leftval} <> {rightval}"
-
-    elif isinstance(node, IfStatement):
-        testval = interpret(node.test, env)
-        if testval:
-            interpret(node.true_block, env)
-        else:
-            interpret(node.else_block, env)
-        return None
-
-    elif isinstance(node, WhileStatement):
-        while interpret(node.test, env):
-            try:
-                interpret(node.code_block, env)
-            except Break:
-                break
-            except Continue:
-                continue
-        return None
-
-    elif isinstance(node, BreakStatement):
-        print("In break")
-        raise Break()
-
-    elif isinstance(node, ContinueStatement):
-        print("In continue")
-        raise Continue()
 
     elif isinstance(node, list):
         result = None

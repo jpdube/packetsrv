@@ -56,22 +56,6 @@ def parse_prog(tokens):
 def parse_stmt(tokens):
     if tokens.peek(Tok.NAME):
         return parse_assignment(tokens)
-    elif tokens.peek(Tok.PRINT):
-        return parse_print(tokens)
-    elif tokens.peek(Tok.IF):
-        return parse_if(tokens)
-    elif tokens.peek(Tok.WHILE):
-        return parse_while(tokens)
-    elif tokens.peek(Tok.VAR):
-        return parse_var(tokens)
-    elif tokens.peek(Tok.CONST):
-        return parse_const(tokens)
-    # elif tokens.peek(Tok.CONTINUE):
-    #     return parse_continue(tokens)
-    # elif tokens.peek(Tok.BREAK):
-    #     return parse_break(tokens)
-    elif tokens.peek(Tok.WITH):
-        return parse_with(tokens)
     elif tokens.peek(Tok.SELECT):
         return parse_select(tokens)
     elif tokens.peek(Tok.NOW):
@@ -99,51 +83,6 @@ def parse_assignment(tokens):
     return Store(var_name.value, value)
 
 
-def parse_with(tokens):
-    tokens.expect(Tok.WITH, error_msg="Expected with statement")
-    sniffer = tokens.expect(Tok.NAME, error_msg="Expected name")
-
-    where_value = None
-    tok_where = tokens.expect(
-        Tok.FILTER, error_msg="Filter token expected")
-    if tok_where:
-        where_value = parse_expression(tokens)
-    else:
-        return
-
-    tokens.expect(Tok.OUTPUT, error_msg="Must specify output mode")
-    fields = []
-    if tokens.peek(Tok.WILDCARD):
-        field = tokens.expect(Tok.WILDCARD)
-        fields.append(Label("*"))
-    else:
-        while True:
-            field = tokens.expect(Tok.NAME)
-            # print(f'SELECT fields: {field}')
-            if field:
-                fields.append(Label(field.value))
-
-            if tokens.accept(Tok.DELIMITER) is None:
-                break
-
-    top_value = None
-    if tokens.peek(Tok.TOP):
-        tokens.expect(Tok.TOP)
-        top_value = parse_expression(tokens)
-
-    limit_fields = []
-    if tokens.peek(Tok.LIMIT):
-        tokens.expect(Tok.LIMIT)
-        offset = tokens.expect(Tok.INTEGER)
-        limit_fields.append(offset)
-        tokens.expect(Tok.DELIMITER)
-        limit = tokens.expect(Tok.INTEGER)
-        limit_fields.append(limit)
-
-    tokens.expect(Tok.SEMI)
-    return WithStatement(sniffer, fields, where_value, top_value, limit_fields)
-
-
 def parse_select(tokens):
     tokens.expect(Tok.SELECT)
     fields = []
@@ -169,13 +108,23 @@ def parse_select(tokens):
         if tokens.accept(Tok.DELIMITER) is None:
             break
 
-    # tokens.expect(Tok.INCLUDE)
-    # include_field = tokens.expect(Tok.NAME)
-
     where_value = None
     if tokens.peek(Tok.WHERE):
         tokens.expect(Tok.WHERE)
         where_value = parse_expression(tokens)
+
+    groupby_value = None
+    if tokens.peek(Tok.GROUP_BY):
+        tokens.expect(Tok.GROUP_BY)
+        groupby_value = []
+        while True:
+            field = tokens.expect(Tok.NAME)
+            # print(f'SELECT fields: {field}')
+            if field:
+                groupby_value.append(Label(field.value))
+
+            if tokens.accept(Tok.DELIMITER) is None:
+                break
 
     top_value = None
     if tokens.peek(Tok.TOP):
@@ -196,16 +145,10 @@ def parse_select(tokens):
                            from_fields,
                            None,
                            where_value,
+                           groupby_value,
                            top_value,
                            limit_fields
                            )
-
-
-def parse_print(tokens):
-    tokens.expect(Tok.PRINT)
-    prt_value = parse_expression(tokens)
-    tokens.expect(Tok.SEMI)
-    return PrintStatement(prt_value)
 
 
 def parse_date(tokens):
@@ -216,11 +159,6 @@ def parse_date(tokens):
 def parse_string(tokens):
     token = tokens.expect(Tok.STRING)
     return String(token.value)
-
-
-def parse_char(tokens):
-    token = tokens.expect(Tok.CHAR)
-    return Char(token.value)
 
 
 def parse_integer(tokens):
@@ -235,7 +173,6 @@ def parse_float(tokens):
 
 def parse_ipv4(tokens):
     token = tokens.expect(Tok.IPV4)
-    print(f"*** -> IPV4 parse: {token.value}")
     return IPv4(token.value)
 
 
@@ -342,8 +279,6 @@ def parse_factor(tokens):
         return parse_ipv4(tokens)
     elif tokens.peek(Tok.MAC):
         return parse_mac(tokens)
-    elif tokens.peek(Tok.CHAR):
-        return parse_char(tokens)
     elif tokens.peek(Tok.STRING):
         return parse_string(tokens)
     elif tokens.peek(Tok.DATE):
@@ -390,51 +325,13 @@ def parse_unary(tokens):
     return Unary(optok.value, factor)
 
 
-def parse_while(tokens):
-    tokens.expect(Tok.WHILE)
-    expr = parse_expression(tokens)
-    tokens.expect(Tok.LBRACE)
-    while_stmt = parse_stmts(tokens)
-    tokens.expect(Tok.RBRACE)
-
-    return WhileStatement(expr, while_stmt)
-
-
-def parse_if(tokens):
-    tokens.expect(Tok.IF)
-    expr = parse_expression(tokens)
-    # expr = parse_value(tokens)
-    tokens.expect(Tok.LBRACE)
-    true_stmt = parse_stmts(tokens)
-    tokens.expect(Tok.RBRACE)
-    if tokens.accept(Tok.ELSE):
-        tokens.expect(Tok.LBRACE)
-        else_stmt = parse_stmts(tokens)
-        tokens.expect(Tok.RBRACE)
-    else:
-        else_stmt = []
-    return IfStatement(expr, true_stmt, else_stmt)
-
-
-# def parse_break(tokens):
-#     tokens.expect(Tok.BREAK)
-#     tokens.expect(Tok.SEMI)
-#     return BreakStatement()
-
-
-# def parse_continue(tokens):
-#     tokens.expect(Tok.CONTINUE)
-#     tokens.expect(Tok.SEMI)
-#     return ContinueStatement()
-
-
 def parse_source(text):
     lexer = Lexer(text)
-    tokens = lexer.tokenize()
+    # tokens = lexer.tokenize()
     # for t in tokens:
     #     print(t)
 
-    # tokens = lexer.tokenize()
+    tokens = lexer.tokenize()
     model = parse_prog(Tokenizer(tokens))
     return model
 
