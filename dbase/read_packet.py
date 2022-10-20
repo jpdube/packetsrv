@@ -32,22 +32,22 @@ def get_packet(file_id: int, ptr_list):
     with open(f"{config.pcap_path}/{file_id}.pcap", "rb") as f:
         for ptr in ptr_list:
             # print(f"ID: {ptr[1]}")
-            cached_packet = IndexCache.get_packet(ptr[1])
-            if cached_packet is not None:
-                cache_hit += 1
-                packet_list.append(cached_packet.export())
-                f.seek(ptr[0] + cached_packet.get_layer(0xff).incl_len)
-            else:
-                file_hit += 1
-                f.seek(ptr[0])
-                header = f.read(PCAP_PACKET_HEADER_SIZE)
-                pcap_hdr = PcapHeader(header)
-                packet = f.read(pcap_hdr.incl_len)
-                pb = PacketBuilder()
-                pb.from_bytes(packet, pcap_hdr)
-                packet_list.append(pb.export())
-                IndexCache.save_packet(ptr[1], pb)
-            filter_count += 1
+            # cached_packet = IndexCache.get_packet(ptr[1])
+            # if cached_packet is not None:
+            #     cache_hit += 1
+            #     packet_list.append(cached_packet.export())
+            #     f.seek(ptr[0] + cached_packet.get_layer(0xff).incl_len)
+            # else:
+            file_hit += 1
+            f.seek(ptr[0])
+            header = f.read(PCAP_PACKET_HEADER_SIZE)
+            pcap_hdr = PcapHeader(header)
+            packet = f.read(pcap_hdr.incl_len)
+            pb = PacketBuilder()
+            pb.from_bytes(packet, pcap_hdr)
+            packet_list.append(pb.export())
+            # IndexCache.save_packet(ptr[1], pb)
+            # filter_count += 1
         # print(
         #     f"Excution plan: Total:{filter_count}, Cache hit: {cache_hit}, File hit: {file_hit}")
     return packet_list
