@@ -6,6 +6,7 @@ PYFILES=$(wildcard *.py)
 APPNAME=pcapdbapi
 MAIN=main.py
 PYTHON=python3
+TEST_DIR=$(BASE)/test
 RUSTLIB=$(BASE)/dbengine
 
 
@@ -13,12 +14,12 @@ check:
 	mypy main.py pql/ dbase/ packet/ api/
 
 run:
-	# cd $(RUSTLIB) && maturin develop && cd $(BASE)
-	$(PYTHON) $(MAIN) "2022-02-12 15:30:00" "2022-02-12 16:00:00"
+	cd $(RUSTLIB) && maturin develop && cd $(BASE)
+	$(PYTHON) $(MAIN)
 
 .PHONY: test
 test:
-	$(PYTHON) -m unittest
+	pytest $(TEST_DIR)
 
 .PHONY: build
 build:
