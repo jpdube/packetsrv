@@ -79,6 +79,8 @@ def interpret(node, env):
 
         if node.op == "/":
             return f"{IPv4(leftval).to_network(rightval)[0]} AND {IPv4(leftval).to_network(rightval)[1]}"
+        elif node.op == "to":
+            return f"(ip_src = {leftval} and ip_dst = {rightval}) or (ip_dst = {leftval} and ip_src = {rightval})"
         elif node.op == "in" or node.op == "between":
             return f" {leftval} BETWEEN {rightval}"
         elif node.op == "*":

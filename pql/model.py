@@ -94,15 +94,6 @@ class Label(Expression):
         return f"Label({self._value})"
 
 
-# class Function(Statement):
-#     def __init__(self, name: str, params) -> None:
-#         self.name = name
-#         self.params = params
-
-#     def __repr__(self) -> str:
-#         return f"Function {self.name} ({self.params})"
-
-
 class Date(Expression):
     def __init__(self, value):
         self.value = value
@@ -123,30 +114,6 @@ class Now(Expression):
 
     def __repr__(self) -> str:
         return f"Now ({self.value}, {self.offset}, {self.modifier})"
-
-
-# class WithStatement(Statement):
-#     def __init__(
-#         self,
-#         with_fields,
-#         include_field,
-#         filter_expr,
-#         top_expr=None,
-#         limit_expr=None,
-#     ):
-#         self.index_only = False
-#         self.with_field = with_fields
-#         self.include = include_field
-#         self.filter_expr = filter_expr
-#         self.top_expr = top_expr
-#         self.offset = None
-#         self.limit = None
-#         if isinstance(limit_expr, List) and len(limit_expr) == 2:
-#             self.offset = limit_expr[0]
-#             self.limit = limit_expr[1]
-
-#     def __repr__(self) -> str:
-#         return f"With: {repr(self.with_field)}, Include: {self.include}, Filter: {repr(self.filter_expr)}, Top: {self.top_expr}, Limit: {self.offset},{self.limit}"
 
 
 class SelectStatement(Statement):
@@ -176,36 +143,12 @@ class SelectStatement(Statement):
         return f"SelectStatement Select: {self.value}, From: {repr(self.from_fields)}, Include: {self.include}, Where: {repr(self.where_expr)}, Group By: {self.groupby_expr}, Top: {self.top_expr}, Limit: {self.offset},{self.limit}"
 
 
-# class InStatement(Expression):
-#     def __init__(self, value):
-#         self.value = value
-#
-#     def __repr__(self) -> str:
-#         return f"In ({self.value})"
-
-
-# class PrintStatement(Statement):
-#     def __init__(self, value):
-#         self.value = value
-
-#     def __repr__(self):
-#         return f"PrintStatement {repr(self.value)}"
-
-
 class String(Expression):
     def __init__(self, value):
         self.value = value
 
     def __repr__(self):
         return f"String({self.value})"
-
-
-# class Char(Expression):
-#     def __init__(self, value):
-#         self.value = value
-
-#     def __repr__(self):
-#         return f"Char({self.value})"
 
 
 class Float(Expression):
@@ -263,26 +206,6 @@ class Grouping(Expression):
         return f"Grouping({self.value})"
 
 
-# class IfStatement(Statement):
-#     def __init__(self, test, true_block, else_block):
-#         self.test = test
-#         self.true_block = true_block
-#         self.else_block = else_block
-
-#     def __repr__(self):
-#         return f"ifStatement {self.test} {{\n  {self.true_block} }}\n else {{ {self.else_block} }}\n"
-
-
-# class ContinueStatement(Statement):
-#     def __repr__(self):
-#         return f"ContinueStatement"
-
-
-# class BreakStatement(Statement):
-#     def __repr__(self):
-#         return f"BreakStatement"
-
-
 class BinOp(Expression):
     def __init__(self, op, left, right):
         self.op = op
@@ -291,20 +214,3 @@ class BinOp(Expression):
 
     def __repr__(self):
         return f"BinOp({self.op}, {self.left}, {self.right})"
-
-
-# class WhileStatement(Statement):
-#     def __init__(self, test, code_block):
-#         self.test = test
-#         self.code_block = code_block
-
-#     def __repr__(self):
-#         return f"WhileStatement {self.test} {self.code_block}"
-
-
-# class Block:
-#     def __init__(self, code):
-#         self.code = code
-
-#     def __repr__(self):
-#         return f"Block: {self.code}"

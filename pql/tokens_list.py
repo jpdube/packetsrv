@@ -19,18 +19,11 @@ class Tok(Enum):
     NOW = auto()
     VAR = auto()
     CONST = auto()
-    PRINT = auto()
-    IF = auto()
-    ELSE = auto()
-    ASSIGN = auto()
-    CONTINUE = auto()
-    WHILE = auto()
-    BREAK = auto()
     EOL = auto()
     EOF = auto()
-    WITH = auto()
     FILTER = auto()
     OUTPUT = auto()
+    TO = auto()
 
     #--- Types
     INTEGER = auto()
@@ -46,6 +39,7 @@ class Tok(Enum):
     FALSE = auto()
 
     # --- One character keywords
+    ASSIGN = auto()
     MASK = auto()
     WILDCARD = auto()
     TIMES = auto()

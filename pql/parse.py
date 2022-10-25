@@ -240,8 +240,10 @@ def parse_and(tokens):
 
 def parse_relation(tokens):
     leftval = parse_sum(tokens)
+    print(f"TO found: {tokens}")
+
     optok = tokens.accept(Tok.LT, Tok.LE, Tok.GT,
-                          Tok.GE, Tok.EQ, Tok.NE, Tok.IN, Tok.BETWEEN)
+                          Tok.GE, Tok.EQ, Tok.NE, Tok.IN, Tok.BETWEEN, Tok.TO)
     if not optok:
         return leftval
     return BinOp(optok.value, leftval, parse_sum(tokens))

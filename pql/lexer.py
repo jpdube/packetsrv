@@ -20,10 +20,10 @@ _keywords = {
     "now": Tok.NOW,
     "filter": Tok.FILTER,
     "output": Tok.OUTPUT,
+    "to": Tok.TO,
 }
 
 _token1 = {
-    "=": Tok.ASSIGN,
     "/": Tok.MASK,
     "*": Tok.WILDCARD,
     ";": Tok.SEMI,
