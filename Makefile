@@ -7,14 +7,14 @@ APPNAME=pcapdbapi
 MAIN=main.py
 PYTHON=python3
 TEST_DIR=$(BASE)/test
-RUSTLIB=$(BASE)/dbengine
+RUSTLIB=$(BASE)/pktengine
 
 
 check:
 	mypy main.py pql/ dbase/ packet/ api/
 
 run:
-	cd $(RUSTLIB) && maturin develop && cd $(BASE)
+	cd $(RUSTLIB) && maturin develop -r && cd $(BASE)
 	$(PYTHON) $(MAIN)
 
 .PHONY: test
