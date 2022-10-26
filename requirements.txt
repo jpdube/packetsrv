@@ -5,3 +5,4 @@ pytest
 mypy==0.942
 psutil==5.9.0
 flask
+rich
