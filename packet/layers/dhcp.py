@@ -1,12 +1,9 @@
 from packet.layers.fields import IPv4Address, MacAddress
 from struct import unpack
-from packet.layers.ip import IP
 from packet.layers.layer_type import LayerID
 from packet.layers.packet import Packet
-from packet.utils.print_hex import format_hex
-from typing import Tuple, List
+from typing import Tuple
 
-from pql.pql import Result
 
 params_req_list = {
     1: "Subnet mask",
@@ -552,14 +549,14 @@ class Dhcp(Packet):
     def filename(self) -> str:
         return str(self.packet[108:236])
 
-    """    
-    00e0: 00 00 00 00 00 00 00 00  00 00 00 00 63 82 53 63   ············c·Sc
-    00f0: 35 01 05 3a 04 00 03 f4  80 3b 04 00 06 eb e0 33   5··:·····;·····3
-    0100: 04 00 07 e9 00 36 04 c0  a8 03 e6 01 04 ff ff ff   ·····6··········
-    0110: 00 51 03 03 ff 00 03 04  c0 a8 03 01 06 08 c0 a8   ·Q··············
-    0120: 03 e6 c0 a8 02 e6 0f 0e  6c 61 6c 6c 69 65 72 2e   ········lallier.
-    0130: 6c 6f 63 61 6c 00 ff                               local··
-    """
+    # """    
+    # 00e0: 00 00 00 00 00 00 00 00  00 00 00 00 63 82 53 63   ············c·Sc
+    # 00f0: 35 01 05 3a 04 00 03 f4  80 3b 04 00 06 eb e0 33   5··:·····;·····3
+    # 0100: 04 00 07 e9 00 36 04 c0  a8 03 e6 01 04 ff ff ff   ·····6··········
+    # 0110: 00 51 03 03 ff 00 03 04  c0 a8 03 01 06 08 c0 a8   ·Q··············
+    # 0120: 03 e6 c0 a8 02 e6 0f 0e  6c 61 6c 6c 69 65 72 2e   ········lallier.
+    # 0130: 6c 6f 63 61 6c 00 ff                               local··
+    # """
 
     def summary(self, offset: int) -> str:
         result = f'{" " * offset}DHCP ->\n'
@@ -569,6 +566,9 @@ class Dhcp(Packet):
             result += opt.summary(offset)
 
         return result
+
+    def get_field(self, fieldname: str) -> int | str | None:
+        ...
 
     def __str__(self):
         result = f"DHCP -> Opcode: {self.msg_type}, Xid: {self.xid:x}, Lease sec: {self.sec}\n{format_hex(self.packet)}\n********\n"

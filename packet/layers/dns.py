@@ -1,7 +1,6 @@
 from packet.layers.packet import Packet
 from packet.layers.fields import IPv4Address
-from packet.utils.print_hex import format_hex, print_hex
-from struct import pack, unpack
+from struct import unpack
 
 type_values = {
     1: "1: Type(A)",
@@ -230,3 +229,6 @@ class Dns(Packet):
             result += f"{i}: {a}\n"
 
         return result
+
+    def get_field(self, fieldname: str) -> int | str | None:
+        ...

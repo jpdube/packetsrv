@@ -1,6 +1,4 @@
 from struct import unpack
-from functools import lru_cache
-from packet.utils.print_hex import print_hex
 
 FRAME_TYPE_8021Q = 0x8100
 

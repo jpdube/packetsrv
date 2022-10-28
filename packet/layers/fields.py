@@ -1,8 +1,7 @@
 # import ipaddress
 from struct import pack
 from time import time_ns
-from packet.utils.print_hex import print_hex
-from typing import Tuple, List
+from typing import Tuple
 from ipaddress import *
 import json
 
