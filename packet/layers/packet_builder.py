@@ -2,7 +2,7 @@ import base64
 from ipaddress import IPv4Address
 from json import dumps
 from os import wait
-from typing import Dict
+from typing import Dict,List,Tuple
 
 from packet.layers.arp import ARP
 from packet.layers.dhcp import Dhcp
@@ -18,18 +18,32 @@ from packet.layers.packet import Packet
 from packet.layers.pcap_header import PcapHeader
 from packet.layers.tcp import TCP
 from packet.layers.udp import UDP
-from packet.utils.print_hex import print_hex
+from packet.utils.print_hex import HexDump
 
 
 class PacketBuilder:
-    __slots__ = ["packet", "layers", "fields_list"]
+    __slots__ = ["packet", "layers", "fields_list", "color_range"]
 
     def __init__(self) -> None:
-        self.layers: Dict[int, Packet] = {}
+        self.layers: Dict[LayerID, Packet] = {}
         self.fields_list = {}
+
+    def init_colors(self):
+        self.color_range: List[Tuple[int, int, str]] = []
+        self.color_range.append((0,18, "yellow"))
+        
+        if self.has_layer(LayerID.IPV4):
+            self.color_range.append((18, 38, "red"))
+        if self.has_layer(LayerID.UDP):
+           self.color_range.append((38, 54, "green"))
+           self.color_range.append((54, 8192, "magenta"))
+        if self.has_layer(LayerID.TCP):
+           self.color_range.append((38, 58, "cyan"))
+           self.color_range.append((58, 8192, "magenta"))
 
     def add(self, layer: Packet):
         self.layers[layer.name] = layer
+        self.init_colors()
 
     def print_layers(self) -> None:
         print("-" * 40)
@@ -37,7 +51,7 @@ class PacketBuilder:
             print(f"{v}")
 
     def from_bytes(self, raw_packet, header=None):
-        self.layers: Dict[int, Packet] = {}
+        self.layers: Dict[LayerID, Packet] = {}
         self.packet = raw_packet
         if header is not None:
             self.add(header)
@@ -125,9 +139,6 @@ class PacketBuilder:
                 result["icmp.seq"] = layer.sequence_no
 
             elif isinstance(layer, PcapHeader):
-                # r = bytearray(self.packet)
-                # r = bytearray(layer.header) + bytearray(self.packet)
-                # result["packet"] = str(base64.b64encode(r), "ascii")
                 result["orig_len"] = layer.orig_len
                 result["incl_len"] = layer.incl_len
                 result["ts_offset"] = layer.ts_usec
@@ -150,7 +161,7 @@ class PacketBuilder:
     def get_layer(self, layer_id) -> Packet | None:
         return self.layers.get(layer_id, None)
 
-    def get_field(self, field: str) -> int | str | IPv4Address | None:
+    def get_field(self, field: str):
         pkt_name = field.split('.')[0]
         match pkt_name:
             case 'eth':
@@ -172,3 +183,6 @@ class PacketBuilder:
                     return udp.get_field(field)
 
         return None
+
+    def print_hex(self):
+        HexDump.print_hex(self.packet, self.color_range)
