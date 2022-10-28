@@ -8,6 +8,6 @@ class Packet(ABC):
     def summary(self, offset: int) -> str:
         ...
 
-    # @abstractmethod
-    # def get_field(self, fieldname: str) -> int | str | None:
-    #     ...
+    @abstractmethod
+    def get_field(self, fieldname: str) -> int | str | None:
+        ...
