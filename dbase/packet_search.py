@@ -4,8 +4,8 @@ from struct import unpack
 
 from packet.layers.packet_decode import PacketDecode
 from packet.layers.packet_builder import PacketBuilder
-from packet.utils.print_hex import format_hex
-from pktengine import fast_packet_search
+# from packet.utils.print_hex import format_hex
+# from pktengine import fast_packet_search
 
 db_filename = "/Users/jpdube/hull-voip/db/index.db"
 pcap_path = "/Users/jpdube/hull-voip/db/pcap"
@@ -18,9 +18,6 @@ def packet_search(params):
     result = []
 
     start_time = datetime.now()
-
-    # field = params["filter"][0]
-    # value = params["filter"][1]
 
     filename = f'{pcap_path}/{params["file"]}.pcap'
     total = 0
@@ -45,8 +42,8 @@ def packet_search(params):
     print(
         f"File: [{filename}] Found:{len(result)}, Time:{datetime.now() - start_time}")
 
-    # for p in result:
-    #     print(p)
+    for p in result:
+        print(p)
 
     return (total, len(result))
 
@@ -55,7 +52,7 @@ def search_parallel():
     pool = Pool()
     flist = []
     start_time = datetime.now()
-    for i in range(20):
+    for i in range(5):
         params = {
             "file": i,
             "filter": ("ip.src", 0xc0a80301)
@@ -73,5 +70,5 @@ def search_parallel():
         f"---> Total Time: {ttl_time} Result: {found}")
 
 
-def fast_search():
-    fast_packet_search(2)
+# def fast_search():
+#     fast_packet_search(2)
