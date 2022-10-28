@@ -1,0 +1,13 @@
+
+ from pcapng.blocks import EnhancedPacket
+ from pcapng import FileScanner
+ from packet.utils.print_hex import HexDump
+
+
+if __name__ == "__main__":
+   hexDump = HexDump()
+   with open('/Users/jpdube/Downloads/dhcp.pcapng', 'rb') as fp:
+       scanner = FileScanner(fp)
+       for block in scanner:
+           if isinstance(block,EnhancedPacket):
+               HexDump.print_hex(block.packet_data, [(0, 14, "yellow"), (14, 34, "red"), (34,32768, "cyan")])
