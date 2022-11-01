@@ -40,3 +40,6 @@ class PcapHeader(Packet):
         result += f'{" " * offset}   Incl len..: {self.incl_len},0x{self.incl_len:04x} \n'
 
         return result
+
+    def get_field(self, fieldname: str) -> int | str | None:
+        ...
