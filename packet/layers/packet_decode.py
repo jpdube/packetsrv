@@ -1,4 +1,5 @@
 from struct import unpack
+from packet.layers.fields import IPv4Address
 
 FRAME_TYPE_8021Q = 0x8100
 
@@ -178,3 +179,6 @@ class PacketDecode:
             return (unpack("!H", self.packet[self.ip_offset + 12:self.ip_offset + 14])[0] & 0x10) == 0x10
         else:
             return False
+
+    def __str__(self) -> str:
+        return f"MacSrc: {self.mac_src:X}, MacDst: {self.mac_dst:X}, Vlan: {self.vlan_id}, IP src: {IPv4Address(self.ip_src)}, IP dst: {IPv4Address(self.ip_dst)} Port:{self.sport}/{self.dport}"
