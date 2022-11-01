@@ -3,6 +3,7 @@ from struct import unpack
 from packet.layers.layer_type import LayerID
 from packet.layers.packet import Packet
 from typing import Tuple
+from packet.utils.print_hex import HexDump
 
 
 params_req_list = {
@@ -571,7 +572,7 @@ class Dhcp(Packet):
         ...
 
     def __str__(self):
-        result = f"DHCP -> Opcode: {self.msg_type}, Xid: {self.xid:x}, Lease sec: {self.sec}\n{format_hex(self.packet)}\n********\n"
+        result = f"DHCP -> Opcode: {self.msg_type}, Xid: {self.xid:x}, Lease sec: {self.sec}\n{HexDump.format_hex(self.packet)}\n********\n"
         for opt in self.option_list:
             result += f" {opt}\n"
         return result

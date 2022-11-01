@@ -112,3 +112,6 @@ class IcmpEcho(Packet):
         return result
     def __str__(self):
         return f"ICMP Echo -> type: {self.type}, code: {self.code}, checksum: {self.checksum:x}, identifier: {self.identifier}, sequence: {self.sequence_no}"
+
+    def get_field(self, fieldname: str) -> int | str | None:
+        ...

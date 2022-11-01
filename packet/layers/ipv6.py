@@ -93,3 +93,6 @@ class IPV6(Packet):
         result += f'{" " * offset}   Protocol...: {self.protocol},0x{self.protocol:02x} \n'
 
         return result
+
+    def get_field(self, fieldname: str) -> int | str | None:
+        ...

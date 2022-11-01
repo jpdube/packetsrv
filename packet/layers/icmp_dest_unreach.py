@@ -118,3 +118,6 @@ class IcmpDestUnreach(Packet):
         result += f'{" " * offset}   Datagram...: {self.datagram}\n'
 
         return result
+
+    def get_field(self, fieldname: str) -> int | str | None:
+        ...
