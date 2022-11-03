@@ -143,11 +143,11 @@ class MacAddress(Field):
         return other.value == self.value
 
     def to_int(self) -> int:
-        response =  (self.value[0] << 40) & 0x00_00_FF_00_00_00_00_00
+        response = (self.value[0] << 40) & 0x00_00_FF_00_00_00_00_00
         response += (self.value[1] << 32) & 0x00_00_00_FF_00_00_00_00
         response += (self.value[2] << 24) & 0x00_00_00_00_FF_00_00_00
         response += (self.value[3] << 16) & 0x00_00_00_00_00_FF_00_00
-        response += (self.value[4] << 8)  & 0x00_00_00_00_00_00_FF_00
+        response += (self.value[4] << 8) & 0x00_00_00_00_00_00_FF_00
         response += self.value[5] & 0x00_00_00_00_00_00_00_FF
 
         return response
@@ -213,7 +213,6 @@ class IPv4Address():
             # print(f'IPV4 Address: {bin_addr:04X}')
             return bin_addr
 
-
     def __eq__(self, other: IPv4Address) -> bool:
         if isinstance(other, IPv4Address):
             return self.value == other.value
@@ -222,12 +221,15 @@ class IPv4Address():
 
     @property
     def ip_str(self):
-        byte1 = (self.value & 0xFF000000) >> 24
-        byte2 = (self.value & 0x00FF0000) >> 16
-        byte3 = (self.value & 0x0000FF00) >> 8
-        byte4 = self.value & 0x000000FF
+        if self.value:
+            byte1 = (self.value & 0xff000000) >> 24
+            byte2 = (self.value & 0x00ff0000) >> 16
+            byte3 = (self.value & 0x0000ff00) >> 8
+            byte4 = self.value & 0x000000ff
 
-        return f"{byte1}.{byte2}.{byte3}.{byte4}"
+            return f"{byte1}.{byte2}.{byte3}.{byte4}"
+        else:
+            return "0.0.0.0"
 
     @property
     def binary(self):
