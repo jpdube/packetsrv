@@ -1,8 +1,5 @@
-from datetime import datetime
 from struct import unpack
-
 from packet.layers.packet_decode import PacketDecode
-from packet.layers.packet_builder import PacketBuilder
 
 db_filename = "/Users/jpdube/hull-voip/db/index.db"
 pcap_path = "/Users/jpdube/hull-voip/db/pcap"
@@ -18,8 +15,6 @@ class PcapFile:
 
     def open(self, filename: str):
         self.filename = filename
-        # self.file = open(f"{pcap_path}/{filename}.pcap", "rb")
-        # _ = self.file.read(PCAP_GLOBAL_HEADER_SIZE)
 
     def next(self):
         with open(f"{pcap_path}/{self.filename}.pcap", "rb") as f:
@@ -35,7 +30,5 @@ class PcapFile:
 
                 pd = PacketDecode()
                 pd.decode(packet)
-                # pd = PacketBuilder()
-                # pd.from_bytes(packet)
 
                 yield pd

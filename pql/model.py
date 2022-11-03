@@ -1,10 +1,7 @@
 from datetime import datetime
-from packet.layers.fields import IPv4Address, MacAddress
+from packet.layers.fields import IPv4Address
 from typing import List
-from pql import fields_list
-from pql.fields_list import field_list, Field
-
-from packet.layers.ip import IP
+from pql.fields_list import field_list
 
 
 class Node:
@@ -78,10 +75,6 @@ class VarDecl(Expression):
 class Label(Expression):
     def __init__(self, value):
         self._value = value
-        # f = field_list.get(self._value, None)
-        # print(f"Label model: {self.value}")
-        # if f is not None:
-        #     self.index = f.index
 
     @property
     def value(self) -> str:
@@ -185,7 +178,7 @@ class Mac(Expression):
         self.value = value
 
     def __repr__(self) -> str:
-        return f"MacStatement({repr(self.value)})"
+        return f"Mac({repr(self.value)})"
 
 
 class Integer(Expression):
