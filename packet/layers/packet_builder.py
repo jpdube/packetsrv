@@ -2,7 +2,7 @@ import base64
 from ipaddress import IPv4Address
 from json import dumps
 from os import wait
-from typing import Dict,List,Tuple
+from typing import Dict, List, Tuple
 
 from packet.layers.arp import ARP
 from packet.layers.dhcp import Dhcp
@@ -30,16 +30,16 @@ class PacketBuilder:
 
     def init_colors(self):
         self.color_range: List[Tuple[int, int, str]] = []
-        self.color_range.append((0,18, "yellow"))
-        
+        self.color_range.append((0, 18, "yellow"))
+
         if self.has_layer(LayerID.IPV4):
             self.color_range.append((18, 38, "red"))
         if self.has_layer(LayerID.UDP):
-           self.color_range.append((38, 54, "green"))
-           self.color_range.append((54, 8192, "magenta"))
+            self.color_range.append((38, 54, "green"))
+            self.color_range.append((54, 8192, "magenta"))
         if self.has_layer(LayerID.TCP):
-           self.color_range.append((38, 58, "cyan"))
-           self.color_range.append((58, 8192, "magenta"))
+            self.color_range.append((38, 58, "cyan"))
+            self.color_range.append((58, 8192, "magenta"))
 
     def add(self, layer: Packet):
         self.layers[layer.name] = layer
@@ -181,8 +181,11 @@ class PacketBuilder:
                 udp = self.get_layer(LayerID.UDP)
                 if udp:
                     return udp.get_field(field)
+            case _:
+                return 0
 
-        return None
+        return 0
+        # return None
 
     def print_hex(self):
         HexDump.print_hex(self.packet, self.color_range)
