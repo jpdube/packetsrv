@@ -6,6 +6,7 @@ class Field:
     def __str__(self) -> str:
         return f'Field: {self.field}, Index: {self.index}'
 
+
 field_list = {
     "packet":               Field("packet", False),
     "timestamp":            Field("timestamp", True),
@@ -13,9 +14,12 @@ field_list = {
     "ether.mac.src":        Field("mac_src", True),
     "ether.mac.dst":        Field("mac_dst", True),
     "ether.type":           Field("ether_type", True),
-    "ether.vlan":           Field("vlan_id", True),
-    "ip.src":               Field("ip_src", True),
-    "ip.dst":               Field("ip_dst", True),
+    "ether.vlan":           Field("eth.vlan", True),
+    # "ether.vlan":           Field("vlan_id", True),
+    "ip.src":               Field("ip.src", True),
+    # "ip.src":               Field("ip_src", True),
+    "ip.dst":               Field("ip.dst", True),
+    # "ip.dst":               Field("ip_dst", True),
     "ip.version":           Field("ip_version", False),
     "ip.header_len":        Field("ip_header_len", False),
     "ip.tos":               Field("ip_tos", False),
@@ -33,6 +37,14 @@ field_list = {
     "icmp.code":            Field("icmp_code", False),
     "udp.sport":            Field("sport", True),
     "udp.dport":            Field("dport", True),
-    "tcp.sport":            Field("sport", True),
-    "tcp.dport":            Field("dport", True),
+    "tcp.sport":            Field("tcp.sport", True),
+    "tcp.dport":            Field("tcp.dport", True),
+    "tcp.syn":              Field("tcp.syn", True),
+    "tcp.ack":              Field("tcp.ack", True),
+    "tcp.push":             Field("tcp.push", True),
+    "tcp.fin":              Field("tcp.fin", True),
+    "tcp.urg":              Field("tcp.urg", True),
+    "tcp.rst":              Field("tcp.rst", True),
+    #     "tcp.sport":            Field("sport", True),
+    #     "tcp.dport":            Field("dport", True),
 }

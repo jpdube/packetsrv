@@ -6,6 +6,7 @@ from packet.layers.ipv4 import IPV4
 from pql.model import *
 from pql.pcapfile import PcapFile
 from packet.layers.packet_builder import PacketBuilder
+from packet.layers.packet_decode import PacketDecode
 from pql.tokens_list import *
 
 
@@ -18,16 +19,20 @@ def interpret_program(model, pcapfile):
     pfile = PcapFile()
     pfile.open(pcapfile)
     packet_list = []
+    total = 0
     for pkt in pfile.next():
+        total += 1
         found = interpret(model, env, pkt)
         if found:
-            packet_list.append(pkt)
-            # print(pkt)
+            pb = PacketBuilder()
+            pb.from_bytes(pkt.packet)
+            packet_list.append(True)
+            print(pb)
 
-    print(f"Found {len(packet_list)} packets")
+    print(f"Found {len(packet_list)} packets in {total}")
 
 
-def interpret(node, env, packet: PacketBuilder):
+def interpret(node, env, packet: PacketDecode):
     if isinstance(node, Integer):
         return int(node.value)
 
@@ -35,8 +40,8 @@ def interpret(node, env, packet: PacketBuilder):
         return node.timestamp
 
     elif isinstance(node, Label):
-        # print(f"In Label: {node.value}")
         value = packet.get_field(node.value)
+        # print(f"In Label: {node.value}:{value}")
         if isinstance(value, IPv4):
             return value.value
         else:

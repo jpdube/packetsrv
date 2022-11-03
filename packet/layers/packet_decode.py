@@ -17,13 +17,16 @@ class PacketDecode:
         self.offset = 18 if self.has_vlan else 14
         # print_hex(self.packet)
 
-    def search_field(self, field_name: str, value: int) -> bool:
+    def get_field(self, field_name: str) -> int:
+        # def search_field(self, field_name: str, value: int) -> bool:
         (proto, field) = field_name.split(".")
         match proto:
             case "eth":
-                return self.search_eth(field, value)
+                return self.search_eth(field)
             case "ip":
-                return self.search_ipv4(field, value)
+                return self.search_ipv4(field)
+            case "tcp":
+                return self.search_tcp(field)
             case _:
                 return False
 
@@ -31,37 +34,68 @@ class PacketDecode:
     def has_vlan(self):
         return unpack("!H", self.packet[12:14])[0] == FRAME_TYPE_8021Q
 
-    def search_eth(self, field: str, value: int) -> bool:
+    def search_eth(self, field: str) -> int:
         vlan_flag = self.has_vlan
 
         match field:
             case "dst":
-                return self.mac_dst == value
+                return self.mac_dst
 
             case "src":
-                return self.mac_src == value
+                return self.mac_src
 
             case "type":
-                return self.ethertype == value
+                return self.ethertype
 
             case "vlan":
                 if vlan_flag:
-                    return self.vlan_id == value
+                    return self.vlan_id
                 else:
                     return False
 
             case _:
                 return False
 
-    def search_ipv4(self, field: str, value: int) -> bool:
+    def search_ipv4(self, field: str) -> int:
         # offset = 18 if self.has_vlan() else 14
 
         match field:
             case "src":
-                return self.ip_src == value
+                return self.ip_src
 
             case "dst":
-                return self.ip_dst == value
+                return self.ip_dst
+
+            case _:
+                return False
+
+    def search_tcp(self, field: str) -> int:
+        # offset = 18 if self.has_vlan() else 14
+
+        match field:
+            case "sport":
+                return self.tcp_sport
+
+            case "dport":
+                return self.tcp_dport
+
+            case "syn":
+                return self.tcp_flag_syn
+
+            case "ack":
+                return self.tcp_flag_ack
+
+            case "push":
+                return self.tcp_flag_push
+
+            case "fin":
+                return self.tcp_flag_fin
+
+            case "urg":
+                return self.tcp_flag_urg
+
+            case "rst":
+                return self.tcp_flag_rst
 
             case _:
                 return False
@@ -164,11 +198,19 @@ class PacketDecode:
             return 0
 
     @property
+    def tcp_sport(self) -> int:
+        return unpack("!H", self.packet[self.ip_offset + 0:self.ip_offset + 2])[0]
+
+    @property
+    def tcp_dport(self) -> int:
+        return unpack("!H", self.packet[self.ip_offset + 2:self.ip_offset + 4])[0]
+
+    @property
     def tcp_flag_syn(self) -> bool:
         if self.ip_proto == 0x06:
             # print_hex(self.packet)
-            print(self.offset)
-            return (unpack("!H", self.packet[self.ip_offset + 12:self.ip_offset + 14])[0] & 0x20) == 0x20
+            # print(self.offset)
+            return (unpack("!H", self.packet[self.ip_offset + 12:self.ip_offset + 14])[0] & 0x02) == 0x02
         else:
             return False
 
@@ -177,6 +219,38 @@ class PacketDecode:
         if self.ip_proto == 0x06:
             # print_hex(self.packet)
             return (unpack("!H", self.packet[self.ip_offset + 12:self.ip_offset + 14])[0] & 0x10) == 0x10
+        else:
+            return False
+
+    @property
+    def tcp_flag_push(self) -> bool:
+        if self.ip_proto == 0x06:
+            # print_hex(self.packet)
+            return (unpack("!H", self.packet[self.ip_offset + 12:self.ip_offset + 14])[0] & 0x08) == 0x08
+        else:
+            return False
+
+    @property
+    def tcp_flag_fin(self) -> bool:
+        if self.ip_proto == 0x06:
+            # print_hex(self.packet)
+            return (unpack("!H", self.packet[self.ip_offset + 12:self.ip_offset + 14])[0] & 0x01) == 0x01
+        else:
+            return False
+
+    @property
+    def tcp_flag_urg(self) -> bool:
+        if self.ip_proto == 0x06:
+            # print_hex(self.packet)
+            return (unpack("!H", self.packet[self.ip_offset + 12:self.ip_offset + 14])[0] & 0x20) == 0x20
+        else:
+            return False
+
+    @property
+    def tcp_flag_rst(self) -> bool:
+        if self.ip_proto == 0x06:
+            # print_hex(self.packet)
+            return (unpack("!H", self.packet[self.ip_offset + 12:self.ip_offset + 14])[0] & 0x04) == 0x04
         else:
             return False
 

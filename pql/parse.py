@@ -347,7 +347,7 @@ def parse_now(tokens):
 
 def parse_bool(tokens):
     token = tokens.expect(TOK_TRUE, TOK_FALSE)
-    return token.value
+    return Boolean(token.value)
 
 
 def parse_unary(tokens):

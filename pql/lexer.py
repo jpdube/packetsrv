@@ -22,6 +22,8 @@ _keywords = {
     "filter": TOK_FILTER,
     "output": TOK_OUTPUT,
     "to": TOK_TO,
+    "true": TOK_TRUE,
+    "false": TOK_FALSE,
 }
 
 _token1 = {

@@ -10,6 +10,7 @@ pcap_path = "/Users/jpdube/hull-voip/db/pcap"
 PCAP_GLOBAL_HEADER_SIZE = 24
 PCAP_PACKET_HEADER_SIZE = 16
 
+
 class PcapFile:
 
     def __init__(self):
@@ -19,7 +20,6 @@ class PcapFile:
         self.filename = filename
         # self.file = open(f"{pcap_path}/{filename}.pcap", "rb")
         # _ = self.file.read(PCAP_GLOBAL_HEADER_SIZE)
-        
 
     def next(self):
         with open(f"{pcap_path}/{self.filename}.pcap", "rb") as f:
@@ -33,10 +33,9 @@ class PcapFile:
                 incl_len = unpack("!I", header[12:16])[0]
                 packet = f.read(incl_len)
 
-                # pd = PacketDecode()
-                # pd.decode(packet)
-                pd = PacketBuilder()
-                pd.from_bytes(packet)
+                pd = PacketDecode()
+                pd.decode(packet)
+                # pd = PacketBuilder()
+                # pd.from_bytes(packet)
 
-                yield pd 
-
+                yield pd

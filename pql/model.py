@@ -78,10 +78,10 @@ class VarDecl(Expression):
 class Label(Expression):
     def __init__(self, value):
         self._value = value
-        f = field_list.get(self._value, None)
-        print(f"Label model: {self.value}")
-        if f is not None:
-            self.index = f.index
+        # f = field_list.get(self._value, None)
+        # print(f"Label model: {self.value}")
+        # if f is not None:
+        #     self.index = f.index
 
     @property
     def value(self) -> str:
@@ -198,10 +198,10 @@ class Integer(Expression):
 
 class Boolean(Expression):
     def __init__(self, value):
-        self.value = value
+        self.value = True if value == "true" else False
 
     def __repr__(self):
-        return f"BooleanStatement({self.value})"
+        return f"Boolean({self.value})"
 
 
 class Grouping(Expression):

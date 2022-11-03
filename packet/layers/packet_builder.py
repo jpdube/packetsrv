@@ -104,7 +104,7 @@ class PacketBuilder:
         result = ""
         for l in self.layers.values():
             result += f"{l}\n"
-        return str(result)
+        return result
 
     def export(self) -> Dict:
         result = {}

@@ -78,7 +78,7 @@ class TCP(Packet):
     def options(self) -> bytes | None:
         if self.header_len > 5:
             offset = (self.header_len - 5) * 4
-            return self.packet[20 : 20 + offset]
+            return self.packet[20: 20 + offset]
         else:
             return None
 
@@ -86,7 +86,7 @@ class TCP(Packet):
     def payload(self) -> bytes:
         if self.header_len > 5:
             offset = (self.header_len - 5) * 4
-            return self.packet[20 + offset :]
+            return self.packet[20 + offset:]
         else:
             return self.packet[20:]
 
@@ -127,7 +127,7 @@ class TCP(Packet):
         return self.flags & 0x01 == 0x01
 
     def summary(self, offset: int) -> str:
-        result =  f'{" " * offset}TCP ->\n'
+        result = f'{" " * offset}TCP ->\n'
         result += f'{" " * offset}   Src port...: {self.src_port}\n'
         result += f'{" " * offset}   Dst port...: {self.dst_port}\n'
         result += f'{" " * offset}   Seq no.....: {self.seq_no},0x{self.seq_no:04x} \n'
@@ -139,7 +139,7 @@ class TCP(Packet):
         return result
 
     def __str__(self) -> str:
-        return f"TCP -> sport: {self.src_port} dport: {self.dst_port} SYN:{self.flag_syn} ACK:{self.flag_ack}"
+        return f"TCP -> sport: {self.src_port} dport: {self.dst_port} SYN:{self.flag_syn} ACK:{self.flag_ack} FIN:{self.flag_fin} PUSH:{self.flag_push} URG:{self.flag_urg} RST:{self.flag_rst}"
 
     def get_field(self, fieldname: str):
         field = fieldname.split('.')[1]
