@@ -15,6 +15,7 @@ field_list = {
     "eth.dst":              Field("eth.dst", True),
     "eth.type":             Field("eth.type", True),
     "eth.vlan":             Field("eth.vlan", True),
+    "eth.has_vlan":         Field("eth.has_vlan", True),
     "ip.src":               Field("ip.src", True),
     "ip.dst":               Field("ip.dst", True),
     "ip.version":           Field("ip_version", False),

@@ -45,6 +45,10 @@ class Ethernet(Packet):
             return 1
 
     @property
+    def has_vlan(self) -> bool:
+        return self.frametype == FRAME_TYPE_8021Q
+
+    @property
     def payload(self) -> bytes:
         if self.frametype == FRAME_TYPE_8021Q:
             return self.packet[18:]
@@ -72,6 +76,8 @@ class Ethernet(Packet):
                     return self.src_mac
                 case 'vlan':
                     return self.vlan_id
+                case 'has_vlan':
+                    return self.has_vlan
                 case 'type':
                     return self.ethertype
                 case _:

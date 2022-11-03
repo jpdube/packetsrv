@@ -51,7 +51,10 @@ class PacketDecode:
                 if vlan_flag:
                     return self.vlan_id
                 else:
-                    return False
+                    return 1
+
+            case "has_vlan":
+                return vlan_flag
 
             case _:
                 return False
