@@ -93,10 +93,13 @@ class IcmpTimeExceeded(Packet):
         return f"ICMP Dest unreachable -> type: {self.type}, code: {self.code}, checksum: {self.checksum}"
 
     def summary(self, offset: int) -> str:
-        result =  f'{" " * offset}ICMP-Time exceeded ->\n'
+        result = f'{" " * offset}ICMP-Time exceeded ->\n'
         result += f'{" " * offset}   Type.......: {self.type}\n'
         result += f'{" " * offset}   Code.......: {self.code}\n'
         result += f'{" " * offset}   Checksum...: {self.checksum},0x{self.checksum:04x}\n'
         result += f'{" " * offset}   Datagram...: {self.datagram}\n'
 
         return result
+
+    def get_field(self, fieldname: str) -> int | str | None:
+        ...
