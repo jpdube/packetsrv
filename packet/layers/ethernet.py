@@ -72,7 +72,7 @@ class Ethernet(Packet):
                     return self.src_mac
                 case 'vlan':
                     return self.vlan_id
-                case 'ethertype':
+                case 'type':
                     return self.ethertype
                 case _:
                     return 0

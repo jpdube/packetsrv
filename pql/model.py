@@ -1,5 +1,5 @@
 from datetime import datetime
-from packet.layers.fields import IPv4Address
+from packet.layers.fields import IPv4Address, MacAddress
 from typing import List
 from pql.fields_list import field_list
 
@@ -175,10 +175,15 @@ class IPv4(Expression):
 
 class Mac(Expression):
     def __init__(self, value):
-        self.value = value
+        self.value = MacAddress(value)
+        self.int_value = self.value.to_int()
+
+    @property
+    def to_int(self) -> int:
+        return self.int_value
 
     def __repr__(self) -> str:
-        return f"Mac({repr(self.value)})"
+        return f"Mac({self.value})"
 
 
 class Integer(Expression):

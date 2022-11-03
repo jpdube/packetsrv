@@ -51,6 +51,10 @@ def interpret(node, env, packet: PacketDecode):
         # print(node.to_int)
         return node
 
+    elif isinstance(node, Mac):
+        # print(node.to_int)
+        return node
+
     elif isinstance(node, Now):
         time_result = datetime.fromtimestamp(node.value)
         match node.modifier:
@@ -116,6 +120,8 @@ def interpret(node, env, packet: PacketDecode):
         elif node.op == TOK_EQ:
             if isinstance(rightval, IPv4):
                 return rightval.is_in_network(leftval)
+            elif isinstance(rightval, Mac):
+                return leftval == rightval.to_int
             else:
                 return leftval == rightval
         elif node.op == TOK_LAND:
