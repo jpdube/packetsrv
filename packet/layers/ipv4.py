@@ -140,9 +140,9 @@ class IPV4(Packet):
                 case 'checksum':
                     return self.checksum
                 case 'src':
-                    return self.src_ip
+                    return self.src_ip.value
                 case 'dst':
-                    return self.dst_ip
+                    return self.dst_ip.value
                 case _:
                     return 0
         else:
