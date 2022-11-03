@@ -1,56 +1,59 @@
 import re
 
-from pql.tokens_list import Tok
+from pql.tokens_list import *
+# from pql.tokens_list import Tok
 
 _keywords = {
-    "select": Tok.SELECT,
-    "from": Tok.FROM,
-    "include": Tok.INCLUDE,
-    "where": Tok.WHERE,
-    "order by": Tok.ORDER_BY,
-    "asc": Tok.ASC,
-    "desc": Tok.DESC,
-    "between": Tok.BETWEEN,
-    "groupby": Tok.GROUP_BY,
-    "top": Tok.TOP,
-    "limit": Tok.LIMIT,
-    "in": Tok.IN,
-    "and": Tok.LAND,
-    "or": Tok.LOR,
-    "now": Tok.NOW,
-    "filter": Tok.FILTER,
-    "output": Tok.OUTPUT,
-    "to": Tok.TO,
+    "select": TOK_SELECT,
+    "from": TOK_FROM,
+    "include": TOK_INCLUDE,
+    "where": TOK_WHERE,
+    "order by": TOK_ORDER_BY,
+    "asc": TOK_ASC,
+    "desc": TOK_DESC,
+    "between": TOK_BETWEEN,
+    "groupby": TOK_GROUP_BY,
+    "top": TOK_TOP,
+    "limit": TOK_LIMIT,
+    "in": TOK_IN,
+    "and": TOK_LAND,
+    "or": TOK_LOR,
+    "now": TOK_NOW,
+    "filter": TOK_FILTER,
+    "output": TOK_OUTPUT,
+    "to": TOK_TO,
 }
 
 _token1 = {
-    "/": Tok.MASK,
-    "*": Tok.WILDCARD,
-    ";": Tok.SEMI,
-    ",": Tok.DELIMITER,
-    ">": Tok.GT,
-    "<": Tok.LT,
-    "{": Tok.LBRACE,
-    "}": Tok.RBRACE,
-    "+": Tok.PLUS,
-    "-": Tok.MINUS,
-    "(": Tok.LPAREN,
-    ")": Tok.RPAREN,
+    "/": TOK_MASK,
+    "*": TOK_WILDCARD,
+    ";": TOK_SEMI,
+    ",": TOK_DELIMITER,
+    ">": TOK_GT,
+    "<": TOK_LT,
+    "{": TOK_LBRACE,
+    "}": TOK_RBRACE,
+    "+": TOK_PLUS,
+    "-": TOK_MINUS,
+    "(": TOK_LPAREN,
+    ")": TOK_RPAREN,
 }
 
 _token2 = {
-    "==": Tok.EQ,
-    "<=": Tok.LE,
-    ">=": Tok.GE,
-    "!=": Tok.NE,
+    "==": TOK_EQ,
+    "<=": TOK_LE,
+    ">=": TOK_GE,
+    "!=": TOK_NE,
 }
 
 _token_comment = {"//", "/*", "*/"}
 
 
 class Token:
-    def __init__(self, type: Tok, value: str, line: int, col: int):
-        self.type: Tok = type
+    def __init__(self, type: int, value: str, line: int, col: int):
+        # def __init__(self, type: Tok, value: str, line: int, col: int):
+        self.type = type
+        # self.type: Tok = type
         self.value: str = value
         self.line: int = line
         self.col: int = col
@@ -143,7 +146,7 @@ class Lexer:
             yield (token)
 
         # --- End of file parsing
-        yield (Token(Tok.EOF, "EOF", self.line, self.col))
+        yield (Token(TOK_EOF, "EOF", self.line, self.col))
 
     def is_digit(self, c: str) -> bool:
         return c.isdigit() or c == '.' or c == ':'
@@ -155,11 +158,11 @@ class Lexer:
 
         value = self.text[tok_start: self.pos]
         if value.count(".") == 3:
-            token = Token(Tok.IPV4, value, self.line, self.col)
+            token = Token(TOK_IPV4, value, self.line, self.col)
         elif "." in value:
-            token = Token(Tok.FLOAT, value, self.line, self.col)
+            token = Token(TOK_FLOAT, value, self.line, self.col)
         else:
-            token = Token(Tok.INTEGER, value, self.line, self.col)
+            token = Token(TOK_INTEGER, value, self.line, self.col)
 
         self.col += self.pos - (self.pos - len(value))
         return token
@@ -176,7 +179,7 @@ class Lexer:
         if value in _keywords:
             token = Token(_keywords[value], value, self.line, self.col)
         else:
-            token = Token(Tok.NAME, value, self.line, self.col)
+            token = Token(TOK_NAME, value, self.line, self.col)
 
         self.col += self.pos - (self.pos - len(value))
         return token
@@ -191,7 +194,7 @@ class Lexer:
 
         value = self.text[tok_start: self.pos]
         self.col += self.pos - (self.pos - len(value))
-        return Token(Tok.MAC, value, self.line, self.col)
+        return Token(TOK_MAC, value, self.line, self.col)
 
     def is_string(self) -> bool:
         return self.text[self.pos] == "'"
@@ -202,7 +205,7 @@ class Lexer:
         while self.pos < self.text_len and self.text[self.pos] != "'":
             self.pos += 1
         value = self.text[tok_start + 1: self.pos]
-        token = Token(Tok.STRING, value, self.line, self.col)
+        token = Token(TOK_STRING, value, self.line, self.col)
         self.pos += 1
         self.col += self.pos - (self.pos - len(value))
 
@@ -218,7 +221,7 @@ class Lexer:
 
     def read_date(self) -> Token:
         value = self.text[self.pos: self.pos + 19]
-        token = Token(Tok.DATE, value, self.line, self.col)
+        token = Token(TOK_DATE, value, self.line, self.col)
         self.pos += 19
         self.col += self.pos - (self.pos - len(value))
         return token

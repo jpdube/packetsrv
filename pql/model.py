@@ -79,6 +79,7 @@ class Label(Expression):
     def __init__(self, value):
         self._value = value
         f = field_list.get(self._value, None)
+        print(f"Label model: {self.value}")
         if f is not None:
             self.index = f.index
 
@@ -160,8 +161,10 @@ class Float(Expression):
 
 
 class IPv4(Expression):
-    def __init__(self, value):
+    def __init__(self, value, mask):
         self.ipaddr = IPv4Address(value)
+        self.mask = mask
+        self.min, self.max = self.to_network(self.mask)
 
     @property
     def to_int(self):
@@ -170,8 +173,11 @@ class IPv4(Expression):
     def to_network(self, mask):
         return self.ipaddr.network(mask)
 
+    def is_in_network(self, address) -> bool:
+        return address >= self.min and address <= self.max
+
     def __repr__(self) -> str:
-        return f"IPv4({(self.ipaddr)})"
+        return f"IPv4({(self.ipaddr)}, {self.mask})"
 
 
 class Mac(Expression):

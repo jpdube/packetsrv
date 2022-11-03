@@ -1,7 +1,7 @@
 # from packet.layers.ipv4 import IPV4
 from pql.lexer import Lexer
 from pql.model import *
-from pql.tokens_list import Tok
+from pql.tokens_list import *
 
 
 class Tokenizer:
@@ -48,17 +48,17 @@ class Tokenizer:
 
 def parse_prog(tokens):
     statements = parse_stmts(tokens)
-    tokens.expect(Tok.EOF)
+    tokens.expect(TOK_EOF)
 
     return statements
 
 
 def parse_stmt(tokens):
-    if tokens.peek(Tok.NAME):
+    if tokens.peek(TOK_NAME):
         return parse_assignment(tokens)
-    elif tokens.peek(Tok.SELECT):
+    elif tokens.peek(TOK_SELECT):
         return parse_select(tokens)
-    elif tokens.peek(Tok.NOW):
+    elif tokens.peek(TOK_NOW):
         return parse_now(tokens)
     else:
         return None
@@ -76,71 +76,71 @@ def parse_stmts(tokens):
 
 def parse_assignment(tokens):
     print("In assignment")
-    var_name = tokens.expect(Tok.NAME)
-    tokens.expect(Tok.ASSIGN)
+    var_name = tokens.expect(TOK_NAME)
+    tokens.expect(TOK_ASSIGN)
     value = parse_expression(tokens)
-    tokens.expect(Tok.SEMI)
+    tokens.expect(TOK_SEMI)
     return Store(var_name.value, value)
 
 
 def parse_select(tokens):
-    tokens.expect(Tok.SELECT)
+    tokens.expect(TOK_SELECT)
     fields = []
-    if tokens.peek(Tok.WILDCARD):
-        field = tokens.expect(Tok.WILDCARD)
+    if tokens.peek(TOK_WILDCARD):
+        field = tokens.expect(TOK_WILDCARD)
         fields.append(Label("*"))
     else:
         while True:
-            field = tokens.expect(Tok.NAME)
+            field = tokens.expect(TOK_NAME)
             # print(f'SELECT fields: {field}')
             if field:
                 fields.append(Label(field.value))
 
-            if tokens.accept(Tok.DELIMITER) is None:
+            if tokens.accept(TOK_DELIMITER) is None:
                 break
 
-    tokens.expect(Tok.FROM)
+    tokens.expect(TOK_FROM)
     from_fields = []
     while True:
-        ffield = tokens.expect(Tok.NAME)
+        ffield = tokens.expect(TOK_NAME)
         if ffield:
             from_fields.append(Label(ffield.value))
-        if tokens.accept(Tok.DELIMITER) is None:
+        if tokens.accept(TOK_DELIMITER) is None:
             break
 
     where_value = None
-    if tokens.peek(Tok.WHERE):
-        tokens.expect(Tok.WHERE)
+    if tokens.peek(TOK_WHERE):
+        tokens.expect(TOK_WHERE)
         where_value = parse_expression(tokens)
 
     groupby_value = None
-    if tokens.peek(Tok.GROUP_BY):
-        tokens.expect(Tok.GROUP_BY)
+    if tokens.peek(TOK_GROUP_BY):
+        tokens.expect(TOK_GROUP_BY)
         groupby_value = []
         while True:
-            field = tokens.expect(Tok.NAME)
+            field = tokens.expect(TOK_NAME)
             # print(f'SELECT fields: {field}')
             if field:
                 groupby_value.append(Label(field.value))
 
-            if tokens.accept(Tok.DELIMITER) is None:
+            if tokens.accept(TOK_DELIMITER) is None:
                 break
 
     top_value = None
-    if tokens.peek(Tok.TOP):
-        tokens.expect(Tok.TOP)
+    if tokens.peek(TOK_TOP):
+        tokens.expect(TOK_TOP)
         top_value = parse_expression(tokens)
 
     limit_fields = []
-    if tokens.peek(Tok.LIMIT):
-        tokens.expect(Tok.LIMIT)
-        offset = tokens.expect(Tok.INTEGER)
+    if tokens.peek(TOK_LIMIT):
+        tokens.expect(TOK_LIMIT)
+        offset = tokens.expect(TOK_INTEGER)
         limit_fields.append(offset)
-        tokens.expect(Tok.DELIMITER)
-        limit = tokens.expect(Tok.INTEGER)
+        tokens.expect(TOK_DELIMITER)
+        limit = tokens.expect(TOK_INTEGER)
         limit_fields.append(limit)
 
-    tokens.expect(Tok.SEMI)
+    tokens.expect(TOK_SEMI)
     return SelectStatement(fields,
                            from_fields,
                            None,
@@ -152,67 +152,73 @@ def parse_select(tokens):
 
 
 def parse_date(tokens):
-    token = tokens.expect(Tok.DATE)
+    token = tokens.expect(TOK_DATE)
     return Date(token.value)
 
 
 def parse_string(tokens):
-    token = tokens.expect(Tok.STRING)
+    token = tokens.expect(TOK_STRING)
     return String(token.value)
 
 
 def parse_integer(tokens):
-    token = tokens.expect(Tok.INTEGER)
+    token = tokens.expect(TOK_INTEGER)
     return Integer(token.value)
 
 
 def parse_float(tokens):
-    token = tokens.expect(Tok.FLOAT)
+    token = tokens.expect(TOK_FLOAT)
     return Float(token.value)
 
 
 def parse_ipv4(tokens):
-    token = tokens.expect(Tok.IPV4)
-    return IPv4(token.value)
+    token = tokens.expect(TOK_IPV4)
+    mask_value = 32
+    if tokens.peek(TOK_MASK):
+        tokens.accept(TOK_MASK)
+        mask = tokens.expect(TOK_INTEGER)
+        mask_value = mask.value
+
+    return IPv4(token.value, mask_value)
 
 
 def parse_mac(tokens):
-    token = tokens.expect(Tok.MAC)
+    token = tokens.expect(TOK_MAC)
     return Mac(token.value)
 
 
 def parse_const(tokens):
-    tokens.expect(Tok.CONST)
-    name = tokens.expect(Tok.NAME)
-    const_type = tokens.accept(Tok.NAME)
+    tokens.expect(TOK_CONST)
+    name = tokens.expect(TOK_NAME)
+    const_type = tokens.accept(TOK_NAME)
     if const_type:
         type = const_type.value
     else:
         type = None
-    tokens.expect(Tok.ASSIGN)
+    tokens.expect(TOK_ASSIGN)
     value = parse_expression(tokens)
-    tokens.expect(Tok.SEMI)
+    tokens.expect(TOK_SEMI)
     return ConstDecl(name.value, type, value)
 
 
 def parse_var(tokens):
-    tokens.expect(Tok.VAR)
-    name = tokens.expect(Tok.NAME)
-    const_type = tokens.accept(Tok.NAME)
+    tokens.expect(TOK_VAR)
+    name = tokens.expect(TOK_NAME)
+    const_type = tokens.accept(TOK_NAME)
     if const_type:
         type = const_type.value
     else:
         type = None
-    tokens.expect(Tok.ASSIGN)
+    tokens.expect(TOK_ASSIGN)
     value = parse_expression(tokens)
-    tokens.expect(Tok.SEMI)
+    tokens.expect(TOK_SEMI)
     return VarDecl(name.value, type, value)
 
 
 def parse_grouping(tokens):
-    tokens.expect(Tok.LPAREN)
+    tokens.expect(TOK_LPAREN)
     expr = parse_expression(tokens)
-    tokens.expect(Tok.RPAREN)
+    tokens.expect(TOK_RPAREN)
     return Grouping(expr)
 
 
@@ -223,106 +229,129 @@ def parse_expression(tokens):
 def parse_or(tokens):
     leftval = parse_and(tokens)
     while True:
-        optok = tokens.accept(Tok.LOR)
+        optok = tokens.accept(TOK_LOR)
         if not optok:
             return leftval
-        leftval = BinOp(optok.value, leftval, parse_and(tokens))
+        leftval = BinOp(optok.type, leftval, parse_and(tokens))
 
 
 def parse_and(tokens):
     leftval = parse_relation(tokens)
     while True:
-        optok = tokens.accept(Tok.LAND)
+        optok = tokens.accept(TOK_LAND)
+        print(optok)
         if not optok:
             return leftval
-        leftval = BinOp(optok.value, leftval, parse_relation(tokens))
+        leftval = BinOp(optok.type, leftval, parse_relation(tokens))
 
 
 def parse_relation(tokens):
     leftval = parse_sum(tokens)
     print(f"TO found: {tokens}")
 
-    optok = tokens.accept(Tok.LT, Tok.LE, Tok.GT,
-                          Tok.GE, Tok.EQ, Tok.NE, Tok.IN, Tok.BETWEEN, Tok.TO)
+    optok = tokens.accept(TOK_LT, TOK_LE, TOK_GT,
+                          TOK_GE, TOK_EQ, TOK_NE, TOK_IN, TOK_BETWEEN, TOK_TO)
+    # TOK_GE, TOK_EQ, TOK_NE, TOK_IN, TOK_BETWEEN, TOK_TO)
     if not optok:
         return leftval
-    return BinOp(optok.value, leftval, parse_sum(tokens))
+    return BinOp(optok.type, leftval, parse_sum(tokens))
 
 
 def parse_sum(tokens):
     leftval = parse_term(tokens)
     while True:
-        optok = tokens.accept(Tok.PLUS, Tok.MINUS)
+        optok = tokens.accept(TOK_PLUS, TOK_MINUS)
         if not optok:
             return leftval
-        leftval = BinOp(optok.value, leftval, parse_term(tokens))
+        leftval = BinOp(optok.type, leftval, parse_term(tokens))
 
 
 def parse_load(tokens):
-    t = tokens.expect(Tok.NAME)
+    t = tokens.expect(TOK_NAME)
     return Label(t.value)
 
 
 def parse_term(tokens):
     leftval = parse_factor(tokens)
     while True:
-        optok = tokens.accept(Tok.TIMES, Tok.MASK)
+        optok = tokens.accept(TOK_TIMES)
+        # optok = tokens.accept(TOK_TIMES, TOK_MASK)
         if not optok:
             return leftval
         leftval = BinOp(optok.value, leftval, parse_factor(tokens))
 
 
+# def parse_mask(tokens):
+#     leftval = parse_factor(tokens)
+#     while True:
+#         optok = tokens.accept(TOK_MASK)
+#         if not optok:
+#             return leftval
+#         leftval = BinOp(optok.value, leftval, parse_factor(tokens))
+
+
 def parse_factor(tokens):
-    if tokens.peek(Tok.INTEGER):
+    if tokens.peek(TOK_INTEGER):
         return parse_integer(tokens)
-    elif tokens.peek(Tok.FLOAT):
+    elif tokens.peek(TOK_FLOAT):
         return parse_float(tokens)
-    elif tokens.peek(Tok.IPV4):
+    elif tokens.peek(TOK_IPV4):
         return parse_ipv4(tokens)
-    elif tokens.peek(Tok.MAC):
+    elif tokens.peek(TOK_MAC):
         return parse_mac(tokens)
-    elif tokens.peek(Tok.STRING):
+    elif tokens.peek(TOK_STRING):
         return parse_string(tokens)
-    elif tokens.peek(Tok.DATE):
+    elif tokens.peek(TOK_DATE):
         return parse_date(tokens)
-    elif tokens.peek(Tok.TRUE, Tok.FALSE):
+    elif tokens.peek(TOK_TRUE, TOK_FALSE):
         return parse_bool(tokens)
-    elif tokens.peek(Tok.PLUS, Tok.MINUS, Tok.LNOT):
+    elif tokens.peek(TOK_PLUS, TOK_MINUS, TOK_LNOT):
         return parse_unary(tokens)
-    elif tokens.peek(Tok.NAME):
+    elif tokens.peek(TOK_NAME):
         return parse_load(tokens)
-    elif tokens.peek(Tok.LPAREN):
+    elif tokens.peek(TOK_LPAREN):
         return parse_grouping(tokens)
-    elif tokens.peek(Tok.NOW):
+    elif tokens.peek(TOK_NOW):
         return parse_now(tokens)
+    # elif tokens.peek(TOK_IN):
+    #     return parse_in(tokens)
+
+
+def parse_in(tokens):
+    in_tok = tokens.expect(TOK_IN)
+    ip = tokens.expect(TOK_IPV4)
+    tokens.expect(TOK_MASK)
+    mask = tokens.expect(TOK_INTEGER)
+
+    return BinOp(in_tok.value, 0xc0a80300, 0xc0a803ff)
 
 
 def parse_now(tokens):
     modifier = 'h'
     offset = 0
 
-    now_tok = tokens.expect(Tok.NOW)
-    tokens.expect(Tok.LPAREN)
+    now_tok = tokens.expect(TOK_NOW)
+    tokens.expect(TOK_LPAREN)
 
-    if not tokens.peek(Tok.RPAREN):
-        tokens.expect(Tok.MINUS)
-        offset = tokens.expect(Tok.INTEGER).value
+    if not tokens.peek(TOK_RPAREN):
+        tokens.expect(TOK_MINUS)
+        offset = tokens.expect(TOK_INTEGER).value
 
-        if tokens.peek(Tok.NAME):
-            modifier = tokens.expect(Tok.NAME).value
+        if tokens.peek(TOK_NAME):
+            modifier = tokens.expect(TOK_NAME).value
 
-    tokens.expect(Tok.RPAREN)
+    tokens.expect(TOK_RPAREN)
 
     return Now(int(offset), modifier)
 
 
 def parse_bool(tokens):
-    token = tokens.expect(Tok.TRUE, Tok.FALSE)
+    token = tokens.expect(TOK_TRUE, TOK_FALSE)
     return token.value
 
 
 def parse_unary(tokens):
-    optok = tokens.expect(Tok.PLUS, Tok.MINUS, Tok.LNOT)
+    optok = tokens.expect(TOK_PLUS, TOK_MINUS, TOK_LNOT)
     factor = parse_factor(tokens)
     return Unary(optok.value, factor)
 
