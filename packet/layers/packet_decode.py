@@ -69,6 +69,9 @@ class PacketDecode:
             case "dst":
                 return self.ip_dst
 
+            case "version":
+                return self.ip_version
+
             case _:
                 return False
 

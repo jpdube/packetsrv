@@ -24,10 +24,10 @@ def interpret_program(model, pcapfile):
         total += 1
         found = interpret(model, env, pkt)
         if found:
-            # pb = PacketBuilder()
-            # pb.from_bytes(pkt.packet)
+            pb = PacketBuilder()
+            pb.from_bytes(pkt.packet)
             packet_list.append(True)
-            # print(pb)
+            print(pb)
 
     print(f"Found {len(packet_list)} packets in {total}")
 
