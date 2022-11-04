@@ -75,6 +75,9 @@ class PacketDecode:
             case "hdr_len":
                 return self.ip_hdr_len
 
+            case "tos":
+                return self.ip_tos
+
             case _:
                 return False
 
@@ -141,7 +144,7 @@ class PacketDecode:
     @property
     def vlan_id(self) -> int:
         if self.has_vlan:
-            return unpack("!H", self.packet[14:16])[0]
+            return unpack("!H", self.packet[14:16])[0] & 0xFFF
         else:
             return 1
 
@@ -157,6 +160,11 @@ class PacketDecode:
     def ip_offset(self) -> int:
         # print(f"V:{self.ip_version}, HL:{self.ip_hdr_len}")
         return self.offset + self.ip_hdr_len
+
+    @property
+    def ip_tos(self) -> int:
+        # print(f"V:{self.ip_version}, HL:{self.ip_hdr_len}")
+        return self.packet[self.offset + 1]
 
     @property
     def ip_src(self) -> int:

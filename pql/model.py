@@ -2,6 +2,7 @@ from datetime import datetime
 from packet.layers.fields import IPv4Address, MacAddress
 from typing import List
 from pql.fields_list import field_list
+from pql.tokens_list import const_value, human_tokens
 
 
 class Node:
@@ -56,7 +57,7 @@ class ConstDecl(Expression):
     def __init__(self, name, type, value):
         self.name = name
         self.type = type
-        self.value = value
+        self.value = const_value(value)
 
     def __repr__(self):
         return f"ConstDecl {self.name}, {self.type}, {self.value}"
@@ -217,4 +218,4 @@ class BinOp(Expression):
         self.right = right
 
     def __repr__(self):
-        return f"BinOp({self.op}, {self.left}, {self.right})"
+        return f"BinOp({human_tokens(self.op)}, {self.left}, {self.right})"

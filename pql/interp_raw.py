@@ -55,6 +55,9 @@ def interpret(node, env, packet: PacketDecode):
         # print(node.to_int)
         return node
 
+    elif isinstance(node, ConstDecl):
+        return node.value
+
     elif isinstance(node, Now):
         time_result = datetime.fromtimestamp(node.value)
         match node.modifier:

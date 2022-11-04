@@ -188,17 +188,21 @@ def parse_mac(tokens):
 
 
 def parse_const(tokens):
-    tokens.expect(TOK_CONST)
-    name = tokens.expect(TOK_NAME)
-    const_type = tokens.accept(TOK_NAME)
-    if const_type:
-        type = const_type.value
-    else:
-        type = None
-    tokens.expect(TOK_ASSIGN)
-    value = parse_expression(tokens)
-    tokens.expect(TOK_SEMI)
-    return ConstDecl(name.value, type, value)
+    name = tokens.expect(TOK_CONST)
+    return ConstDecl(name.value, "int", name.value)
+
+# def parse_const(tokens):
+#     tokens.expect(TOK_CONST)
+#     name = tokens.expect(TOK_NAME)
+#     const_type = tokens.accept(TOK_NAME)
+#     if const_type:
+#         type = const_type.value
+#     else:
+#         type = None
+#     tokens.expect(TOK_ASSIGN)
+#     value = parse_expression(tokens)
+#     tokens.expect(TOK_SEMI)
+#     return ConstDecl(name.value, type, value)
 
 
 def parse_var(tokens):
@@ -309,6 +313,8 @@ def parse_factor(tokens):
         return parse_unary(tokens)
     elif tokens.peek(TOK_NAME):
         return parse_load(tokens)
+    elif tokens.peek(TOK_CONST):
+        return parse_const(tokens)
     elif tokens.peek(TOK_LPAREN):
         return parse_grouping(tokens)
     elif tokens.peek(TOK_NOW):
@@ -358,9 +364,9 @@ def parse_unary(tokens):
 
 def parse_source(text):
     lexer = Lexer(text)
-    # tokens = lexer.tokenize()
-    # for t in tokens:
-    #     print(t)
+    tokens = lexer.tokenize()
+    for t in tokens:
+        print(t)
 
     tokens = lexer.tokenize()
     model = parse_prog(Tokenizer(tokens))

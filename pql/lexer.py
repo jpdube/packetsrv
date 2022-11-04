@@ -26,6 +26,18 @@ _keywords = {
     "false": TOK_FALSE,
 }
 
+_constants = {
+    "IP_TOS_NET_CTRL": CONST_IP_TOS_NET_CTRL,
+    "IP_TOS_INTNET_CTRL": CONST_IP_TOS_INTNET_CTRL,
+    "IP_TOS_CRITIC_ECP": CONST_IP_TOS_CRITIC_ECP,
+    "IP_TOS_FLASH_OVERRIDE": CONST_IP_TOS_FLASH_OVERRIDE,
+    "IP_TOS_FLASH": CONST_IP_TOS_FLASH,
+    "IP_TOS_IMMEDIATE": CONST_IP_TOS_IMMEDIATE,
+    "IP_TOS_PRIORITY": CONST_IP_TOS_PRIORITY,
+    "IP_TOS_ROUTINE": CONST_IP_TOS_ROUTINE,
+    "IP_TOS_EF": CONST_IP_TOS_EF,
+}
+
 _token1 = {
     "/": TOK_MASK,
     "*": TOK_WILDCARD,
@@ -61,7 +73,7 @@ class Token:
         self.col: int = col
 
     def __repr__(self):
-        return f"({self.type}, {self.value}, {self.line}, {self.col})"
+        return f"({self.type:x}:{human_tokens(self.type)}, {self.value}, {self.line}, {self.col})"
 
 
 class Lexer:
@@ -180,6 +192,8 @@ class Lexer:
         value = self.text[tok_start: self.pos]
         if value in _keywords:
             token = Token(_keywords[value], value, self.line, self.col)
+        elif value in _constants:
+            token = Token(TOK_CONST, value, self.line, self.col)
         else:
             token = Token(TOK_NAME, value, self.line, self.col)
 
