@@ -19,7 +19,7 @@ field_list = {
     "ip.src":               Field("ip.src", True),
     "ip.dst":               Field("ip.dst", True),
     "ip.version":           Field("ip.version", False),
-    "ip.header_len":        Field("ip.header_len", False),
+    "ip.hdr_len":           Field("ip.hdr_len", False),
     "ip.tos":               Field("ip.tos", False),
     "ip.total_len":         Field("ip.total_len", False),
     "ip.identification":    Field("ip.identification", False),

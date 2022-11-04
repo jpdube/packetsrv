@@ -72,6 +72,9 @@ class PacketDecode:
             case "version":
                 return self.ip_version
 
+            case "hdr_len":
+                return self.ip_hdr_len
+
             case _:
                 return False
 
@@ -148,7 +151,7 @@ class PacketDecode:
 
     @property
     def ip_hdr_len(self) -> int:
-        return (self.packet[self.offset] & 0x0f) * 4
+        return (self.packet[self.offset] & 0x0f)
 
     @property
     def ip_offset(self) -> int:
