@@ -115,7 +115,7 @@ class IPV4(Packet):
         return result
 
     def __str__(self) -> str:
-        return f"IPV4 -> src_ip: {self.src_ip}, dst_ip: {self.dst_ip}, proto: {self.protocol}"
+        return f"IPV4 -> src_ip: {self.src_ip}, dst_ip: {self.dst_ip}, proto: {self.protocol}, ttl: {self.ttl}, flags: {self.flags:x}, tos:{self.tos:x}"
 
     def get_field(self, fieldname: str):
         field = fieldname.split('.')[1]

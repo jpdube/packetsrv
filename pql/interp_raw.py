@@ -24,9 +24,9 @@ def interpret_program(model, pcapfile):
         total += 1
         found = interpret(model, env, pkt)
         if found:
+            packet_list.append(True)
             pb = PacketBuilder()
             pb.from_bytes(pkt.packet)
-            packet_list.append(True)
             print(pb)
 
     print(f"Found {len(packet_list)} packets in {total}")
@@ -132,7 +132,12 @@ def interpret(node, env, packet: PacketDecode):
         elif node.op == TOK_LOR:
             return leftval or rightval
         elif node.op == TOK_NE:
-            return leftval != rightval
+            if isinstance(rightval, IPv4):
+                return not rightval.is_in_network(leftval)
+            elif isinstance(rightval, Mac):
+                return leftval != rightval.to_int
+            else:
+                return leftval != rightval
 
     elif isinstance(node, list):
         result = None

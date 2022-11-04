@@ -78,6 +78,9 @@ class PacketDecode:
             case "tos":
                 return self.ip_tos
 
+            case "ttl":
+                return self.ip_ttl
+
             case _:
                 return False
 
@@ -158,13 +161,15 @@ class PacketDecode:
 
     @property
     def ip_offset(self) -> int:
-        # print(f"V:{self.ip_version}, HL:{self.ip_hdr_len}")
-        return self.offset + self.ip_hdr_len
+        return self.offset + (self.ip_hdr_len * 4)
 
     @property
     def ip_tos(self) -> int:
-        # print(f"V:{self.ip_version}, HL:{self.ip_hdr_len}")
         return self.packet[self.offset + 1]
+
+    @property
+    def ip_ttl(self) -> int:
+        return self.packet[self.offset + 8]
 
     @property
     def ip_src(self) -> int:
@@ -225,9 +230,7 @@ class PacketDecode:
     @property
     def tcp_flag_syn(self) -> bool:
         if self.ip_proto == 0x06:
-            # print_hex(self.packet)
-            # print(self.offset)
-            return (unpack("!H", self.packet[self.ip_offset + 12:self.ip_offset + 14])[0] & 0x02) == 0x02
+            return self.tcp_flag & 0x02 == 0x02
         else:
             return False
 
@@ -235,7 +238,7 @@ class PacketDecode:
     def tcp_flag_ack(self) -> bool:
         if self.ip_proto == 0x06:
             # print_hex(self.packet)
-            return (unpack("!H", self.packet[self.ip_offset + 12:self.ip_offset + 14])[0] & 0x10) == 0x10
+            return (self.tcp_flag & 0x10) == 0x10
         else:
             return False
 
@@ -243,7 +246,7 @@ class PacketDecode:
     def tcp_flag_push(self) -> bool:
         if self.ip_proto == 0x06:
             # print_hex(self.packet)
-            return (unpack("!H", self.packet[self.ip_offset + 12:self.ip_offset + 14])[0] & 0x08) == 0x08
+            return (self.tcp_flag & 0x08) == 0x08
         else:
             return False
 
@@ -251,7 +254,7 @@ class PacketDecode:
     def tcp_flag_fin(self) -> bool:
         if self.ip_proto == 0x06:
             # print_hex(self.packet)
-            return (unpack("!H", self.packet[self.ip_offset + 12:self.ip_offset + 14])[0] & 0x01) == 0x01
+            return (self.tcp_flag & 0x01) == 0x01
         else:
             return False
 
@@ -259,7 +262,7 @@ class PacketDecode:
     def tcp_flag_urg(self) -> bool:
         if self.ip_proto == 0x06:
             # print_hex(self.packet)
-            return (unpack("!H", self.packet[self.ip_offset + 12:self.ip_offset + 14])[0] & 0x20) == 0x20
+            return (self.tcp_flag & 0x20) == 0x20
         else:
             return False
 
@@ -267,7 +270,7 @@ class PacketDecode:
     def tcp_flag_rst(self) -> bool:
         if self.ip_proto == 0x06:
             # print_hex(self.packet)
-            return (unpack("!H", self.packet[self.ip_offset + 12:self.ip_offset + 14])[0] & 0x04) == 0x04
+            return (self.tcp_flag & 0x04) == 0x04
         else:
             return False
 
