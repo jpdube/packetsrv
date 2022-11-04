@@ -40,7 +40,7 @@ class Ethernet(Packet):
     @property
     def vlan_id(self) -> int:
         if self.frametype == FRAME_TYPE_8021Q:
-            return unpack("!H", self.packet[14:16])[0]
+            return unpack("!H", self.packet[14:16])[0] & 0xfff
         else:
             return 1
 
