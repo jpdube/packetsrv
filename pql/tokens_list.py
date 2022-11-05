@@ -148,6 +148,8 @@ def human_tokens(token: int) -> str:
         return "FLOAT"
     elif token == TOK_IPV4:
         return "IPV4"
+    elif token == TOK_MASK:
+        return "MASK"
     elif token == TOK_MAC:
         return "MAC"
     elif token == TOK_DATE:
