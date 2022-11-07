@@ -364,9 +364,9 @@ def parse_unary(tokens):
 
 def parse_source(text):
     lexer = Lexer(text)
-    tokens = lexer.tokenize()
-    for t in tokens:
-        print(t)
+    # tokens = lexer.tokenize()
+    # for t in tokens:
+    #     print(t)
 
     tokens = lexer.tokenize()
     model = parse_prog(Tokenizer(tokens))

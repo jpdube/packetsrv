@@ -25,9 +25,9 @@ def interpret_program(model, pcapfile):
         found = interpret(model, env, pkt)
         if found:
             packet_list.append(True)
-            pb = PacketBuilder()
-            pb.from_bytes(pkt.packet)
-            print(pb)
+            # pb = PacketBuilder()
+            # pb.from_bytes(pkt.packet)
+            # print(pb)
 
     print(f"Found {len(packet_list)} packets in {total}")
 
