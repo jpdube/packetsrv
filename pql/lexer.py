@@ -37,6 +37,12 @@ _constants = {
     "IP_TOS_PRIORITY": CONST_IP_TOS_PRIORITY,
     "IP_TOS_ROUTINE": CONST_IP_TOS_ROUTINE,
     "IP_TOS_EF": CONST_IP_TOS_EF,
+    "IP_PROTO_ICMP": 0x01,
+    "IP_PROTO_TCP": 0x06,
+    "IP_PROTO_UDP": 0x11,
+    "ETH_PROTO_IPV4": 0x0800,
+    "ETH_PROTO_IPV6": 0x86dd,
+    "ETH_PROTO_ARP": 0x0806,
 }
 
 _token1 = {

@@ -81,6 +81,9 @@ class PacketDecode:
             case "ttl":
                 return self.ip_ttl
 
+            case "proto":
+                return self.ip_proto
+
             case _:
                 return False
 
