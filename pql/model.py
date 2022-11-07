@@ -2,7 +2,8 @@ from datetime import datetime
 from packet.layers.fields import IPv4Address, MacAddress
 from typing import List
 from pql.fields_list import field_list
-from pql.tokens_list import const_value, human_tokens
+from pql.tokens_list import human_tokens
+from pql.constant import const_value
 
 
 class Node:

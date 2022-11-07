@@ -1,6 +1,7 @@
 import re
 
 from pql.tokens_list import *
+from pql.constant import *
 # from pql.tokens_list import Tok
 
 _keywords = {
