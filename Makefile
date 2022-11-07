@@ -14,7 +14,7 @@ check:
 	mypy main.py pql/ dbase/ packet/ api/
 
 run:
-	cd $(RUSTLIB) && maturin develop -r && cd $(BASE)
+	# cd $(RUSTLIB) && maturin develop -r && cd $(BASE)
 	$(PYTHON) $(MAIN)
 
 .PHONY: test
