@@ -20,17 +20,20 @@ def interpret_program(model, pcapfile):
     pfile.open(pcapfile)
     packet_list = []
     total = 0
+    # start_time = datetime.now()
     for pkt in pfile.next():
         total += 1
         found = interpret(model, env, pkt)
         if found:
-            packet_list.append(True)
+            # packet_list.append(True)
             # pb = PacketBuilder()
             # pb.from_bytes(pkt.packet)
-            # packet_list.append(pb)
+            packet_list.append(pkt.packet)
             # print(pb)
 
-    print(f"Found {len(packet_list)} packets in {total}")
+    # ttl_time = datetime.now() - start_time
+    # print(
+    #     f"Found {len(packet_list)} packets in {total}pkts time: {ttl_time.total_seconds()}s")
     return packet_list
 
 
