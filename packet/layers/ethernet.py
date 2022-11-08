@@ -64,7 +64,7 @@ class Ethernet(Packet):
         return result
 
     def __str__(self):
-        return f"Ethernet -> src_mac: {self.src_mac}, dst_mac: {self.dst_mac}, protocol: {self.ethertype}, vlan_id: {self.vlan_id}"
+        return f"Ethernet -> dst_mac: {self.dst_mac}, src_mac: {self.src_mac}, protocol: {self.ethertype}/{self.ethertype:04x}, vlan_id: {self.vlan_id}/{self.vlan_id:x}"
 
     def get_field(self, fieldname: str):
         field = fieldname.split('.')[1]
