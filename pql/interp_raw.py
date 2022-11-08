@@ -25,11 +25,13 @@ def interpret_program(model, pcapfile):
         found = interpret(model, env, pkt)
         if found:
             packet_list.append(True)
-            pb = PacketBuilder()
-            pb.from_bytes(pkt.packet)
-            print(pb)
+            # pb = PacketBuilder()
+            # pb.from_bytes(pkt.packet)
+            # packet_list.append(pb)
+            # print(pb)
 
     print(f"Found {len(packet_list)} packets in {total}")
+    return packet_list
 
 
 def interpret(node, env, packet: PacketDecode):
@@ -41,18 +43,15 @@ def interpret(node, env, packet: PacketDecode):
 
     elif isinstance(node, Label):
         value = packet.get_field(node.value)
-        # print(f"In Label: {node.value}:{value}")
         if isinstance(value, IPv4):
             return value.to_int
         else:
             return value
 
     elif isinstance(node, IPv4):
-        # print(node.to_int)
         return node
 
     elif isinstance(node, Mac):
-        # print(node.to_int)
         return node
 
     elif isinstance(node, ConstDecl):
@@ -76,7 +75,6 @@ def interpret(node, env, packet: PacketDecode):
 
     elif isinstance(node, SelectStatement):
         value = interpret(node.value, env, packet)
-        print(value)
         return None
 
     elif isinstance(node, Unary):
@@ -103,7 +101,6 @@ def interpret(node, env, packet: PacketDecode):
         if node.op == "to":
             return f"(ip_src = {leftval} and ip_dst = {rightval}) or (ip_dst = {leftval} and ip_src = {rightval})"
         elif node.op == "in":
-            # print(f"IN {leftval}:{rightval}")
             return rightval.is_in_network(leftval)
         elif node.op == "*":
             return "*"

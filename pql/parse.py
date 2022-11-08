@@ -75,7 +75,7 @@ def parse_stmts(tokens):
 
 
 def parse_assignment(tokens):
-    print("In assignment")
+    # print("In assignment")
     var_name = tokens.expect(TOK_NAME)
     tokens.expect(TOK_ASSIGN)
     value = parse_expression(tokens)
@@ -243,7 +243,6 @@ def parse_and(tokens):
     leftval = parse_relation(tokens)
     while True:
         optok = tokens.accept(TOK_LAND)
-        print(optok)
         if not optok:
             return leftval
         leftval = BinOp(optok.type, leftval, parse_relation(tokens))
@@ -251,7 +250,6 @@ def parse_and(tokens):
 
 def parse_relation(tokens):
     leftval = parse_sum(tokens)
-    print(f"TO found: {tokens}")
 
     optok = tokens.accept(TOK_LT, TOK_LE, TOK_GT,
                           TOK_GE, TOK_EQ, TOK_NE, TOK_IN, TOK_BETWEEN, TOK_TO)
@@ -387,4 +385,4 @@ if __name__ == "__main__":
     if len(sys.argv) != 2:
         raise SystemExit("Usage: pql filename")
     model = parse_file(sys.argv[1])
-    print(model)
+    # print(model)

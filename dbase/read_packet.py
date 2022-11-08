@@ -2,12 +2,12 @@ import sqlite3
 from datetime import datetime
 from sqlite3.dbapi2 import Cursor
 
-from dbase.dbcache import IndexCache
+# from dbase.dbcache import IndexCache
 from dbase.sql_statement import SqlStatement
 # from dbengine import Index
 from packet.layers.packet_builder import PacketBuilder
 from packet.layers.pcap_header import PcapHeader
-from server.config import config
+from config.config import Config
 
 PCAP_GLOBAL_HEADER_SIZE = 24
 PCAP_PACKET_HEADER_SIZE = 16
@@ -29,7 +29,7 @@ def get_packet(file_id: int, ptr_list):
     packet_list = []
     cache_hit = 0
     file_hit = 0
-    with open(f"{config.pcap_path}/{file_id}.pcap", "rb") as f:
+    with open(f"{Config.get('pcap_path')}/{file_id}.pcap", "rb") as f:
         for ptr in ptr_list:
             # print(f"ID: {ptr[1]}")
             # cached_packet = IndexCache.get_packet(ptr[1])
@@ -54,7 +54,7 @@ def get_packet(file_id: int, ptr_list):
 
 
 def sql(pql: SqlStatement) -> Cursor:
-    conn = sqlite3.connect(config.db_filename)
+    conn = sqlite3.connect(Config.get("db_filename"))
     cursor = conn.cursor()
 
     conn.execute("""PRAGMA synchronous = OFF""")

@@ -5,7 +5,7 @@ from datetime import datetime, timedelta
 from pql.model import *
 
 
-def interpret_program(model):
+def interpret_program(model, pcapfile=None):
     env = {}
     return interpret(model, env)
 
