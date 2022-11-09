@@ -53,6 +53,7 @@ class PacketBuilder:
     def from_bytes(self, raw_packet, header=None):
         self.layers: Dict[LayerID, Packet] = {}
         self.packet = raw_packet
+
         if header is not None:
             self.add(header)
 

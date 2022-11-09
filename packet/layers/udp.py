@@ -32,7 +32,7 @@ class UDP(Packet):
         return self.packet[8:]
 
     def summary(self, offset: int) -> str:
-        result =  f'{" " * offset}UDP ->\n'
+        result = f'{" " * offset}UDP ->\n'
         result += f'{" " * offset}   Src port...: {self.src_port}\n'
         result += f'{" " * offset}   Dst port...: {self.dst_port}\n'
         result += f'{" " * offset}   Lenght.....: {self.length}\n'
@@ -41,7 +41,7 @@ class UDP(Packet):
         return result
 
     def __str__(self) -> str:
-        return f"UDP -> Src port: {self.src_port}, Dst Port: {self.dst_port}"
+        return f"UDP -> Src port: {self.src_port}, Dst Port: {self.dst_port}, Length: {self.length}, Checksum: {self.checksum}"
 
     def get_field(self, fieldname: str):
         field = fieldname.split('.')[1]

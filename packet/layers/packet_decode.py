@@ -27,6 +27,8 @@ class PacketDecode:
                 return self.search_ipv4(field)
             case "tcp":
                 return self.search_tcp(field)
+            case "udp":
+                return self.search_udp(field)
             case _:
                 return False
 
@@ -117,6 +119,25 @@ class PacketDecode:
 
             case _:
                 return False
+
+    def search_udp(self, field: str) -> int:
+        # offset = 18 if self.has_vlan() else 14
+
+        match field:
+            case "sport":
+                return self.udp_sport
+
+            case "dport":
+                return self.udp_dport
+
+            case "length":
+                return self.udp_length
+
+            case "checksum":
+                return self.udp_checksum
+
+            case _:
+                return 0
 
     def get_mac(self, mac_bytes) -> int:
         response = (mac_bytes[0] << 40) & 0x00_00_FF_00_00_00_00_00
@@ -279,3 +300,19 @@ class PacketDecode:
 
     def __str__(self) -> str:
         return f"MacSrc: {self.mac_src:X}, MacDst: {self.mac_dst:X}, Vlan: {self.vlan_id}, IP src: {IPv4Address(self.ip_src)}, IP dst: {IPv4Address(self.ip_dst)} Port:{self.sport}/{self.dport}"
+
+    @property
+    def udp_sport(self) -> int:
+        return unpack("!H", self.packet[self.ip_offset + 0:self.ip_offset + 2])[0]
+
+    @property
+    def udp_dport(self) -> int:
+        return unpack("!H", self.packet[self.ip_offset + 2:self.ip_offset + 4])[0]
+
+    @property
+    def udp_length(self) -> int:
+        return unpack("!H", self.packet[self.ip_offset + 4:self.ip_offset + 6])[0]
+
+    @property
+    def udp_checksum(self) -> int:
+        return unpack("!H", self.packet[self.ip_offset + 6:self.ip_offset + 8])[0]

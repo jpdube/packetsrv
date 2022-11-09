@@ -40,6 +40,6 @@ field_list = {
     "tcp.fin":              Field("tcp.fin", True),
     "tcp.urg":              Field("tcp.urg", True),
     "tcp.rst":              Field("tcp.rst", True),
-    #     "tcp.sport":            Field("sport", True),
-    #     "tcp.dport":            Field("dport", True),
+    "udp.sport":            Field("udp.sport", True),
+    "udp.dport":            Field("udp.dport", True),
 }

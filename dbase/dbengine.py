@@ -48,7 +48,7 @@ class DBEngine:
         pool = Pool()
         start_time = datetime.now()
         flist = []
-        for i in range(50):
+        for i in range(10):
             flist.append((i, pql))
         result = pool.map(self._execute, flist)
         found = 0
@@ -59,7 +59,7 @@ class DBEngine:
                 pb = PacketBuilder()
                 pb.from_bytes(p)
                 print(pb)
-                # print(pb.print_hex())
+                print(pb.print_hex())
                 found += 1
                 if found >= self.top():
                     break
