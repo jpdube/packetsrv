@@ -25,11 +25,7 @@ def interpret_program(model, pcapfile):
         total += 1
         found = interpret(model, env, pkt)
         if found:
-            # packet_list.append(True)
-            # pb = PacketBuilder()
-            # pb.from_bytes(pkt.packet)
-            packet_list.append(pkt.packet)
-            # print(pb)
+            packet_list.append((pkt.packet, pkt.header))
 
     # ttl_time = datetime.now() - start_time
     # print(
@@ -77,7 +73,7 @@ def interpret(node, env, packet: PacketDecode):
         return int(round(time_result.timestamp()))
 
     elif isinstance(node, SelectStatement):
-        value = interpret(node.value, env, packet)
+        value = interpret(node.select_expr, env, packet)
         return None
 
     elif isinstance(node, Unary):

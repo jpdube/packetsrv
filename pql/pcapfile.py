@@ -29,6 +29,6 @@ class PcapFile:
                 packet = f.read(incl_len)
 
                 pd = PacketDecode()
-                pd.decode(packet)
+                pd.decode(header, packet)
 
                 yield pd

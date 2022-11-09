@@ -10,9 +10,11 @@ class PacketDecode:
 
     def __init__(self):
         self.packet = bytes()
+        self.header = bytes()
         self.offset = 0
 
-    def decode(self, packet: bytes):
+    def decode(self, header: bytes, packet: bytes):
+        self.header = header
         self.packet = packet
         self.offset = 18 if self.has_vlan else 14
         # print_hex(self.packet)

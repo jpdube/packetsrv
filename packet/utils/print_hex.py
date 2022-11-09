@@ -1,5 +1,6 @@
 from rich import print
 
+
 class HexDump:
 
     # def __init__(self):
@@ -26,7 +27,6 @@ class HexDump:
                     cls.prev_color = cls.color
                     result += f"[{cls.color}]"
 
-
             result += f"{byte_array[i]:02x} "
             # result += f"[{cls.color}]{byte_array[i]:02x} "
             str_array.append(byte_array[i])
@@ -51,7 +51,7 @@ class HexDump:
 
         # result += (" " * spacing) + str_array
         result += (" " * spacing) + cls.get_char(str_array)
-        result += "\n"
+        # result += "\n"
         # print(f"\n{result}")
         return result
 
@@ -64,7 +64,7 @@ class HexDump:
 
     @classmethod
     def print_hex(cls, byte_array, color_ranges=None):
-        print(f"\n{cls.format_hex(byte_array, color_ranges)}")
+        print(f"{cls.format_hex(byte_array, color_ranges)}")
 
     def get_color_char(self, char_ord) -> str:
         ret_value = ""
@@ -76,12 +76,11 @@ class HexDump:
         else:
             ret_value = f"\u00b7"
 
-        # if self.color_changed:        
+        # if self.color_changed:
         #     self.color_changed = False
         #     return f"[{self.color}]{ret_value}"
         # else:
         return ret_value
-
 
     @classmethod
     def get_char(cls, byte_array):
@@ -94,4 +93,3 @@ class HexDump:
                 result += "\u00b7"
 
         return result
-

@@ -2,14 +2,14 @@ from pql.interp import interpret_program
 from pql.parse import parse_source
 from pql.interp_raw import interpret_program
 from datetime import datetime
-from typing import List
+from typing import List, Tuple
 from packet.layers.packet_builder import PacketBuilder
 from multiprocessing import Pool
 
 
 class DBEngine:
     def __init__(self):
-        pass
+        self.pkt_found = 0
 
     def select(self) -> List[str]:
         model = parse_source(self.pql)
@@ -48,25 +48,34 @@ class DBEngine:
         pool = Pool()
         start_time = datetime.now()
         flist = []
-        for i in range(10):
+        for i in range(25):
             flist.append((i, pql))
         result = pool.map(self._execute, flist)
         found = 0
-        for r in result:
+
+        pkt_list = self.build_result(result)
+        for p in pkt_list:
+            pb = PacketBuilder()
+            pb.from_bytes(*p)
+            print(pb)
+            pb.print_hex()
+            found += 1
             if found >= self.top():
                 break
-            for p in r:
-                pb = PacketBuilder()
-                pb.from_bytes(p)
-                print(pb)
-                print(pb.print_hex())
-                found += 1
-                if found >= self.top():
-                    break
 
         ttl_time = datetime.now() - start_time
         print(
-            f"---> Total Time: {ttl_time} Result: {found} TOP: {self.top()} SELECT: {self.select()}")
+            f"---> Total Time: {ttl_time} Result: {self.pkt_found} TOP: {self.top()} SELECT: {self.select()}")
+
+    def build_result(self, raw_result: List[List[Tuple[bytes, bytes]]]) -> List[Tuple[bytes, bytes]]:
+        result = []
+        self.pkt_found = 0
+        for r in raw_result:
+            for p in r:
+                result.append(p)
+                self.pkt_found += 1
+
+        return result
 
     def file_list(self):
         pass

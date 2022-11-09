@@ -55,7 +55,11 @@ class PacketBuilder:
         self.packet = raw_packet
 
         if header is not None:
-            self.add(header)
+            if isinstance(header, bytes):
+                ph = PcapHeader(header)
+                self.add(ph)
+            elif isinstance(header, PcapHeader):
+                self.add(header)
 
         e = Ethernet(raw_packet)
         offset = 0

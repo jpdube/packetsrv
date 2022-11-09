@@ -42,4 +42,6 @@ field_list = {
     "tcp.rst":              Field("tcp.rst", True),
     "udp.sport":            Field("udp.sport", True),
     "udp.dport":            Field("udp.dport", True),
+    "udp.length":           Field("udp.length", True),
+    "udp.checksum":         Field("udp.checksum", True),
 }
