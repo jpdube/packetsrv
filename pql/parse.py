@@ -219,6 +219,11 @@ def parse_var(tokens):
     return VarDecl(name.value, type, value)
 
 
+def parse_load(tokens):
+    t = tokens.expect(TOK_NAME)
+    return Label(t.value)
+
+
 def parse_grouping(tokens):
     tokens.expect(TOK_LPAREN)
     expr = parse_expression(tokens)
@@ -266,11 +271,6 @@ def parse_sum(tokens):
         if not optok:
             return leftval
         leftval = BinOp(optok.type, leftval, parse_term(tokens))
-
-
-def parse_load(tokens):
-    t = tokens.expect(TOK_NAME)
-    return Label(t.value)
 
 
 def parse_term(tokens):
