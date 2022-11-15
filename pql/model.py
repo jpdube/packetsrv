@@ -4,16 +4,18 @@ from typing import List
 from pql.fields_list import field_list
 from pql.tokens_list import human_tokens
 from pql.constant import const_value
+from functools import lru_cache
 
 
 class Node:
-    _next_id = 1
+    pass
+    # _next_id = 1
 
-    def __new__(cls, *args, **kwargs):
-        self = super().__new__(cls)
-        self.id = Node._next_id
-        Node._next_id += 1
-        return self
+    # def __new__(cls, *args, **kwargs):
+    #     self = super().__new__(cls)
+    #     self.id = Node._next_id
+    #     Node._next_id += 1
+    #     return self
 
 
 class Statement(Node):
@@ -79,6 +81,7 @@ class Label(Expression):
         self._value = value
 
     @property
+    @lru_cache
     def value(self) -> str:
         f = field_list.get(self._value, None)
         if f is not None:
@@ -159,15 +162,17 @@ class IPv4(Expression):
     def __init__(self, value, mask):
         self.ipaddr = IPv4Address(value)
         self.mask = mask
-        self.min, self.max = self.to_network(self.mask)
+        self.min, self.max = self.ipaddr.network(self.mask)
 
     @property
+    @lru_cache
     def to_int(self):
         return self.ipaddr.value
 
-    def to_network(self, mask):
-        return self.ipaddr.network(mask)
+    # def to_network(self, mask):
+    #     return self.ipaddr.network(mask)
 
+    @lru_cache
     def is_in_network(self, address) -> bool:
         return address >= self.min and address <= self.max
 
@@ -181,6 +186,7 @@ class Mac(Expression):
         self.int_value = self.value.to_int()
 
     @property
+    @lru_cache
     def to_int(self) -> int:
         return self.int_value
 
@@ -190,10 +196,15 @@ class Mac(Expression):
 
 class Integer(Expression):
     def __init__(self, value):
-        self.value = value
+        self._value = value
+
+    @property
+    @lru_cache
+    def value(self):
+        return self._value
 
     def __repr__(self):
-        return f"Integer({self.value})"
+        return f"Integer({self._value})"
 
 
 class Boolean(Expression):
