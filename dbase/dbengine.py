@@ -33,6 +33,7 @@ class DBEngine:
     def _execute(self, params):
         file_id, pql = params
         model = parse_source(pql)
+        # print(model)
 
         result = []
         # start_time = datetime.now()
@@ -48,9 +49,10 @@ class DBEngine:
         pool = Pool()
         start_time = datetime.now()
         flist = []
-        for i in range(25):
+        for i in range(240):
             flist.append((i, pql))
         result = pool.map(self._execute, flist)
+
         found = 0
 
         pkt_list = self.build_result(result)

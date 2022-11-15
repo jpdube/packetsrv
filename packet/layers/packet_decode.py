@@ -1,5 +1,6 @@
 from struct import unpack
 from packet.layers.fields import IPv4Address
+from datetime import datetime
 
 FRAME_TYPE_8021Q = 0x8100
 
@@ -23,6 +24,8 @@ class PacketDecode:
         # def search_field(self, field_name: str, value: int) -> bool:
         (proto, field) = field_name.split(".")
         match proto:
+            case "pkt":
+                return self.search_pkt(field)
             case "eth":
                 return self.search_eth(field)
             case "ip":
@@ -37,6 +40,25 @@ class PacketDecode:
     @property
     def has_vlan(self):
         return unpack("!H", self.packet[12:14])[0] == FRAME_TYPE_8021Q
+
+    def search_pkt(self, field: str) -> int:
+        vlan_flag = self.has_vlan
+
+        match field:
+            case "timestamp":
+                return self.timestamp
+
+            case "ts_offset":
+                return self.ts_offset
+
+            case "inc_len":
+                return self.inc_len
+
+            case "orig_len":
+                return self.orig_len
+
+            case _:
+                return 0
 
     def search_eth(self, field: str) -> int:
         vlan_flag = self.has_vlan
@@ -154,6 +176,24 @@ class PacketDecode:
     # @property
     # def offset(self) -> int:
     #     return 18 if self.has_vlan else 14
+
+    @property
+    def timestamp(self) -> int:
+        ts_sec = unpack("!I", self.header[0:4])[0]
+        return ts_sec
+        # return datetime.fromtimestamp(ts_sec)
+
+    @property
+    def ts_offset(self) -> int:
+        return unpack("!I", self.header[4:8])[0]
+
+    @property
+    def inc_len(self) -> int:
+        return unpack("!I", self.header[8:12])[0]
+
+    @property
+    def orig_len(self) -> int:
+        return unpack("!I", self.header[12:16])[0]
 
     @property
     def mac_dst(self) -> int:

@@ -69,7 +69,10 @@ def interpret(node, env, packet: PacketDecode):
                 time_result -= timedelta(days=node.offset)
             case "w":
                 time_result -= timedelta(weeks=node.offset)
+            case "M":
+                time_result -= timedelta(days=node.offset)
 
+        # print(f"In Now {int(round(time_result.timestamp()))}")
         return int(round(time_result.timestamp()))
 
     elif isinstance(node, SelectStatement):
@@ -115,6 +118,7 @@ def interpret(node, env, packet: PacketDecode):
         elif node.op == TOK_GT:
             return leftval > rightval
         elif node.op == TOK_GE:
+            # print(f"{leftval},{rightval}")
             return leftval >= rightval
         elif node.op == TOK_EQ:
             if isinstance(rightval, IPv4):

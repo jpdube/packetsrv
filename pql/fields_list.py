@@ -9,7 +9,10 @@ class Field:
 
 field_list = {
     "packet":               Field("packet", False),
-    "timestamp":            Field("timestamp", True),
+    "pkt.timestamp":        Field("pkt.timestamp", True),
+    "pkt.ts_offset":        Field("pkt.ts_offset", True),
+    "pkt.orig_len":         Field("pkt.org_len", True),
+    "pkt.incl_len":         Field("pkt.incl_len", True),
     "*":                    Field("*", True),
     "eth.src":              Field("eth.src", True),
     "eth.dst":              Field("eth.dst", True),
