@@ -46,16 +46,15 @@ class UDP(Packet):
     def get_field(self, fieldname: str):
         field = fieldname.split('.')[1]
         if field:
-            match field:
-                case 'length':
-                    return self.length
-                case 'checksum':
-                    return self.checksum
-                case 'src':
-                    return self.src_port
-                case 'dst':
-                    return self.dst_port
-                case _:
-                    return 0
+            if field == 'length':
+                return self.length
+            elif field == 'checksum':
+                return self.checksum
+            elif field == 'src':
+                return self.src_port
+            elif field == 'dst':
+                return self.dst_port
+            else:
+                return 0
         else:
             return 0

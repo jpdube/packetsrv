@@ -23,145 +23,135 @@ class PacketDecode:
     def get_field(self, field_name: str) -> int:
         # def search_field(self, field_name: str, value: int) -> bool:
         (proto, field) = field_name.split(".")
-        match proto:
-            case "pkt":
-                return self.search_pkt(field)
-            case "eth":
-                return self.search_eth(field)
-            case "ip":
-                return self.search_ipv4(field)
-            case "tcp":
-                return self.search_tcp(field)
-            case "udp":
-                return self.search_udp(field)
-            case _:
-                return False
+        if proto == "pkt":
+            return self.search_pkt(field)
+        elif proto == "eth":
+            return self.search_eth(field)
+        elif proto == "ip":
+            return self.search_ipv4(field)
+        elif proto == "tcp":
+            return self.search_tcp(field)
+        elif proto == "udp":
+            return self.search_udp(field)
+        else:
+            return False
 
     @property
     def has_vlan(self):
         return unpack("!H", self.packet[12:14])[0] == FRAME_TYPE_8021Q
 
     def search_pkt(self, field: str) -> int:
-        vlan_flag = self.has_vlan
 
-        match field:
-            case "timestamp":
-                return self.timestamp
+        if field == "timestamp":
+            return self.timestamp
 
-            case "ts_offset":
-                return self.ts_offset
+        elif field == "ts_offset":
+            return self.ts_offset
 
-            case "inc_len":
-                return self.inc_len
+        elif field == "inc_len":
+            return self.inc_len
 
-            case "orig_len":
-                return self.orig_len
+        elif field == "orig_len":
+            return self.orig_len
 
-            case _:
-                return 0
+        else:
+            return 0
 
     def search_eth(self, field: str) -> int:
         vlan_flag = self.has_vlan
 
-        match field:
-            case "dst":
-                return self.mac_dst
+        if field == "dst":
+            return self.mac_dst
 
-            case "src":
-                return self.mac_src
+        elif field == "src":
+            return self.mac_src
 
-            case "type":
-                return self.ethertype
+        elif field == "type":
+            return self.ethertype
 
-            case "vlan":
-                if vlan_flag:
-                    return self.vlan_id
-                else:
-                    return 1
+        elif field == "vlan":
+            if vlan_flag:
+                return self.vlan_id
+            else:
+                return 1
 
-            case "has_vlan":
-                return vlan_flag
+        elif field == "has_vlan":
+            return vlan_flag
 
-            case _:
-                return False
+        else:
+            return False
 
     def search_ipv4(self, field: str) -> int:
         # offset = 18 if self.has_vlan() else 14
 
-        match field:
-            case "src":
-                return self.ip_src
+        if field == "src":
+            return self.ip_src
 
-            case "dst":
-                return self.ip_dst
+        elif field == "dst":
+            return self.ip_dst
 
-            case "version":
-                return self.ip_version
+        elif field == "version":
+            return self.ip_version
 
-            case "hdr_len":
-                return self.ip_hdr_len
+        elif field == "hdr_len":
+            return self.ip_hdr_len
 
-            case "tos":
-                return self.ip_tos
+        elif field == "tos":
+            return self.ip_tos
 
-            case "ttl":
-                return self.ip_ttl
+        elif field == "ttl":
+            return self.ip_ttl
 
-            case "proto":
-                return self.ip_proto
+        elif field == "proto":
+            return self.ip_proto
 
-            case _:
-                return False
+        else:
+            return False
 
     def search_tcp(self, field: str) -> int:
-        # offset = 18 if self.has_vlan() else 14
+        if field == "sport":
+            return self.tcp_sport
 
-        match field:
-            case "sport":
-                return self.tcp_sport
+        elif field == "dport":
+            return self.tcp_dport
 
-            case "dport":
-                return self.tcp_dport
+        elif field == "syn":
+            return self.tcp_flag_syn
 
-            case "syn":
-                return self.tcp_flag_syn
+        elif field == "ack":
+            return self.tcp_flag_ack
 
-            case "ack":
-                return self.tcp_flag_ack
+        elif field == "push":
+            return self.tcp_flag_push
 
-            case "push":
-                return self.tcp_flag_push
+        elif field == "fin":
+            return self.tcp_flag_fin
 
-            case "fin":
-                return self.tcp_flag_fin
+        elif field == "urg":
+            return self.tcp_flag_urg
 
-            case "urg":
-                return self.tcp_flag_urg
+        elif field == "rst":
+            return self.tcp_flag_rst
 
-            case "rst":
-                return self.tcp_flag_rst
-
-            case _:
-                return False
+        else:
+            return False
 
     def search_udp(self, field: str) -> int:
-        # offset = 18 if self.has_vlan() else 14
 
-        match field:
-            case "sport":
-                return self.udp_sport
+        if field == "sport":
+            return self.udp_sport
 
-            case "dport":
-                return self.udp_dport
+        elif field == "dport":
+            return self.udp_dport
 
-            case "length":
-                return self.udp_length
+        elif field == "length":
+            return self.udp_length
 
-            case "checksum":
-                return self.udp_checksum
+        elif field == "checksum":
+            return self.udp_checksum
 
-            case _:
-                return 0
+        else:
+            return 0
 
     def get_mac(self, mac_bytes) -> int:
         response = (mac_bytes[0] << 40) & 0x00_00_FF_00_00_00_00_00

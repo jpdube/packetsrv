@@ -41,5 +41,5 @@ class PcapHeader(Packet):
 
         return result
 
-    def get_field(self, fieldname: str) -> int | str | None:
+    def get_field(self, fieldname: str):
         ...

@@ -69,18 +69,17 @@ class Ethernet(Packet):
     def get_field(self, fieldname: str):
         field = fieldname.split('.')[1]
         if field:
-            match field:
-                case 'dst':
-                    return self.dst_mac
-                case 'src':
-                    return self.src_mac
-                case 'vlan':
-                    return self.vlan_id
-                case 'has_vlan':
-                    return self.has_vlan
-                case 'type':
-                    return self.ethertype
-                case _:
-                    return 0
+            if field == 'dst':
+                return self.dst_mac
+            elif field == 'src':
+                return self.src_mac
+            elif field == 'vlan':
+                return self.vlan_id
+            elif field == 'has_vlan':
+                return self.has_vlan
+            elif field == 'type':
+                return self.ethertype
+            else:
+                return 0
         else:
             return 0

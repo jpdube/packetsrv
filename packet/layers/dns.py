@@ -83,7 +83,7 @@ class DnsQuery:
         self.decode()
 
     def get_label(self, index, label_len):
-        return self.query[index : index + label_len].decode("utf-8")
+        return self.query[index: index + label_len].decode("utf-8")
 
     def decode(self):
         index = 0
@@ -95,8 +95,8 @@ class DnsQuery:
             index += label_len + 1
 
         index += 1
-        self.qtype = unpack("!H", self.query[index : index + 2])[0]
-        self.qclass = unpack("!H", self.query[index + 2 : index + 4])[0]
+        self.qtype = unpack("!H", self.query[index: index + 2])[0]
+        self.qclass = unpack("!H", self.query[index + 2: index + 4])[0]
 
         self.answer_pos = index + 4
 
@@ -104,7 +104,7 @@ class DnsQuery:
         return f'Labels: {self.label_list}, Type: {type_values.get(self.qtype, "Unknow")}, Class: {self.qclass}'
 
     def summary(self, offset: int) -> str:
-        result =  f'{" " * offset}  Query ->\n'
+        result = f'{" " * offset}  Query ->\n'
         result += f'{" " * offset}   Type.....: {type_values.get(self.qtype, "Undefined")}\n'
         result += f'{" " * offset}   Class....: {self.qclass}\n'
 
@@ -126,7 +126,7 @@ class DnsAnswer:
         return f'Answer -> Type: {type_values.get(self.qtype,"Unknow")}, Class: {self.qclass}, Ttl: {self.ttl}, Len: {self.data_len}, Data: {self.result}'
 
     def summary(self, offset: int) -> str:
-        result =  f'{" " * offset}  Answer ->\n'
+        result = f'{" " * offset}  Answer ->\n'
         result += f'{" " * offset}   Type.....: {type_values.get(self.qtype, "Undefined")}\n'
         result += f'{" " * offset}   Class....: {self.qclass}\n'
         result += f'{" " * offset}   TTL......: {self.ttl}\n'
@@ -149,7 +149,7 @@ class Dns(Packet):
         self.answer_list = []
 
         if self.header.response:
-            self.decode_answer(self.packet[self.queries.answer_pos + 12 :])
+            self.decode_answer(self.packet[self.queries.answer_pos + 12:])
         else:
             self.answer = None
 
@@ -165,22 +165,23 @@ class Dns(Packet):
                 data_len = unpack("!H", answer[10:12])[0]
                 # print(f'#### Data len label: {data_len}')
                 if qtype == 1:
-                    result = IPv4Address(unpack("!I", answer[12 : 12 + data_len])[0])
+                    result = IPv4Address(
+                        unpack("!I", answer[12: 12 + data_len])[0])
                 elif qtype == 33:
-                    result = self.get_srv(answer[12 : 12 + data_len], data_len)
+                    result = self.get_srv(answer[12: 12 + data_len], data_len)
                 elif qtype in [5, 6]:
-                    result = self.get_labels(answer[12 : 12 + data_len])  # -1
+                    result = self.get_labels(answer[12: 12 + data_len])  # -1
 
                 dns_answer = DnsAnswer(qtype, qclass, ttl, data_len, result)
                 self.answer_list.append(dns_answer)
 
-                answer = answer[12 + data_len :]
+                answer = answer[12 + data_len:]
 
     def get_srv(self, packet, data_len):
         priority = unpack("!H", packet[0:2])[0]
         weight = unpack("!H", packet[2:4])[0]
         port = unpack("!H", packet[4:6])[0]
-        target = self.get_labels(packet[6 : 6 + (data_len - 6)])
+        target = self.get_labels(packet[6: 6 + (data_len - 6)])
         # target = unpack(f'!{data_len - 6}s', packet[6: 6 + (data_len - 6)])
 
         return f"Priority: {priority}, Weight: {weight}, Port: {port}, Target: {target}"
@@ -196,7 +197,7 @@ class Dns(Packet):
             # print_hex(packet)
             label_len = packet[pos]
             pos += 1
-            label = unpack(f"!{label_len}s", packet[pos : pos + label_len])[0].decode(
+            label = unpack(f"!{label_len}s", packet[pos: pos + label_len])[0].decode(
                 "ascii"
             )
             label_list.append(label)
@@ -230,5 +231,5 @@ class Dns(Packet):
 
         return result
 
-    def get_field(self, fieldname: str) -> int | str | None:
+    def get_field(self, fieldname: str):
         ...

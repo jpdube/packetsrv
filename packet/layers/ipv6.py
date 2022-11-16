@@ -87,12 +87,12 @@ class IPV6(Packet):
         return f"IPv6 src addr: {self.src_addr}, dst addr: {self.dst_addr} protocol: {self.protocol}"
 
     def summary(self, offset: int) -> str:
-        result =  f'{" " * offset}IPv4 ->\n'
+        result = f'{" " * offset}IPv4 ->\n'
         result += f'{" " * offset}   Dst Addr...: {self.dst_addr}\n'
         result += f'{" " * offset}   Src Addr...: {self.src_addr}\n'
         result += f'{" " * offset}   Protocol...: {self.protocol},0x{self.protocol:02x} \n'
 
         return result
 
-    def get_field(self, fieldname: str) -> int | str | None:
+    def get_field(self, fieldname: str):
         ...

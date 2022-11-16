@@ -1,6 +1,7 @@
 from abc import ABC, abstractmethod
 from packet.layers.layer_type import LayerID
 
+
 class Packet(ABC):
     name: LayerID = LayerID.UNDEFINED
 
@@ -9,5 +10,5 @@ class Packet(ABC):
         ...
 
     @abstractmethod
-    def get_field(self, fieldname: str) -> int | str | None:
+    def get_field(self, fieldname: str):
         ...

@@ -58,19 +58,18 @@ def interpret(node, env, packet: PacketDecode):
 
     elif isinstance(node, Now):
         time_result = datetime.fromtimestamp(node.value)
-        match node.modifier:
-            case "s":
-                time_result -= timedelta(seconds=node.offset)
-            case "m":
-                time_result -= timedelta(minutes=node.offset)
-            case "h":
-                time_result -= timedelta(hours=node.offset)
-            case "d":
-                time_result -= timedelta(days=node.offset)
-            case "w":
-                time_result -= timedelta(weeks=node.offset)
-            case "M":
-                time_result -= timedelta(days=node.offset)
+        if node.modifier == "s":
+            time_result -= timedelta(seconds=node.offset)
+        elif node.modifier == "m":
+            time_result -= timedelta(minutes=node.offset)
+        elif node.modifier == "h":
+            time_result -= timedelta(hours=node.offset)
+        elif node.modifier == "d":
+            time_result -= timedelta(days=node.offset)
+        elif node.modifier == "w":
+            time_result -= timedelta(weeks=node.offset)
+        elif node.modifier == "M":
+            time_result -= timedelta(days=node.offset)
 
         # print(f"In Now {int(round(time_result.timestamp()))}")
         return int(round(time_result.timestamp()))

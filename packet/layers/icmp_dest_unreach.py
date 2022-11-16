@@ -111,7 +111,7 @@ class IcmpDestUnreach(Packet):
         return f"ICMP Dest unreachable -> type: {self.type}, code: {self.code}, checksum: {self.checksum:x}, src_ip: {self.datagram.src_ip}, dst_ip: {self.datagram.dst_ip}"
 
     def summary(self, offset: int) -> str:
-        result =  f'{" " * offset}ICMP-Destination unreachable ->\n'
+        result = f'{" " * offset}ICMP-Destination unreachable ->\n'
         result += f'{" " * offset}   Type.......: {self.type}\n'
         result += f'{" " * offset}   Code.......: {self.code}\n'
         result += f'{" " * offset}   Checksum...: {self.checksum},0x{self.checksum:04x}\n'
@@ -119,5 +119,5 @@ class IcmpDestUnreach(Packet):
 
         return result
 
-    def get_field(self, fieldname: str) -> int | str | None:
+    def get_field(self, fieldname: str):
         ...

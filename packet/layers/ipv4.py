@@ -120,30 +120,29 @@ class IPV4(Packet):
     def get_field(self, fieldname: str):
         field = fieldname.split('.')[1]
         if field:
-            match field:
-                case 'version':
-                    return self.version
-                case 'tos':
-                    return self.tos
-                case 'length':
-                    return self.total_len
-                case 'id':
-                    return self.identification
-                case 'flags':
-                    return self.flags
-                case 'frag_offset':
-                    return self.frag_offset
-                case 'ttl':
-                    return self.ttl
-                case 'protocol':
-                    return self.protocol
-                case 'checksum':
-                    return self.checksum
-                case 'src':
-                    return self.src_ip.value
-                case 'dst':
-                    return self.dst_ip.value
-                case _:
-                    return 0
+            if field == 'version':
+                return self.version
+            elif field == 'tos':
+                return self.tos
+            elif field == 'length':
+                return self.total_len
+            elif field == 'id':
+                return self.identification
+            elif field == 'flags':
+                return self.flags
+            elif field == 'frag_offset':
+                return self.frag_offset
+            elif field == 'ttl':
+                return self.ttl
+            elif field == 'protocol':
+                return self.protocol
+            elif field == 'checksum':
+                return self.checksum
+            elif field == 'src':
+                return self.src_ip.value
+            elif field == 'dst':
+                return self.dst_ip.value
+            else:
+                return 0
         else:
             return 0

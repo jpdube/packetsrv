@@ -100,9 +100,8 @@ class IcmpEcho(Packet):
     def payload(self) -> bytes:
         return self.packet[8:]
 
-
     def summary(self, offset: int) -> str:
-        result =  f'{" " * offset}ICMP-Echo ->\n'
+        result = f'{" " * offset}ICMP-Echo ->\n'
         result += f'{" " * offset}   Type...: {self.type}\n'
         result += f'{" " * offset}   Code...: {self.code}\n'
         result += f'{" " * offset}   Seq no.....: {self.sequence_no},0x{self.sequence_no:04x} \n'
@@ -110,8 +109,9 @@ class IcmpEcho(Packet):
         result += f'{" " * offset}   Checksum...: {self.checksum},0x{self.checksum:04x}\n'
 
         return result
+
     def __str__(self):
         return f"ICMP Echo -> type: {self.type}, code: {self.code}, checksum: {self.checksum:x}, identifier: {self.identifier}, sequence: {self.sequence_no}"
 
-    def get_field(self, fieldname: str) -> int | str | None:
+    def get_field(self, fieldname: str):
         ...

@@ -1,4 +1,3 @@
-from pql.interp import interpret_program
 from pql.parse import parse_source
 from pql.interp_raw import interpret_program
 from datetime import datetime
@@ -49,7 +48,7 @@ class DBEngine:
         pool = Pool()
         start_time = datetime.now()
         flist = []
-        for i in range(240):
+        for i in range(32):
             flist.append((i, pql))
         result = pool.map(self._execute, flist)
 

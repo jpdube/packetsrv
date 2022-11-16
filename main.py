@@ -1,23 +1,25 @@
-from api.server2 import start
-from pql.interp import interpret_program
-from pql.parse import parse_source
-from pql.interp_raw import interpret_program
-from datetime import datetime
+# from api.server2 import start
+from dbase.dbengine import DBEngine
 
 
 def search():
-    model = parse_source(
-        "select * from a where ip.src == 192.168.250.10/24 and ip.dst != 192.168.53.128/25 and ip.tos == IP_TOS_EF;")
-    # "select * from ip.src where (ip.src == 8.8.8.8 and ip.dst == 192.168.3.230) or (ip.src == 192.168.3.230 and ip.dst == 8.8.8.8);")
-    print(model)
+    engine = DBEngine()
+    result = engine.exec_parallel(
+        """
+        select ip.src, ip.dst, ip.proto 
+        from a 
+        where 
+              ip.proto == 17 and
+              pkt.timestamp < now() 
+              top 15;
+        """)
+    # start()
 
-    start_time = datetime.now()
-    for m in model:
-        if m.where_expr is not None:
-            interpret_program(m.where_expr, pcapfile="0")
-
-    print(f"Time:{(datetime.now() - start_time).total_seconds()}")
+    # udp.length < 64 and
+    # pkt.timestamp >= 2022-03-15 13:08:00 and
+    # pkt.timestamp <= 2022-03-15 14:55:00
 
 
 if __name__ == "__main__":
+    # Config.load("./config-jpd/server.toml")
     search()

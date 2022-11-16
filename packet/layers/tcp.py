@@ -75,7 +75,7 @@ class TCP(Packet):
         return unpack("!H", self.packet[18:20])[0]
 
     @property
-    def options(self) -> bytes | None:
+    def options(self):
         if self.header_len > 5:
             offset = (self.header_len - 5) * 4
             return self.packet[20: 20 + offset]
@@ -144,30 +144,29 @@ class TCP(Packet):
     def get_field(self, fieldname: str):
         field = fieldname.split('.')[1]
         if field:
-            match field:
-                case 'seq_no':
-                    return self.seq_no
-                case 'ack_no':
-                    return self.ack_no
-                case 'length':
-                    return self.header_len
-                case 'window':
-                    return self.window
-                case 'checksum':
-                    return self.checksum
-                case 'urgent_ptr':
-                    return self.urgent_ptr
-                case 'flag_syn':
-                    return self.flag_syn
-                case 'flag_ack':
-                    return self.flag_ack
-                case 'checksum':
-                    return self.checksum
-                case 'src':
-                    return self.src_port
-                case 'dst':
-                    return self.dst_port
-                case _:
-                    return 0
+            if field == 'seq_no':
+                return self.seq_no
+            elif field == 'ack_no':
+                return self.ack_no
+            elif field == 'length':
+                return self.header_len
+            elif field == 'window':
+                return self.window
+            elif field == 'checksum':
+                return self.checksum
+            elif field == 'urgent_ptr':
+                return self.urgent_ptr
+            elif field == 'flag_syn':
+                return self.flag_syn
+            elif field == 'flag_ack':
+                return self.flag_ack
+            elif field == 'checksum':
+                return self.checksum
+            elif field == 'src':
+                return self.src_port
+            elif field == 'dst':
+                return self.dst_port
+            else:
+                return 0
         else:
             return 0

@@ -112,7 +112,7 @@ class Router(DHCPOption):
 
         for _ in range(nbr_router):
             # if offset + 4 < len(self.option):
-            ip = IPv4Address(self.option[offset : offset + 4])
+            ip = IPv4Address(self.option[offset: offset + 4])
             self.router_list.append(ip)
             offset += 4
 
@@ -142,7 +142,7 @@ class DomainNameServer(DHCPOption):
         nbr_dns = int(self.opt_len / 4)
         offset = 0
         for _ in range(nbr_dns):
-            ip = IPv4Address(self.option[offset : offset + 4])
+            ip = IPv4Address(self.option[offset: offset + 4])
             self.dns_list.append(ip)
             offset += 4
 
@@ -169,7 +169,8 @@ class Hostname(DHCPOption):
         self.decode()
 
     def decode(self):
-        self.hostname = unpack(f"!{self.opt_len}s", self.option)[0].decode("utf-8")
+        self.hostname = unpack(f"!{self.opt_len}s", self.option)[
+            0].decode("utf-8")
 
     def __str__(self) -> str:
         return f"{super().__str__()}{self.hostname}"
@@ -251,7 +252,7 @@ class ParamReqList(DHCPOption):
 
     def __str__(self) -> str:
         result = ""
-        for i,p in enumerate(self.params):
+        for i, p in enumerate(self.params):
             result += f'{p:03}:{params_req_list.get(p, "Undefined param")}'
             if i < len(self.params) - 1:
                 result += ', '
@@ -310,7 +311,8 @@ class VendorClassId(DHCPOption):
         self.decode()
 
     def decode(self):
-        self.vci = unpack(f"!{self.opt_len - 1}s", self.option[:-1])[0].decode("utf-8")
+        self.vci = unpack(f"!{self.opt_len - 1}s",
+                          self.option[:-1])[0].decode("utf-8")
 
     def __str__(self) -> str:
         return f"{super().__str__()}{self.vci}"
@@ -356,7 +358,8 @@ class ClientFQDN(DHCPOption):
         self.flag = unpack("!B", self.option[0:1])[0]
         self.a_rr = unpack("!B", self.option[1:2])[0]
         self.ptr_rr = unpack("!B", self.option[2:3])[0]
-        self.fqdn = unpack(f"!{self.opt_len - 3}s", self.option[3:])[0].decode("utf-8")
+        self.fqdn = unpack(f"!{self.opt_len - 3}s",
+                           self.option[3:])[0].decode("utf-8")
 
     def __str__(self) -> str:
         return f"{super().__str__()}Flag: {self.flag} A-RR: {self.a_rr} PTR-RR: {self.ptr_rr} FQDN: {self.fqdn}"
@@ -413,11 +416,11 @@ class Dhcp(Packet):
 
         if self.index < len(self.packet) - 1:
             option_id, option_len = unpack(
-                "!BB", self.packet[self.index : self.index + 2]
+                "!BB", self.packet[self.index: self.index + 2]
             )
             self.index += 2
 
-            option_data = self.packet[self.index : self.index + option_len]
+            option_data = self.packet[self.index: self.index + option_len]
             self.index += option_len
 
         return (option_id, option_len, option_data)
@@ -550,7 +553,7 @@ class Dhcp(Packet):
     def filename(self) -> str:
         return str(self.packet[108:236])
 
-    # """    
+    # """
     # 00e0: 00 00 00 00 00 00 00 00  00 00 00 00 63 82 53 63   ············c·Sc
     # 00f0: 35 01 05 3a 04 00 03 f4  80 3b 04 00 06 eb e0 33   5··:·····;·····3
     # 0100: 04 00 07 e9 00 36 04 c0  a8 03 e6 01 04 ff ff ff   ·····6··········
@@ -568,7 +571,7 @@ class Dhcp(Packet):
 
         return result
 
-    def get_field(self, fieldname: str) -> int | str | None:
+    def get_field(self, fieldname: str):
         ...
 
     def __str__(self):

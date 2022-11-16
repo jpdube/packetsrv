@@ -64,5 +64,5 @@ class ARP(Packet):
     def __str__(self):
         return f"ARP -> Opcode: {self.opcode}, Htype: {self.htype}, PType: {self.ptype}, smac: {self.src_mac}, sip: {self.src_ip}, tmac: {self.target_mac}, tip: {self.target_ip}"
 
-    def get_field(self, fieldname: str) -> int | str | None:
+    def get_field(self, fieldname: str):
         ...

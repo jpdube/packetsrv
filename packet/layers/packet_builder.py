@@ -163,31 +163,30 @@ class PacketBuilder:
         result = self.layers.get(layer_name, None)
         return result is not None
 
-    def get_layer(self, layer_id) -> Packet | None:
+    def get_layer(self, layer_id):
         return self.layers.get(layer_id, None)
 
     def get_field(self, field: str):
         pkt_name = field.split('.')[0]
-        match pkt_name:
-            case 'eth':
-                eth = self.get_layer(LayerID.ETHERNET)
-                if eth:
-                    return eth.get_field(field)
-            case 'ip':
-                ip = self.get_layer(LayerID.IPV4)
-                if ip:
-                    return ip.get_field(field)
-            case 'tcp':
-                tcp = self.get_layer(LayerID.TCP)
-                if tcp:
-                    return tcp.get_field(field)
+        if pkt_name == 'eth':
+            eth = self.get_layer(LayerID.ETHERNET)
+            if eth:
+                return eth.get_field(field)
+        elif pkt_name == 'ip':
+            ip = self.get_layer(LayerID.IPV4)
+            if ip:
+                return ip.get_field(field)
+        elif pkt_name == 'tcp':
+            tcp = self.get_layer(LayerID.TCP)
+            if tcp:
+                return tcp.get_field(field)
 
-            case 'udp':
-                udp = self.get_layer(LayerID.UDP)
-                if udp:
-                    return udp.get_field(field)
-            case _:
-                return 0
+        elif pkt_name == 'udp':
+            udp = self.get_layer(LayerID.UDP)
+            if udp:
+                return udp.get_field(field)
+        else:
+            return 0
 
         return 0
         # return None

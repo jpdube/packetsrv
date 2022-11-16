@@ -1,6 +1,6 @@
 from struct import unpack
 from packet.layers.packet_decode import PacketDecode
-from config.config import Config
+# from config.config import Config
 
 
 PCAP_GLOBAL_HEADER_SIZE = 24
@@ -14,10 +14,10 @@ class PcapFile:
 
     def open(self, filename: str):
         self.filename = filename
-        Config.load("./config-jpd/server.toml")
+        # Config.load("./config-jpd/server.toml")
 
     def next(self):
-        with open(f"{Config.get('pcap_path')}/{self.filename}.pcap", "rb") as f:
+        with open(f"/Users/jpdube/hull-voip/db/pcap/{self.filename}.pcap", "rb") as f:
             _ = f.read(PCAP_GLOBAL_HEADER_SIZE)
 
             while True:
