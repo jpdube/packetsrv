@@ -1,9 +1,12 @@
 from pql.parse import parse_source
 from pql.interp_raw import interpret_program
 from datetime import datetime
-from typing import List, Tuple
+from typing import Dict, List, Tuple
 from packet.layers.packet_builder import PacketBuilder
 from multiprocessing import Pool
+from pql.pcapfile import PcapFile
+
+NBR_FILES_TO_PROCESS = 16
 
 
 class DBEngine:
@@ -31,42 +34,52 @@ class DBEngine:
 
     def _execute(self, params):
         file_id, pql = params
-        model = parse_source(pql)
+        # model = parse_source(pql)
         # print(model)
 
         result = []
         # start_time = datetime.now()
-        for m in model:
+        for m in self.model:
             if m.where_expr is not None:
                 result = interpret_program(m.where_expr, pcapfile=f"{file_id}")
 
         # print(f"Time:{(datetime.now() - start_time).total_seconds()}")
         return result
 
-    def exec_parallel(self, pql: str):
+    def exec_parallel(self, pql: str) -> List[Dict]:
         self.pql = pql
+        self.model = parse_source(pql)
         pool = Pool()
         start_time = datetime.now()
         flist = []
-        for i in range(32):
+        for i in range(NBR_FILES_TO_PROCESS):
             flist.append((i, pql))
         result = pool.map(self._execute, flist)
 
         found = 0
 
         pkt_list = self.build_result(result)
+        result = []
+        pcapfile = PcapFile()
         for p in pkt_list:
+            file_id, ptr = p
+            # print(f"Packet file id:{p[0]}, ptr:{p[1]}")
+            pcapfile.open(file_id)
             pb = PacketBuilder()
-            pb.from_bytes(*p)
-            print(pb)
-            pb.print_hex()
+            header, packet = pcapfile.get(ptr)
+            pb.from_bytes(packet, header)
+            result.append(pb.export())
+            # print(pb)
+            # pb.print_hex()
             found += 1
             if found >= self.top():
                 break
 
         ttl_time = datetime.now() - start_time
+        # self.pkt_found = len(result)
         print(
             f"---> Total Time: {ttl_time} Result: {self.pkt_found} TOP: {self.top()} SELECT: {self.select()}")
+        return result
 
     def build_result(self, raw_result: List[List[Tuple[bytes, bytes]]]) -> List[Tuple[bytes, bytes]]:
         result = []

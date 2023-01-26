@@ -20,16 +20,23 @@ def interpret_program(model, pcapfile):
     pfile.open(pcapfile)
     packet_list = []
     total = 0
+    pd = PacketDecode()
     # start_time = datetime.now()
-    for pkt in pfile.next():
-        total += 1
-        found = interpret(model, env, pkt)
+    for pkt_decode in pfile.next():
+        # total += 1
+        hdr, pkt, offset = pkt_decode
+        pd.decode(hdr, pkt)
+        found = interpret(model, env, pd)
         if found:
-            packet_list.append((pkt.packet, pkt.header))
+            total += 1
+            # print(f"Pkt file: {pcapfile} offset: {offset}")
+            packet_list.append((pcapfile, offset))
+            # packet_list.append((pkt.packet, pkt.header))
 
     # ttl_time = datetime.now() - start_time
     # print(
     #     f"Found {len(packet_list)} packets in {total}pkts time: {ttl_time.total_seconds()}s")
+    # return total
     return packet_list
 
 
