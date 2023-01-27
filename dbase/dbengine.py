@@ -5,8 +5,9 @@ from typing import Dict, List, Tuple
 from packet.layers.packet_builder import PacketBuilder
 from multiprocessing import Pool
 from pql.pcapfile import PcapFile
+from config.config import Config
 
-NBR_FILES_TO_PROCESS = 16
+# NBR_FILES_TO_PROCESS = 1
 
 
 class DBEngine:
@@ -33,17 +34,13 @@ class DBEngine:
         return 2
 
     def _execute(self, params):
-        file_id, pql = params
-        # model = parse_source(pql)
-        # print(model)
+        file_id, _ = params
 
         result = []
-        # start_time = datetime.now()
         for m in self.model:
             if m.where_expr is not None:
                 result = interpret_program(m.where_expr, pcapfile=f"{file_id}")
 
-        # print(f"Time:{(datetime.now() - start_time).total_seconds()}")
         return result
 
     def exec_parallel(self, pql: str) -> List[Dict]:
@@ -52,7 +49,7 @@ class DBEngine:
         pool = Pool()
         start_time = datetime.now()
         flist = []
-        for i in range(NBR_FILES_TO_PROCESS):
+        for i in range(Config.nbr_files_to_process()):
             flist.append((i, pql))
         result = pool.map(self._execute, flist)
 
@@ -63,7 +60,6 @@ class DBEngine:
         pcapfile = PcapFile()
         for p in pkt_list:
             file_id, ptr = p
-            # print(f"Packet file id:{p[0]}, ptr:{p[1]}")
             pcapfile.open(file_id)
             pb = PacketBuilder()
             header, packet = pcapfile.get(ptr)
@@ -76,12 +72,11 @@ class DBEngine:
                 break
 
         ttl_time = datetime.now() - start_time
-        # self.pkt_found = len(result)
         print(
             f"---> Total Time: {ttl_time} Result: {self.pkt_found} TOP: {self.top()} SELECT: {self.select()}")
         return result
 
-    def build_result(self, raw_result: List[List[Tuple[bytes, bytes]]]) -> List[Tuple[bytes, bytes]]:
+    def build_result(self, raw_result: List[List[Tuple[bytes, bytes]]]) -> List[Tuple[str, int]]:
         result = []
         self.pkt_found = 0
         for r in raw_result:
