@@ -6,6 +6,7 @@ from packet.layers.packet_builder import PacketBuilder
 from multiprocessing import Pool
 from pql.pcapfile import PcapFile
 from config.config import Config
+from pathlib import Path
 
 # NBR_FILES_TO_PROCESS = 1
 
@@ -88,3 +89,19 @@ class DBEngine:
 
     def file_list(self):
         pass
+
+    def index_db(self):
+        path = Path(Config.pcap_path())
+        files_list = list(path.glob("*.pcap"))
+        pcapfile = PcapFile()
+        pool = Pool()
+        start_time = datetime.now()
+        flist = []
+        for i in files_list:
+            flist.append(i.stem)
+        result = pool.map(pcapfile.create_index, flist)
+        result.sort(key=lambda a: a[0])
+        # print(result)
+        pcapfile.build_master_index(result)
+        ttl_time = datetime.now() - start_time
+        print(f"---> Total Index Time: {ttl_time}")
