@@ -1,13 +1,13 @@
 from struct import unpack
+
 from packet.layers.fields import IPv4Address
-from datetime import datetime
 
 FRAME_TYPE_8021Q = 0x8100
 
 
 class PacketDecode:
 
-    # __slots__ = ["packet", "offset"]
+    __slots__ = ["packet", "header", "offset"]
 
     def __init__(self):
         self.packet = bytes()
