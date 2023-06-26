@@ -21,7 +21,7 @@ def search():
 
 
         # """)
-        "select ip.src from a where eth.vlan == 61 and ip.protocol == 6 and tcp.dport == 389 top 25;")
+        "select ip.src from a where eth.vlan == 61  and tcp.dport == 443 top 25;")
     # uvicorn.run(app=app, host="localhost", port=8080)
  # eth.vlan == 61 and (pkt.timestamp >= 2022-03-14 00:00:00 and pkt.timestamp <= 2022-03-15 23:59:59)
 

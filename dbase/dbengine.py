@@ -1,12 +1,15 @@
-from pql.parse import parse_source
-from pql.interp_raw import interpret_program
 from datetime import datetime
-from typing import Dict, List, Tuple
-from packet.layers.packet_builder import PacketBuilder
 from multiprocessing import Pool
-from pql.pcapfile import PcapFile
-from config.config import Config
 from pathlib import Path
+from typing import Dict, List, Tuple
+
+from config.config import Config
+from packet.layers.packet_builder import PacketBuilder
+from pql.interp_raw import interpret_program
+from pql.parse import parse_source
+from pql.pcapfile import PcapFile
+import os
+import re
 
 # NBR_FILES_TO_PROCESS = 1
 
@@ -60,12 +63,12 @@ class DBEngine:
         result = []
         pcapfile = PcapFile()
         for p in pkt_list:
-            file_id, ptr = p
-            pcapfile.open(file_id)
-            pb = PacketBuilder()
-            header, packet = pcapfile.get(ptr)
-            pb.from_bytes(packet, header)
-            result.append(pb.export())
+            # file_id, ptr = p
+            # pcapfile.open(file_id)
+            # pb = PacketBuilder()
+            # header, packet = pcapfile.get(ptr)
+            # pb.from_bytes(packet, header)
+            # result.append(pb.export())
             # print(pb)
             # pb.print_hex()
             found += 1
@@ -97,7 +100,7 @@ class DBEngine:
         pool = Pool()
         start_time = datetime.now()
         flist = []
-        for i in files_list:
+        for i in files_list[:32]:
             flist.append(i.stem)
         result = pool.map(pcapfile.create_index, flist)
         result.sort(key=lambda a: a[0])

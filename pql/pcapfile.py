@@ -73,21 +73,41 @@ class PcapFile:
                 if first_ts is None:
                     first_ts = ts
 
-                # index_list.append((ts, offset))
-                raw_index.extend(pack("!II", ts, offset))
+                raw_index.extend(
+                    pack("!III", ts, offset, self.packet_index(pd)))
                 offset += incl_len + 16
-        # print(f"Start: {first_ts}, End: {last_ts}, File: {file_id}")
 
-        # with open(f"{Config.pcap_path()}/{file_id}.pidx", "wb") as f:
-        #     for idx in index_list:
-        #         f.write(pack("!II", *idx))
-        with open(f"{Config.pcap_path()}/{file_id}.pidx", "wb") as f:
+        # print(f"Index file: {Config.pcap_path()}/{file_id}.pidx")
+        with open(f"{Config.pcap_index()}/{file_id}.pidx", "wb") as f:
             f.write(raw_index)
 
         return (first_ts, last_ts, int(file_id))
 
+    def packet_index(self, pd: PacketDecode) -> int:
+        pindex = 0
+
+        if pd.has_ethernet:
+            pindex = pindex + 0x01
+        if pd.has_ipv4:
+            pindex = pindex + 0x04
+        if pd.has_icmp:
+            pindex = pindex + 0x08
+        if pd.has_udp:
+            pindex = pindex + 0x10
+        if pd.has_tcp:
+            pindex = pindex + 0x20
+        if pd.has_dns:
+            pindex = pindex + 0x40
+        if pd.has_dhcp:
+            pindex = pindex + 0x80
+        if pd.has_https:
+            pindex = pindex + 0x100
+
+        # print(f"Bit index: {pindex:x}")
+        return pindex
+
     def build_master_index(self, master_index):
-        with open(f"{Config.pcap_path()}/master.pidx", "wb") as f:
+        with open(f"{Config.pcap_index()}/master.pidx", "wb") as f:
             for idx in master_index:
                 # print(idx)
                 f.write(pack('!III', *idx))
