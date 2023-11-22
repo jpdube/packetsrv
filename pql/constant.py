@@ -37,6 +37,8 @@ const_list = {
     "ETH_PROTO_IPV4": 0x0800,
     "ETH_PROTO_IPV6": 0x86dd,
     "ETH_PROTO_ARP": 0x0806,
+    "HTTPS": 0x1bb,
+    "DNS": 0x35,
 }
 
 

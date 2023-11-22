@@ -1,10 +1,11 @@
 from datetime import datetime
-from packet.layers.fields import IPv4Address, MacAddress
+from functools import lru_cache
 from typing import List
+
+from packet.layers.fields import IPv4Address, MacAddress
+from pql.constant import const_value
 from pql.fields_list import field_list
 from pql.tokens_list import human_tokens
-from pql.constant import const_value
-from functools import lru_cache
 
 
 class Node:
@@ -121,6 +122,8 @@ class SelectStatement(Statement):
         value,
         from_fields,
         include_field,
+        index_field,
+        ip_list,
         where_expr,
         groupby_expr,
         top_expr=None,
@@ -129,6 +132,8 @@ class SelectStatement(Statement):
         self.select_expr = value
         self.from_fields = from_fields
         self.include = include_field
+        self.index_field = index_field
+        self.ip_list = ip_list
         self.where_expr = where_expr
         self.groupby_expr = groupby_expr
         self.top_expr = top_expr
@@ -139,7 +144,7 @@ class SelectStatement(Statement):
             self.limit = limit_expr[1]
 
     def __repr__(self) -> str:
-        return f"SelectStatement Select: {self.select_expr}, From: {repr(self.from_fields)}, Include: {self.include}, Where: {repr(self.where_expr)}, Group By: {self.groupby_expr}, Top: {self.top_expr}, Limit: {self.offset},{self.limit}"
+        return f"SelectStatement Select: {self.select_expr}, From: {repr(self.from_fields)}, Index: {self.index_field}, IP: {self.ip_list}, Include: {self.include}, Where: {repr(self.where_expr)}, Group By: {self.groupby_expr}, Top: {self.top_expr}, Limit: {self.offset},{self.limit}"
 
 
 class String(Expression):
@@ -161,7 +166,7 @@ class Float(Expression):
 class IPv4(Expression):
     def __init__(self, value, mask):
         self.ipaddr = IPv4Address(value)
-        self.mask = mask
+        self.mask = int(mask)
         self.min, self.max = self.ipaddr.network(self.mask)
 
     @property
@@ -172,7 +177,7 @@ class IPv4(Expression):
     # def to_network(self, mask):
     #     return self.ipaddr.network(mask)
 
-    @lru_cache
+    # @lru_cache
     def is_in_network(self, address) -> bool:
         return address >= self.min and address <= self.max
 

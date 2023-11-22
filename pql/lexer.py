@@ -1,7 +1,8 @@
 import re
 
-from pql.tokens_list import *
 from pql.constant import *
+from pql.tokens_list import *
+
 # from pql.tokens_list import Tok
 
 _keywords = {
@@ -25,9 +26,10 @@ _keywords = {
     "to": TOK_TO,
     "true": TOK_TRUE,
     "false": TOK_FALSE,
+    "interval": TOK_INTERVAL,
 }
 
-_constants = {
+constants = {
     "IP_TOS_NET_CTRL": CONST_IP_TOS_NET_CTRL,
     "IP_TOS_INTNET_CTRL": CONST_IP_TOS_INTNET_CTRL,
     "IP_TOS_CRITIC_ECP": CONST_IP_TOS_CRITIC_ECP,
@@ -43,6 +45,8 @@ _constants = {
     "ETH_PROTO_IPV4": 0x0800,
     "ETH_PROTO_IPV6": 0x86dd,
     "ETH_PROTO_ARP": 0x0806,
+    "HTTPS": 443,
+    "DNS": 53
 }
 
 _token1 = {
@@ -199,7 +203,7 @@ class Lexer:
         value = self.text[tok_start: self.pos]
         if value in _keywords:
             token = Token(_keywords[value], value, self.line, self.col)
-        elif value in _constants:
+        elif value in constants:
             token = Token(TOK_CONST, value, self.line, self.col)
         else:
             token = Token(TOK_NAME, value, self.line, self.col)
