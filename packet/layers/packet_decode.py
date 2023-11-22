@@ -3,6 +3,20 @@ from struct import unpack
 from packet.layers.fields import IPv4Address
 
 FRAME_TYPE_8021Q = 0x8100
+FRAME_TYPE_IPV4 = 0x0800
+FRAME_TYPE_IPV6 = 0x86DD
+FRAME_TYPE_ARP = 0x0801
+
+ETHER_TYPE_LIST = [
+    0x0800, 0x0806, 0x0842, 0x22F0, 0x22F3, 0x22EA, 0x6002,
+    0x6003, 0x6004, 0x8035, 0x809B, 0x80F3, 0x8100, 0x8102,
+    0x8103, 0x8137, 0x8204, 0x86DD, 0x8808, 0x8809, 0x8819,
+    0x8847, 0x8848, 0x8863, 0x8864, 0x887B, 0x888E, 0x8892,
+    0x889A, 0x88A2, 0x88A4, 0x88A8, 0x88AB, 0x88B8, 0x88B9,
+    0x88BA, 0x88BF, 0x88CC, 0x88CD, 0x88E1, 0x88E3, 0x88E5,
+    0x88E7, 0x88F7, 0x88F8, 0x88FB, 0x8902, 0x8906, 0x8914,
+    0x8915, 0x891D, 0x893a, 0x892F, 0x9000, 0xF1C1
+]
 
 
 class PacketDecode:
@@ -109,6 +123,9 @@ class PacketDecode:
             return False
 
     def search_tcp(self, field: str) -> int:
+        if not self.has_tcp:
+            return False
+
         if field == "sport":
             return self.tcp_sport
 
@@ -163,9 +180,37 @@ class PacketDecode:
 
         return response
 
-    # @property
-    # def offset(self) -> int:
-    #     return 18 if self.has_vlan else 14
+    @property
+    def has_ethernet(self) -> bool:
+        return self.ethertype in (ETHER_TYPE_LIST)
+
+    @property
+    def has_ipv4(self) -> bool:
+        return self.ethertype == FRAME_TYPE_IPV4
+
+    @property
+    def has_tcp(self) -> bool:
+        return self.ip_proto == 0x06
+
+    @property
+    def has_udp(self) -> bool:
+        return self.ip_proto == 0x11
+
+    @property
+    def has_icmp(self) -> bool:
+        return self.ip_proto == 0x01
+
+    @property
+    def has_dns(self) -> bool:
+        return self.ip_proto == 0x01
+
+    @property
+    def has_dhcp(self) -> bool:
+        return self.ip_proto == 0x01
+
+    @property
+    def has_https(self) -> bool:
+        return self.tcp_dport == 443 or self.tcp_sport == 443
 
     @property
     def timestamp(self) -> int:
