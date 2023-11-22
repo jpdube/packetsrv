@@ -29,8 +29,8 @@ class PacketDecode:
         self.offset = 0
 
     def decode(self, header: bytes, packet: bytes):
-        self.header = header
-        self.packet = packet
+        self.header = bytes(header)
+        self.packet = bytes(packet)
         self.offset = 18 if self.has_vlan else 14
         # print_hex(self.packet)
 
