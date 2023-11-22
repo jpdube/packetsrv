@@ -1,7 +1,7 @@
-from struct import unpack
+from struct import pack, unpack
+
 from config.config import Config
 from packet.layers.packet_decode import PacketDecode
-from struct import pack
 from packet.utils.print_hex import HexDump
 
 PCAP_GLOBAL_HEADER_SIZE = 24
@@ -74,7 +74,7 @@ class PcapFile:
                     first_ts = ts
 
                 raw_index.extend(
-                    pack("!III", ts, offset, self.packet_index(pd)))
+                    pack("!IIIII", ts, offset, self.packet_index(pd), pd.ip_dst, pd.ip_src))
                 offset += incl_len + 16
 
         # print(f"Index file: {Config.pcap_path()}/{file_id}.pidx")
@@ -107,7 +107,7 @@ class PcapFile:
         return pindex
 
     def build_master_index(self, master_index):
-        with open(f"{Config.pcap_index()}/master.pidx", "wb") as f:
+        with open(f"{Config.pcap_master_index()}/master.pidx", "wb") as f:
             for idx in master_index:
                 # print(idx)
                 f.write(pack('!III', *idx))

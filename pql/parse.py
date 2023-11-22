@@ -3,12 +3,20 @@ from pql.lexer import Lexer
 from pql.model import *
 from pql.tokens_list import *
 
+index_field = set()
+# ip_list = set()
+# prev_label = []
+prev_ip = 0
+ip_search = {'ip.src': [], 'ip.dst': []}
+
 
 class Tokenizer:
     def __init__(self, tokens):
         self.tokens = tokens
         self.lookahead = None
         self.prev_token = None
+
+        self.prev_label = ""
 
     def peek(self, *token_type):
         if self.lookahead is None:
@@ -36,13 +44,16 @@ class Tokenizer:
                 col = self.prev_token.col
 
             print(
-                f"Syntax error at line: {line} column: {col} token: {self.lookahead}"
+                f"Syntax error at: {line} col: {col} token: {self.lookahead}"
             )
             raise SyntaxError
         else:
             # if token:
             self.prev_token = self.lookahead
             self.lookahead = None
+
+            if token.value in ['ip.dst', 'ip.src']:
+                self.prev_label = token.value
             return token
 
 
@@ -129,7 +140,9 @@ def parse_select(tokens):
     top_value = None
     if tokens.peek(TOK_TOP):
         tokens.expect(TOK_TOP)
-        top_value = parse_expression(tokens)
+        top_value = int(tokens.expect(TOK_INTEGER).value)
+        print(f"TOP: {top_value}")
+        # top_value = parse_expression(tokens)
 
     limit_fields = []
     if tokens.peek(TOK_LIMIT):
@@ -141,9 +154,27 @@ def parse_select(tokens):
         limit_fields.append(limit)
 
     tokens.expect(TOK_SEMI)
+    # print(prev_label)
+    # ip_index = []
+
+    # for i, label in enumerate(prev_label):
+    #     ip_index.append({label: list(ip_list)[i]})
+
+    # print(ip_index)
+    # ip_search = {"ip.src": [], "ip.dst": []}
+    # for label, ip_addr in zip(prev_label, list(ip_list)):
+    #     ip_search[label].append(ip_addr)
+
+    # ip_search = []
+    # for ip in list(ip_list):
+    #     ip_search.append(ip)
+    # print(ip_search)
+
     return SelectStatement(fields,
                            from_fields,
                            None,
+                           index_field,
+                           ip_search,
                            where_value,
                            groupby_value,
                            top_value,
@@ -179,7 +210,12 @@ def parse_ipv4(tokens):
         mask = tokens.expect(TOK_INTEGER)
         mask_value = mask.value
 
-    return IPv4(token.value, mask_value)
+    ip_addr = IPv4(token.value, mask_value)
+    ip_search[tokens.prev_label].append((ip_addr.to_int, int(mask_value)))
+
+    # ip_list.add((ip_addr.to_int, int(mask_value)))
+    # print(f"IP: {ip_addr}:{prev_label}")
+    return ip_addr
 
 
 def parse_mac(tokens):
@@ -189,20 +225,8 @@ def parse_mac(tokens):
 
 def parse_const(tokens):
     name = tokens.expect(TOK_CONST)
+    index_field.add(name.value)
     return ConstDecl(name.value, "int", name.value)
-
-# def parse_const(tokens):
-#     tokens.expect(TOK_CONST)
-#     name = tokens.expect(TOK_NAME)
-#     const_type = tokens.accept(TOK_NAME)
-#     if const_type:
-#         type = const_type.value
-#     else:
-#         type = None
-#     tokens.expect(TOK_ASSIGN)
-#     value = parse_expression(tokens)
-#     tokens.expect(TOK_SEMI)
-#     return ConstDecl(name.value, type, value)
 
 
 def parse_var(tokens):
@@ -221,6 +245,12 @@ def parse_var(tokens):
 
 def parse_load(tokens):
     t = tokens.expect(TOK_NAME)
+    if "." in t.value:
+        index_field.add(t.value.split(".")[0].upper())
+    # if t.value in ['ip.dst', 'ip.src']:
+    #     prev_label = t.value
+        # prev_label.append(t.value)
+    # print(f"Prev label: {prev_label}")
     return Label(t.value)
 
 
@@ -361,13 +391,15 @@ def parse_unary(tokens):
 
 
 def parse_source(text):
+    # ip_list.clear()
     lexer = Lexer(text)
     # tokens = lexer.tokenize()
     # for t in tokens:
     #     print(t)
 
     tokens = lexer.tokenize()
-    model = parse_prog(Tokenizer(tokens))
+    model = parse_select(Tokenizer(tokens))
+    # model = parse_prog(Tokenizer(tokens))
     return model
 
 

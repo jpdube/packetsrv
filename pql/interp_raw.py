@@ -8,12 +8,30 @@ from pql.pcapfile import PcapFile
 from packet.layers.packet_builder import PacketBuilder
 from packet.layers.packet_decode import PacketDecode
 from pql.tokens_list import *
-
+from dbase.index_manager import PktPtr
 
 # ---------------------------------------------
 # Process a pcap file to filter
 # The pcapfile should be iterator based
 # ---------------------------------------------
+
+
+def exec_program(model, pkt_ref: PktPtr):
+    pfile = PcapFile()
+    pfile.open(f"{pkt_ref.file_id}")
+    env = {}
+
+    pd = PacketDecode()
+    hdr, pkt = pfile.get(pkt_ref.ptr)
+    pd.decode(hdr, pkt)
+    if interpret(model, env, pd):
+        pkt_ref.header = hdr
+        pkt_ref.packet = pkt
+        return pkt_ref
+    else:
+        return None
+
+
 def interpret_program(model, pcapfile):
     env = {}
     pfile = PcapFile()

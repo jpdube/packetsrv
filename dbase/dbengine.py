@@ -1,15 +1,15 @@
 from datetime import datetime
 from multiprocessing import Pool
-from pathlib import Path
+# from pathlib import Path
+# from struct import unpack
 from typing import Dict, List, Tuple
 
 from config.config import Config
+from dbase.index_manager import IndexManager
 from packet.layers.packet_builder import PacketBuilder
-from pql.interp_raw import interpret_program
+from pql.interp_raw import exec_program
 from pql.parse import parse_source
 from pql.pcapfile import PcapFile
-import os
-import re
 
 # NBR_FILES_TO_PROCESS = 1
 
@@ -17,94 +17,41 @@ import re
 class DBEngine:
     def __init__(self):
         self.pkt_found = 0
+        self.index_mgr = IndexManager()
 
-    def select(self) -> List[str]:
-        model = parse_source(self.pql)
-        for m in model:
-            if m.select_expr is not None:
-                field_list = []
-                for f in m.select_expr:
-                    field_list.append(f.value)
-                return field_list
+    def index_db(self):
+        self.index_mgr.create_index()
 
-        return []
-
-    def top(self) -> int:
-        model = parse_source(self.pql)
-        for m in model:
-            if m.top_expr is not None:
-                return int(m.top_expr.value)
-
-        return 2
-
-    def _execute(self, params):
-        file_id, _ = params
-
-        result = []
-        for m in self.model:
-            if m.where_expr is not None:
-                result = interpret_program(m.where_expr, pcapfile=f"{file_id}")
-
-        return result
-
-    def exec_parallel(self, pql: str) -> List[Dict]:
+    def run(self, pql: str):
+        start_time = datetime.now()
         self.pql = pql
         self.model = parse_source(pql)
-        pool = Pool()
-        start_time = datetime.now()
-        flist = []
-        for i in range(Config.nbr_files_to_process()):
-            flist.append((i, pql))
-        result = pool.map(self._execute, flist)
-
-        found = 0
-
-        pkt_list = self.build_result(result)
+        field_index = self.index_mgr.build_search_value(self.model.index_field)
+        index_result = self.index_mgr.search(field_index, self.model.ip_list)
         result = []
-        pcapfile = PcapFile()
-        for p in pkt_list:
-            # file_id, ptr = p
-            # pcapfile.open(file_id)
-            # pb = PacketBuilder()
-            # header, packet = pcapfile.get(ptr)
-            # pb.from_bytes(packet, header)
-            # result.append(pb.export())
-            # print(pb)
-            # pb.print_hex()
-            found += 1
-            if found >= self.top():
+        count = 0
+        searched = 0
+        self.pkt_found = 0
+        print(self.model.where_expr)
+        for idx in index_result:
+            searched += 1
+            pkt_result = exec_program(self.model.where_expr, idx)
+            if pkt_result is not None:
+                # pcapfile = PcapFile()
+                # pcapfile.open(f"{pkt_result.file_id}")
+                # pb = PacketBuilder()
+                # header, packet = pcapfile.get(pkt_result.ptr)
+                # pb.from_bytes(pkt_result.packet, pkt_result.header)
+                # result.append(pb.export())
+                # print(pb)
+                count += 1
+                self.pkt_found += 1
+
+            if count == self.model.top_expr:
                 break
 
         ttl_time = datetime.now() - start_time
         print(
-            f"---> Total Time: {ttl_time} Result: {self.pkt_found} TOP: {self.top()} SELECT: {self.select()}")
-        return result
-
-    def build_result(self, raw_result: List[List[Tuple[bytes, bytes]]]) -> List[Tuple[str, int]]:
-        result = []
-        self.pkt_found = 0
-        for r in raw_result:
-            for p in r:
-                result.append(p)
-                self.pkt_found += 1
+            f"---> Scaneed: {searched} in Time: {ttl_time} Result: {self.pkt_found} TOP: {self.model.top_expr} SELECT: {self.model.select_expr}")
 
         return result
-
-    def file_list(self):
-        pass
-
-    def index_db(self):
-        path = Path(Config.pcap_path())
-        files_list = list(path.glob("*.pcap"))
-        pcapfile = PcapFile()
-        pool = Pool()
-        start_time = datetime.now()
-        flist = []
-        for i in files_list[:32]:
-            flist.append(i.stem)
-        result = pool.map(pcapfile.create_index, flist)
-        result.sort(key=lambda a: a[0])
-        # print(result)
-        pcapfile.build_master_index(result)
-        ttl_time = datetime.now() - start_time
-        print(f"---> Total Index Time: {ttl_time}")
