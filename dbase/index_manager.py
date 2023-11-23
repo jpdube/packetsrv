@@ -2,7 +2,7 @@ from dataclasses import dataclass
 from datetime import datetime
 from pathlib import Path
 from struct import unpack
-from multiprocessing import Pool
+import multiprocessing as mp
 
 from config.config import Config
 from pql.pcapfile import PcapFile
@@ -27,7 +27,7 @@ class IndexManager:
         path = Path(Config.pcap_path())
         files_list = list(path.glob("*.pcap"))
         pcapfile = PcapFile()
-        pool = Pool()
+        pool = mp.Pool()
         start_time = datetime.now()
         flist = []
         for i in files_list:
@@ -38,26 +38,44 @@ class IndexManager:
         ttl_time = datetime.now() - start_time
         print(f"---> Total Index Time: {ttl_time}")
 
+    def search_pkt(self, file_id, search_index, ip_list):
+        result = []
+        with open(file_id, "rb") as f:
+            buffer = []
+            while True:
+                buffer = f.read(20)
+
+                if not buffer:
+                    break
+
+                _, offset, index, ip_dst, ip_src = unpack(
+                    ">IIIII", buffer)
+                if (search_index & index) == search_index and self.match_ip(ip_src, ip_dst, ip_list):
+                    pkt = PktPtr(file_id=int(file_id.stem),
+                                 ptr=offset, ip_dst=ip_dst, ip_src=ip_src)
+                    result.append(pkt)
+        return result
+
     def search(self, search_index, ip_list):
         path = Path(Config.pcap_index())
         files_list = list(path.glob("*.pidx"))
         files_list.sort(key=lambda a: int(a.stem))
-        print(ip_list)
-        for file_id in files_list:
-            with open(f"{Config.pcap_index()}{file_id.stem}.pidx", "rb") as f:
-                buffer = []
-                while True:
-                    buffer = f.read(20)
 
-                    if not buffer:
-                        break
+        pool = mp.Pool()
 
-                    _, offset, index, ip_dst, ip_src = unpack(
-                        ">IIIII", buffer)
-                    if (search_index & index) == search_index and self.match_ip(ip_src, ip_dst, ip_list):
-                        pkt = PktPtr(file_id=int(file_id.stem),
-                                     ptr=offset, ip_dst=ip_dst, ip_src=ip_src)
-                        yield(pkt)
+        for index_chunk in self.chunks(files_list, mp.cpu_count()):
+            params = []
+            for idx in index_chunk:
+                params.append((idx, search_index, ip_list))
+
+            result = pool.starmap(self.search_pkt, params)
+
+            for r in result:
+                yield (r)
+
+    def chunks(self, l, n):
+        for i in range(0, len(l), n):
+            yield l[i:i + n]
 
     def match_ip(self, ip_src, ip_dst, ip_list) -> bool:
         if len(ip_list['ip.dst']) > 0 and len(ip_list['ip.src']) > 0:

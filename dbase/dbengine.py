@@ -33,23 +33,26 @@ class DBEngine:
         searched = 0
         self.pkt_found = 0
         print(self.model.where_expr)
+        # for idx in index_result:
+        # print(f"Found index: {idx}")
+
         for idx in index_result:
-            searched += 1
-            pkt_result = exec_program(self.model.where_expr, idx)
-            if pkt_result is not None:
-                # pcapfile = PcapFile()
-                # pcapfile.open(f"{pkt_result.file_id}")
-                # pb = PacketBuilder()
-                # header, packet = pcapfile.get(pkt_result.ptr)
-                # pb.from_bytes(pkt_result.packet, pkt_result.header)
-                # result.append(pb.export())
-                # print(pb)
-                count += 1
-                self.pkt_found += 1
+            for i in idx:
+                # print(i)
+                searched += 1
+                pkt_result = exec_program(self.model.where_expr, i)
+                if pkt_result is not None:
+                    # pb = PacketBuilder()
+                    # pb.from_bytes(pkt_result.packet, pkt_result.header)
+                    # print(pb)
+                    count += 1
+                    self.pkt_found += 1
+
+                if count == self.model.top_expr:
+                    break
 
             if count == self.model.top_expr:
                 break
-
         ttl_time = datetime.now() - start_time
         print(
             f"---> Scaneed: {searched} in Time: {ttl_time} Result: {self.pkt_found} TOP: {self.model.top_expr} SELECT: {self.model.select_expr}")
