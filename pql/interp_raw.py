@@ -32,32 +32,6 @@ def exec_program(model, pkt_ref: PktPtr):
         return None
 
 
-def interpret_program(model, pcapfile):
-    env = {}
-    pfile = PcapFile()
-    pfile.open(pcapfile)
-    packet_list = []
-    total = 0
-    pd = PacketDecode()
-    # start_time = datetime.now()
-    for pkt_decode in pfile.next():
-        # total += 1
-        hdr, pkt, offset = pkt_decode
-        pd.decode(hdr, pkt)
-        found = interpret(model, env, pd)
-        if found:
-            total += 1
-            # print(f"Pkt file: {pcapfile} offset: {offset}")
-            packet_list.append((pcapfile, offset))
-            # packet_list.append((pkt.packet, pkt.header))
-
-    # ttl_time = datetime.now() - start_time
-    # print(
-    #     f"Found {len(packet_list)} packets in {total}pkts time: {ttl_time.total_seconds()}s")
-    # return total
-    return packet_list
-
-
 def interpret(node, env, packet: PacketDecode):
     if isinstance(node, Integer):
         return int(node.value)
