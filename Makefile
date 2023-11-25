@@ -17,7 +17,7 @@ run:
 
 .PHONY: test
 test:
-	pytest $(TEST_DIR)
+	cd $(TEST_DIR);pytest
 
 .PHONY: build
 build:

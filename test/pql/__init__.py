@@ -1,2 +1,2 @@
 import sys
-sys.path.append('../../pql')
+sys.path.append('../../app')
