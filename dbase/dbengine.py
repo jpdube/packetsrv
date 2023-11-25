@@ -53,6 +53,7 @@ class DBEngine:
 
             if count == self.model.top_expr:
                 break
+
         ttl_time = datetime.now() - start_time
         print(
             f"---> Scaneed: {searched} in Time: {ttl_time} Result: {self.pkt_found} TOP: {self.model.top_expr} SELECT: {self.model.select_expr}")

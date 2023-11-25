@@ -1,5 +1,5 @@
 # from packet.layers.ipv4 import IPV4
-from pql.lexer import Lexer
+from pql.lexer import Lexer, tokenize
 from pql.model import *
 from pql.tokens_list import *
 
@@ -392,12 +392,13 @@ def parse_unary(tokens):
 
 def parse_source(text):
     # ip_list.clear()
-    lexer = Lexer(text)
+    # lexer = Lexer(text)
     # tokens = lexer.tokenize()
     # for t in tokens:
     #     print(t)
 
-    tokens = lexer.tokenize()
+    tokens = tokenize(text)
+    # tokens = lexer.tokenize()
     model = parse_select(Tokenizer(tokens))
     # model = parse_prog(Tokenizer(tokens))
     return model
