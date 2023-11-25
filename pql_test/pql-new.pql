@@ -1,5 +1,0 @@
-# This is a comment
-with sniffer_01
-filter ip.src == 192.168.3.107
-output summary
-top 150;

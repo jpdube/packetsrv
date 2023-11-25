@@ -1,4 +1,0 @@
-select ip.src, ip.dst, tcp.sport
-from packet
-where ether.vlan == 61
-top 5000;

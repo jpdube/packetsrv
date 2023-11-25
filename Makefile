@@ -4,7 +4,7 @@ DIST=$(BASE)/dist
 CONFIGDIR=$(BASE)/config-jpd
 PYFILES=$(wildcard *.py)
 APPNAME=pcapdbapi
-MAIN=main.py
+MAIN=$(BASE)/app/main.py
 PYTHON=python3
 TEST_DIR=$(BASE)/test
 
