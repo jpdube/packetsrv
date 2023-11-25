@@ -29,7 +29,6 @@ _keywords = {
     "true": TOK_TRUE,
     "false": TOK_FALSE,
     "interval": TOK_INTERVAL,
-    "timestamp": TOK_TIMESTAMP,
 }
 
 constants = {
@@ -271,6 +270,7 @@ class Preparser:
 
     def parse(self):
         while not self.at_end():
+            self.get_label()
             self.get_ip_address()
             self.get_mac_address()
             self.get_timestamp()
@@ -279,6 +279,28 @@ class Preparser:
             self.token_list.append(self.advance())
 
         return self.token_list
+
+    def get_label(self):
+        label: str = ""
+        column = 0
+        line = 0
+
+        if self.peek_at(0, TOK_NAME) \
+                and self.peek_at(1, TOK_PERIOD)  \
+                and self.peek_at(2, TOK_NAME):
+
+            for i in range(0, 3):
+                tok = self.advance()
+                if tok:
+                    if i == 0:
+                        column = tok.col
+                        line = tok.line
+
+                    label += tok.value
+
+            token = Token(TOK_NAME, label, line, column)
+
+            self.token_list.append(token)
 
     def get_ip_address(self):
         ip_address: str = ""
@@ -422,5 +444,8 @@ def tokenize(pql: str):
     print(token_list)
     preparser = Preparser(token_list)
     token_list = preparser.parse()
+    print("-----------------------")
+    print(token_list)
+    print("-----------------------")
     for t in token_list:
         yield (t)
