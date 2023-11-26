@@ -36,6 +36,7 @@ TOK_NAME = 0x107
 TOK_LABEL = 0x108
 TOK_TRUE = 0x109
 TOK_FALSE = 0x10a
+TOK_ARRAY = 0x10b
 
 # --- One character keywords
 TOK_ASSIGN = 0x200
@@ -117,6 +118,7 @@ text_token = {
     TOK_PERIOD: "PERIOD",
     TOK_TIMESTAMP: "TIMESTAMP",
     TOK_TIME: "TIME",
+    TOK_ARRAY: "ARRAY",
 }
 
 

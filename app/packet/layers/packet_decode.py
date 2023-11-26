@@ -1,6 +1,7 @@
 from struct import unpack
 
 from packet.layers.fields import IPv4Address
+from typing import List
 
 FRAME_TYPE_8021Q = 0x8100
 FRAME_TYPE_IPV4 = 0x0800
@@ -34,8 +35,13 @@ class PacketDecode:
         self.offset = 18 if self.has_vlan else 14
         # print_hex(self.packet)
 
+    def get_byte_field(self, field_name: str, offset: int, length: int) -> bytes | None:
+        if field_name == "eth":
+            return self.eth_packet(offset, length)
+
+        return None
+
     def get_field(self, field_name: str) -> int:
-        # def search_field(self, field_name: str, value: int) -> bool:
         (proto, field) = field_name.split(".")
         if proto == "pkt":
             return self.search_pkt(field)
@@ -70,6 +76,9 @@ class PacketDecode:
 
         else:
             return 0
+
+    def eth_packet(self, offset: int, length: int) -> bytes:
+        return self.packet[offset:offset + length]
 
     def search_eth(self, field: str) -> int:
         vlan_flag = self.has_vlan

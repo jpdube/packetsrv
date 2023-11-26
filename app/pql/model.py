@@ -94,6 +94,41 @@ class Label(Expression):
         return f"Label({self._value})"
 
 
+class LabelByte(Expression):
+    def __init__(self, value, offset, length):
+        self._value = value
+        self._offset = offset
+        self._length = length
+
+    @property
+    @lru_cache
+    def value(self) -> str:
+        return self._value
+
+    @property
+    def offset(self) -> int:
+        return self._offset
+
+    @property
+    def length(self) -> int:
+        return self._length
+
+    def __repr__(self):
+        return f"LabelByte({self._value}, {self._offset}, {self._length})"
+
+
+class Array(Expression):
+    def __init__(self, value):
+        self._value = value
+
+    @property
+    def value(self) -> int:
+        return self._value
+
+    def __repr__(self):
+        return f"Array ({self._value})"
+
+
 class Date(Expression):
     def __init__(self, value):
         self.value = value

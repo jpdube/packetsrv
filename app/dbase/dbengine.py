@@ -42,9 +42,9 @@ class DBEngine:
                 searched += 1
                 pkt_result = exec_program(self.model.where_expr, i)
                 if pkt_result is not None:
-                    # pb = PacketBuilder()
-                    # pb.from_bytes(pkt_result.packet, pkt_result.header)
-                    # print(pb)
+                    pb = PacketBuilder()
+                    pb.from_bytes(pkt_result.packet, pkt_result.header)
+                    print(pb)
                     count += 1
                     self.pkt_found += 1
 

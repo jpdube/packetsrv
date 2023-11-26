@@ -9,6 +9,7 @@ from packet.layers.packet_builder import PacketBuilder
 from packet.layers.packet_decode import PacketDecode
 from pql.tokens_list import *
 from dbase.index_manager import PktPtr
+import numpy as np
 
 # ---------------------------------------------
 # Process a pcap file to filter
@@ -32,6 +33,16 @@ def exec_program(model, pkt_ref: PktPtr):
         return None
 
 
+def cmp_array(left, right) -> bool:
+    if len(left) != len(right):
+        return False
+
+    for l, r in zip(left, right):
+        if l != r:
+            return False
+    return True
+
+
 def interpret(node, env, packet: PacketDecode):
     if isinstance(node, Integer):
         return int(node.value)
@@ -45,6 +56,14 @@ def interpret(node, env, packet: PacketDecode):
             return value.to_int
         else:
             return value
+    elif isinstance(node, LabelByte):
+        value = packet.get_byte_field(node.value, node.offset, node.length)
+        # print(f"LabelByte: {list(value)}")
+        return value
+
+    elif isinstance(node, Array):
+        # print(f"Array: {list(node.value)}")
+        return node
 
     elif isinstance(node, IPv4):
         return node
@@ -123,6 +142,9 @@ def interpret(node, env, packet: PacketDecode):
                 return rightval.is_in_network(leftval)
             elif isinstance(rightval, Mac):
                 return leftval == rightval.to_int
+            elif isinstance(rightval, Array):
+                return leftval == rightval.value
+                # return cmp_array(leftval, rightval.value)
             else:
                 return leftval == rightval
         elif node.op == TOK_LAND:

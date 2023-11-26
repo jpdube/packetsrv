@@ -154,21 +154,6 @@ def parse_select(tokens):
         limit_fields.append(limit)
 
     tokens.expect(TOK_SEMI)
-    # print(prev_label)
-    # ip_index = []
-
-    # for i, label in enumerate(prev_label):
-    #     ip_index.append({label: list(ip_list)[i]})
-
-    # print(ip_index)
-    # ip_search = {"ip.src": [], "ip.dst": []}
-    # for label, ip_addr in zip(prev_label, list(ip_list)):
-    #     ip_search[label].append(ip_addr)
-
-    # ip_search = []
-    # for ip in list(ip_list):
-    #     ip_search.append(ip)
-    # print(ip_search)
 
     return SelectStatement(fields,
                            from_fields,
@@ -195,6 +180,25 @@ def parse_string(tokens):
 def parse_integer(tokens):
     token = tokens.expect(TOK_INTEGER)
     return Integer(token.value)
+
+
+# Values:
+# [0]
+# [1,2]
+def parse_array(tokens):
+    values = []
+    tokens.expect(TOK_INDEX_START)
+    while True:
+        val = tokens.expect(TOK_INTEGER)
+        values.append(int(val.value))
+
+        if not tokens.peek(TOK_DELIMITER):
+            tokens.expect(TOK_INDEX_END)
+            break
+        else:
+            tokens.expect(TOK_DELIMITER)
+
+    return Array(bytes(values))
 
 
 def parse_float(tokens):
@@ -245,13 +249,22 @@ def parse_var(tokens):
 
 def parse_load(tokens):
     t = tokens.expect(TOK_NAME)
-    if "." in t.value:
+    label_name = t.value
+    allowed_fields = ["eth", "ip", "tcp", "udp"]
+    if tokens.peek(TOK_INDEX_START) and label_name in allowed_fields:
+        print("In label array")
+        tokens.expect(TOK_INDEX_START)
+        offset = int(tokens.expect(TOK_INTEGER).value)
+        tokens.expect(TOK_COLON)
+        length = int(tokens.expect(TOK_INTEGER).value)
+        tokens.expect(TOK_INDEX_END)
+        print(label_name, offset, length)
+        return LabelByte(label_name, offset, length)
+
+    if "." in label_name:
         index_field.add(t.value.split(".")[0].upper())
-    # if t.value in ['ip.dst', 'ip.src']:
-    #     prev_label = t.value
-        # prev_label.append(t.value)
-    # print(f"Prev label: {prev_label}")
-    return Label(t.value)
+
+    return Label(label_name)
 
 
 def parse_grouping(tokens):
@@ -327,6 +340,8 @@ def parse_factor(tokens):
         return parse_integer(tokens)
     elif tokens.peek(TOK_FLOAT):
         return parse_float(tokens)
+    elif tokens.peek(TOK_INDEX_START):
+        return parse_array(tokens)
     elif tokens.peek(TOK_IPV4):
         return parse_ipv4(tokens)
     elif tokens.peek(TOK_MAC):
@@ -400,6 +415,7 @@ def parse_source(text):
     tokens = tokenize(text)
     # tokens = lexer.tokenize()
     model = parse_select(Tokenizer(tokens))
+    print(model)
     # model = parse_prog(Tokenizer(tokens))
     return model
 

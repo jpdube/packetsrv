@@ -13,29 +13,17 @@ def search():
             """
                     select udp.sport,ip.dst, ip.src, udp.dport, pkt.timestamp, pkt.origlen
         from s1
-         where udp.dport == 53 and (ip.dst == 192.168.2.230 and ip.src == 192.168.3.0/24)
-        top 6000;
+        where eth[16:2] == [0x08, 0x00] and (ip.dst == 192.168.2.230 and ip.src == 192.168.3.0/24)
+        top 15;
                     """)
-
-    # lexer = Lexer(
-    #     "0xa2:0xc3")
-    # tokens = lexer.tokenize()
-    # for t in tokens:
-    #     print(t)
-    # parse = Preparser(tokens)
-    # parse.parse()
-    # print(parse.token_list)
-
-    # result = tokenize(
-    #     """
-    #                 select udp.sport,ip.dst, ip.src, udp.dport, frame.timestamp, frame.origlen
-    #     from s1
-    #      where udp.dport == 53 and (ip.dst == 192.168.2.230 and ip.src == 192.168.3.0/24)
-    #     top 6000;
-    #                 """)
-    # # "2023-11-24 13:45:30 2024-12-10 23:45:35 192.168.3.128")
-    # for r in result:
-    #     print(r)
+# [232,28,186]
+        # _ = engine.run(
+        #     """
+        #             select udp.sport,ip.dst, ip.src, udp.dport, pkt.timestamp, pkt.origlen
+        # from s1
+        #  where udp.dport == 53 and (ip.dst == 192.168.2.230 and ip.src == 192.168.3.0/24)
+        # top 6000;
+        #             """)
 
 
 if __name__ == "__main__":
