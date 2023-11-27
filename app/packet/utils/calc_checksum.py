@@ -1,4 +1,4 @@
-from struct import *
+from struct import unpack
 
 
 # --- Compute the 16bit one complement of a buffer
@@ -7,7 +7,7 @@ def calc_checksum(packet):
 
     # Add up 16-bit words
     num_words = len(packet) // 2
-    for chunk in unpack("!%sH" % num_words, packet[0 : num_words * 2]):
+    for chunk in unpack("!%sH" % num_words, packet[0: num_words * 2]):
         total += chunk
 
     # Add any left over byte

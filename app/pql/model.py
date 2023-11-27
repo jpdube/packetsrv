@@ -4,7 +4,6 @@ from typing import List
 
 from packet.layers.fields import IPv4Address, MacAddress
 from pql.constant import const_value
-from pql.fields_list import field_list
 from pql.tokens_list import human_tokens
 
 
@@ -84,11 +83,7 @@ class Label(Expression):
     @property
     @lru_cache
     def value(self) -> str:
-        f = field_list.get(self._value, None)
-        if f is not None:
-            return f.field
-        else:
-            return f'Invalid field near {self._value}'
+        return self._value
 
     def __repr__(self):
         return f"Label({self._value})"

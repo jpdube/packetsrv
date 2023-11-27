@@ -1,17 +1,9 @@
 from datetime import datetime
-from multiprocessing import Pool
-# from pathlib import Path
-# from struct import unpack
-from typing import Dict, List, Tuple
 
-from config.config import Config
 from dbase.index_manager import IndexManager
 from packet.layers.packet_builder import PacketBuilder
 from pql.interp_raw import exec_program
 from pql.parse import parse_source
-from pql.pcapfile import PcapFile
-
-# NBR_FILES_TO_PROCESS = 1
 
 
 class DBEngine:
@@ -44,7 +36,7 @@ class DBEngine:
                 if pkt_result is not None:
                     pb = PacketBuilder()
                     pb.from_bytes(pkt_result.packet, pkt_result.header)
-                    print(pb)
+                    # print(pb)
                     count += 1
                     self.pkt_found += 1
 

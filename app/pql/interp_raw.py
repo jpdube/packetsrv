@@ -1,15 +1,12 @@
 # interp.py
 
 from datetime import datetime, timedelta
-from packet.layers.ipv4 import IPV4
 
 from pql.model import *
 from pql.pcapfile import PcapFile
-from packet.layers.packet_builder import PacketBuilder
 from packet.layers.packet_decode import PacketDecode
 from pql.tokens_list import *
 from dbase.index_manager import PktPtr
-import numpy as np
 
 # ---------------------------------------------
 # Process a pcap file to filter
