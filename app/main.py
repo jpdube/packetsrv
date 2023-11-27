@@ -2,7 +2,6 @@
 # import uvicorn
 from config.config import Config
 from dbase.dbengine import DBEngine
-from pql.lexer import tokenize
 
 
 def search():
@@ -14,16 +13,8 @@ def search():
                     select udp.sport,ip.dst, ip.src, udp.dport, pkt.timestamp, pkt.origlen
         from s1
         where eth[16:2] == [0x08, 0x00] and (ip.dst == 192.168.2.230 and ip.src == 192.168.3.0/24)
-        top 15;
+        top 8500;
                     """)
-# [232,28,186]
-        # _ = engine.run(
-        #     """
-        #             select udp.sport,ip.dst, ip.src, udp.dport, pkt.timestamp, pkt.origlen
-        # from s1
-        #  where udp.dport == 53 and (ip.dst == 192.168.2.230 and ip.src == 192.168.3.0/24)
-        # top 6000;
-        #             """)
 
 
 if __name__ == "__main__":

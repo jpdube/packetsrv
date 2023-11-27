@@ -141,8 +141,6 @@ def parse_select(tokens):
     if tokens.peek(TOK_TOP):
         tokens.expect(TOK_TOP)
         top_value = int(tokens.expect(TOK_INTEGER).value)
-        print(f"TOP: {top_value}")
-        # top_value = parse_expression(tokens)
 
     limit_fields = []
     if tokens.peek(TOK_LIMIT):
@@ -252,13 +250,11 @@ def parse_load(tokens):
     label_name = t.value
     allowed_fields = ["eth", "ip", "tcp", "udp"]
     if tokens.peek(TOK_INDEX_START) and label_name in allowed_fields:
-        print("In label array")
         tokens.expect(TOK_INDEX_START)
         offset = int(tokens.expect(TOK_INTEGER).value)
         tokens.expect(TOK_COLON)
         length = int(tokens.expect(TOK_INTEGER).value)
         tokens.expect(TOK_INDEX_END)
-        print(label_name, offset, length)
         return LabelByte(label_name, offset, length)
 
     if "." in label_name:
@@ -406,17 +402,8 @@ def parse_unary(tokens):
 
 
 def parse_source(text):
-    # ip_list.clear()
-    # lexer = Lexer(text)
-    # tokens = lexer.tokenize()
-    # for t in tokens:
-    #     print(t)
-
     tokens = tokenize(text)
-    # tokens = lexer.tokenize()
     model = parse_select(Tokenizer(tokens))
-    print(model)
-    # model = parse_prog(Tokenizer(tokens))
     return model
 
 

@@ -145,5 +145,4 @@ class IndexManager:
         if 'HTTPS' in index_set:
             pindex = pindex + 0x100
 
-        print(f"Bit index: {pindex: x}")
         return pindex

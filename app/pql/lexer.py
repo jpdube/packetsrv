@@ -190,7 +190,6 @@ class Lexer:
             self.pos += 1
 
         value = self.text[tok_start + 2: self.pos]
-        print(value)
         int_value = int(value, 16)
         token = Token(TOK_INTEGER, str(int_value), self.line, self.col)
 

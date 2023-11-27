@@ -55,11 +55,9 @@ def interpret(node, env, packet: PacketDecode):
             return value
     elif isinstance(node, LabelByte):
         value = packet.get_byte_field(node.value, node.offset, node.length)
-        # print(f"LabelByte: {list(value)}")
         return value
 
     elif isinstance(node, Array):
-        # print(f"Array: {list(node.value)}")
         return node
 
     elif isinstance(node, IPv4):
@@ -141,7 +139,6 @@ def interpret(node, env, packet: PacketDecode):
                 return leftval == rightval.to_int
             elif isinstance(rightval, Array):
                 return leftval == rightval.value
-                # return cmp_array(leftval, rightval.value)
             else:
                 return leftval == rightval
         elif node.op == TOK_LAND:

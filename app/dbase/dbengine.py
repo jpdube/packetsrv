@@ -24,13 +24,9 @@ class DBEngine:
         count = 0
         searched = 0
         self.pkt_found = 0
-        print(self.model.where_expr)
-        # for idx in index_result:
-        # print(f"Found index: {idx}")
 
         for idx in index_result:
             for i in idx:
-                # print(i)
                 searched += 1
                 pkt_result = exec_program(self.model.where_expr, i)
                 if pkt_result is not None:
