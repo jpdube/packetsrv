@@ -162,9 +162,9 @@ class TCP(Packet):
                 return self.flag_ack
             elif field == 'checksum':
                 return self.checksum
-            elif field == 'src':
+            elif field == 'sport':
                 return self.src_port
-            elif field == 'dst':
+            elif field == 'dport':
                 return self.dst_port
             else:
                 return 0
