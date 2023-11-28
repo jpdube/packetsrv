@@ -1,6 +1,7 @@
 from struct import unpack
 
 from packet.layers.fields import IPv4Address
+from packet.utils.print_hex import HexDump
 from typing import List
 
 FRAME_TYPE_8021Q = 0x8100
@@ -38,6 +39,10 @@ class PacketDecode:
     def get_byte_field(self, field_name: str, offset: int, length: int) -> bytes | None:
         if field_name == "eth":
             return self.eth_packet(offset, length)
+        elif field_name == "ip":
+            return self.ipv4_packet(offset, length)
+        elif field_name == "tcp":
+            return self.tcp_packet(offset, length)
 
         return None
 
@@ -79,6 +84,17 @@ class PacketDecode:
 
     def eth_packet(self, offset: int, length: int) -> bytes:
         return self.packet[offset:offset + length]
+
+    def ipv4_packet(self, offset: int, length: int) -> bytes:
+        return self.packet[self.offset + offset:self.offset + offset + length]
+
+    def tcp_packet(self, offset: int, length: int) -> bytes:
+        pkt_offset = self.offset + (self.ip_hdr_len << 2)
+        return self.packet[pkt_offset + offset:pkt_offset + offset + length]
+        # hex_dump = HexDump()
+        # hex_dump.print_hex(
+        #     self.packet[pkt_offset:pkt_offset + pkt_offset + 20])
+        # return result
 
     def search_eth(self, field: str) -> int:
         vlan_flag = self.has_vlan
