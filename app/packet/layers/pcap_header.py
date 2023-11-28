@@ -1,10 +1,11 @@
 from struct import unpack
 from datetime import datetime
+from packet.layers.layer_type import LayerID
 from packet.layers.packet import Packet
 
 
 class PcapHeader(Packet):
-    name = 0xFF
+    name = LayerID.HEADER
 
     def __init__(self, header: bytes):
         self.header = header
@@ -42,4 +43,15 @@ class PcapHeader(Packet):
         return result
 
     def get_field(self, fieldname: str):
-        ...
+        field = fieldname.split('.')[1]
+        if field:
+            if field == 'ts_sec':
+                return self.ts_sec
+            elif field == 'timestamp':
+                return self.ts_format
+            elif field == 'ts_usec':
+                return self.ts_usec
+            elif field == 'origlen':
+                return self.orig_len
+            elif field == 'inclen':
+                return self.incl_len

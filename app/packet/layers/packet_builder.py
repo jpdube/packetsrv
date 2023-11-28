@@ -172,6 +172,10 @@ class PacketBuilder:
             eth = self.get_layer(LayerID.ETHERNET)
             if eth:
                 return eth.get_field(field)
+        elif pkt_name == 'frame':
+            frame = self.get_layer(LayerID.HEADER)
+            if frame:
+                return frame.get_field(field)
         elif pkt_name == 'ip':
             ip = self.get_layer(LayerID.IPV4)
             if ip:
