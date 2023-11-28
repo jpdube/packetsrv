@@ -26,7 +26,7 @@ class SnifferStop(BaseModel):
 @app.post("/pql")
 async def exec_pql(pql: PqlRequest):
     db = DBEngine()
-    result = db.exec_parallel(pql.query)
+    result = db.run(pql.query)
     # result = exec_query(pql.query)
     return {"result": result}
 

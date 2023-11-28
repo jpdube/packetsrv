@@ -7,8 +7,8 @@ class Packet(ABC):
 
     @abstractmethod
     def summary(self, offset: int) -> str:
-        ...
+        pass
 
     @abstractmethod
     def get_field(self, fieldname: str):
-        ...
+        pass

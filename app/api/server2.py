@@ -1,6 +1,6 @@
 from flask import Flask, jsonify, request
 
-from dbase.exec_query import exec_query
+from dbase.dbengine import DBEngine
 
 app = Flask(__name__)
 
@@ -11,7 +11,8 @@ def query():
     if pql is not None:
         print(f"Got PQL <----- {pql}")
         try:
-            result = exec_query(pql["query"])
+            db = DBEngine()
+            result = db.run(pql["query"])
             return jsonify({"result": result})
         except(SyntaxError):
             return jsonify({"error": "Synatx error in pql"})

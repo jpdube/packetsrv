@@ -2,6 +2,7 @@
 # import uvicorn
 from config.config import Config
 from dbase.dbengine import DBEngine
+from api.server2 import start
 
 
 def search():
@@ -19,4 +20,5 @@ def search():
 
 if __name__ == "__main__":
     Config.load()
-    search()
+    # search()
+    start()
