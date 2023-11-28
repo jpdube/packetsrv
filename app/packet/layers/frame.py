@@ -4,7 +4,7 @@ from packet.layers.layer_type import LayerID
 from packet.layers.packet import Packet
 
 
-class PcapHeader(Packet):
+class Frame(Packet):
     name = LayerID.HEADER
 
     def __init__(self, header: bytes):

@@ -15,7 +15,7 @@ from packet.layers.ipv4 import IP_PROTO_ICMP, IP_PROTO_TCP, IP_PROTO_UDP, IPV4
 from packet.layers.ipv6 import IPV6
 from packet.layers.layer_type import LayerID
 from packet.layers.packet import Packet
-from packet.layers.pcap_header import PcapHeader
+from packet.layers.frame import Frame
 from packet.layers.tcp import TCP
 from packet.layers.udp import UDP
 from packet.utils.print_hex import HexDump
@@ -56,9 +56,9 @@ class PacketBuilder:
 
         if header is not None:
             if isinstance(header, bytes):
-                ph = PcapHeader(header)
+                ph = Frame(header)
                 self.add(ph)
-            elif isinstance(header, PcapHeader):
+            elif isinstance(header, Frame):
                 self.add(header)
 
         e = Ethernet(raw_packet)
@@ -143,7 +143,7 @@ class PacketBuilder:
                 result["icmp.code"] = layer.code
                 result["icmp.seq"] = layer.sequence_no
 
-            elif isinstance(layer, PcapHeader):
+            elif isinstance(layer, Frame):
                 result["orig_len"] = layer.orig_len
                 result["incl_len"] = layer.incl_len
                 result["ts_offset"] = layer.ts_usec
