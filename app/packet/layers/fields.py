@@ -1,8 +1,7 @@
-# import ipaddress
 from struct import pack
 from time import time_ns
 from typing import Tuple
-from ipaddress import *
+from ipaddress import IPv4Interface, IPv4Network, IPv4Address
 import json
 
 
