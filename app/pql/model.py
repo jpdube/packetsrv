@@ -158,6 +158,7 @@ class SelectStatement(Statement):
         groupby_expr,
         top_expr=None,
         limit_expr=None,
+        interval=(0, 0),
     ):
         self.select_expr = value
         self.from_fields = from_fields
@@ -169,12 +170,25 @@ class SelectStatement(Statement):
         self.top_expr = top_expr
         self.offset = None
         self.limit = None
+        self.interval = interval
         if isinstance(limit_expr, List) and len(limit_expr) == 2:
             self.offset = limit_expr[0]
             self.limit = limit_expr[1]
 
+    @property
+    def has_interval(self) -> bool:
+        return self.interval[0] != 0 and self.interval[1] != 0
+
     def __repr__(self) -> str:
-        return f"SelectStatement Select: {self.select_expr}, From: {repr(self.from_fields)}, Index: {self.index_field}, IP: {self.ip_list}, Include: {self.include}, Where: {repr(self.where_expr)}, Group By: {self.groupby_expr}, Top: {self.top_expr}, Limit: {self.offset},{self.limit}"
+        return f"""SelectStatement Select: {self.select_expr}, 
+                   From: {repr(self.from_fields)}, 
+                   Index: {self.index_field}, IP: {self.ip_list}, 
+                   Include: {self.include}, 
+                   Where: {repr(self.where_expr)}, 
+                   Group By: {self.groupby_expr}, 
+                   Top: {self.top_expr}, 
+                   Limit: {self.offset},{self.limit}, 
+                   Interval: {self.interval[0]} to {self.interval[1]}"""
 
 
 class String(Expression):

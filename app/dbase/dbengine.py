@@ -28,6 +28,9 @@ class DBEngine:
         searched = 0
         self.pkt_found = 0
 
+        print(self.model.has_interval)
+        print(self.model.interval)
+
         for idx in index_result:
             for i in idx:
                 searched += 1
