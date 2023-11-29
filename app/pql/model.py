@@ -245,11 +245,14 @@ class Mac(Expression):
 
 class Integer(Expression):
     def __init__(self, value):
-        self._value = value
+        if isinstance(value, str):
+            self._value = int(value)
+        else:
+            self._value = value
 
     @property
     @lru_cache
-    def value(self):
+    def value(self) -> int:
         return self._value
 
     def __repr__(self):

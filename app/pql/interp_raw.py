@@ -42,7 +42,7 @@ def cmp_array(left, right) -> bool:
 
 def interpret(node, env, packet: PacketDecode):
     if isinstance(node, Integer):
-        return int(node.value)
+        return node.value
 
     elif isinstance(node, Date):
         return node.timestamp
