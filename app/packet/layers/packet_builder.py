@@ -1,7 +1,3 @@
-import base64
-from ipaddress import IPv4Address
-from json import dumps
-from os import wait
 from typing import Dict, List, Tuple
 
 from packet.layers.arp import ARP
@@ -9,7 +5,7 @@ from packet.layers.dhcp import Dhcp
 from packet.layers.dns import Dns
 from packet.layers.ethernet import (ETHER_TYPE_ARP, ETHER_TYPE_IPV4,
                                     ETHER_TYPE_IPV6, Ethernet)
-from packet.layers.icmp_builder import ICMP_ECHO_MSG, icmp_builder
+from packet.layers.icmp_builder import icmp_builder
 from packet.layers.icmp_echo import IcmpEcho
 from packet.layers.ipv4 import IP_PROTO_ICMP, IP_PROTO_TCP, IP_PROTO_UDP, IPV4
 from packet.layers.ipv6 import IPV6
