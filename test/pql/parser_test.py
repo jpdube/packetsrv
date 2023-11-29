@@ -22,3 +22,9 @@ def test_integer():
     tokens = tokenize("123")
     model = parser.parse_integer(parser.Tokenizer(tokens))
     assert(int(model.value) == 123)
+
+
+def test_date():
+    tokens = tokenize("2023-11-29")
+    model = parser.parse_date(parser.Tokenizer(tokens))
+    assert(model.value == "2023-11-29")
