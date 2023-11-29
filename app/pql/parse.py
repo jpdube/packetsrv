@@ -16,7 +16,7 @@ class Tokenizer:
         self.lookahead = None
         self.prev_token = None
 
-        self.prev_label = ""
+        self.prev_label = None
 
     def peek(self, *token_type):
         if self.lookahead is None:
@@ -222,10 +222,9 @@ def parse_ipv4(tokens):
         mask_value = mask.value
 
     ip_addr = IPv4(token.value, mask_value)
-    ip_search[tokens.prev_label].append((ip_addr.to_int, int(mask_value)))
+    if tokens.prev_label is not None:
+        ip_search[tokens.prev_label].append((ip_addr.to_int, int(mask_value)))
 
-    # ip_list.add((ip_addr.to_int, int(mask_value)))
-    # print(f"IP: {ip_addr}:{prev_label}")
     return ip_addr
 
 
