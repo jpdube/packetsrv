@@ -137,13 +137,7 @@ def parse_select(tokens):
             if tokens.accept(TOK_DELIMITER) is None:
                 break
 
-    interval_start = 0
-    interval_end = 0
-    if tokens.peek(TOK_INTERVAL):
-        tokens.expect(TOK_INTERVAL)
-        interval_start = tokens.expect(TOK_TIMESTAMP).value
-        tokens.expect(TOK_TO)
-        interval_end = tokens.expect(TOK_TIMESTAMP).value
+    interval_start, interval_end = parse_interval(tokens)
 
     top_value = None
     if tokens.peek(TOK_TOP):
@@ -172,6 +166,18 @@ def parse_select(tokens):
                            limit_fields,
                            (interval_start, interval_end)
                            )
+
+
+def parse_interval(tokens):
+    interval_start = 0
+    interval_end = 0
+    if tokens.peek(TOK_INTERVAL):
+        tokens.expect(TOK_INTERVAL)
+        interval_start = tokens.expect(TOK_TIMESTAMP).value
+        tokens.expect(TOK_TO)
+        interval_end = tokens.expect(TOK_TIMESTAMP).value
+
+    return (interval_start, interval_end)
 
 
 def parse_date(tokens):

@@ -28,3 +28,10 @@ def test_date():
     tokens = tokenize("2023-11-29")
     model = parser.parse_date(parser.Tokenizer(tokens))
     assert(model.value == "2023-11-29")
+
+
+def test_limit():
+    tokens = tokenize("interval 2023-11-29 13:00:00 to 2023-11-29 14:00:00")
+    model = parser.parse_interval(parser.Tokenizer(tokens))
+    assert(model[0] == "2023-11-29 13:00:00")
+    assert(model[1] == "2023-11-29 14:00:00")
