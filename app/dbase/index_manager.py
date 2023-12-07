@@ -1,12 +1,12 @@
+import multiprocessing as mp
 from dataclasses import dataclass
 from datetime import datetime
 from pathlib import Path
 from struct import unpack
-import multiprocessing as mp
+from typing import Any, Generator, Optional, Tuple
 
 from config.config import Config
 from pql.pcapfile import PcapFile
-from typing import Optional
 
 
 @dataclass
@@ -38,7 +38,7 @@ class IndexManager:
         ttl_time = datetime.now() - start_time
         print(f"---> Total Index Time: {ttl_time}")
 
-    def search_pkt(self, file_id, search_index, ip_list):
+    def search_pkt(self, file_id: int, search_index: int, ip_list: dict[str, list[Tuple[int, int]]]):
         result = []
         with open(file_id, "rb") as f:
             buffer = []
@@ -56,7 +56,7 @@ class IndexManager:
                     result.append(pkt)
         return result
 
-    def search(self, search_index, ip_list):
+    def search(self, search_index: int, ip_list: dict[str, list[int]]) -> Generator[Any, Any, Any]:
         path = Path(Config.pcap_index())
         files_list = list(path.glob("*.pidx"))
         files_list.sort(key=lambda a: int(a.stem))
@@ -73,76 +73,76 @@ class IndexManager:
             for r in result:
                 yield (r)
 
-    def chunks(self, l, n):
+    def chunks(self, l: list[Any], n: int) -> Generator[Any, Any, Any]:
         for i in range(0, len(l), n):
             yield l[i:i + n]
 
-    def match_ip(self, ip_src, ip_dst, ip_list) -> bool:
+    def match_ip(self, ip_src: int, ip_dst: int, ip_list: dict[str, list[Tuple[int, int]]]) -> bool:
         if len(ip_list['ip.dst']) > 0 and len(ip_list['ip.src']) > 0:
             return self.match_ip_and(ip_src, ip_dst, ip_list)
         else:
             return self.match_ip_or(ip_src, ip_dst, ip_list)
 
-    def match_ip_and(self, ip_src, ip_dst, ip_list):
-        src_found = False
-        dst_found = False
+    def match_ip_and(self, ip_src: int, ip_dst: int, ip_list: dict[str, list[Tuple[int, int]]]) -> bool:
+        src_found=False
+        dst_found=False
 
         if self.is_in_network(ip_src, ip_list['ip.src']):
-            src_found = True
+            src_found=True
 
         if self.is_in_network(ip_dst, ip_list['ip.dst']):
-            dst_found = True
+            dst_found=True
 
         return src_found and dst_found
 
-    def match_ip_or(self, ip_src, ip_dst, ip_list):
-        src_found = False
-        dst_found = False
+    def match_ip_or(self, ip_src: int, ip_dst: int, ip_list: dict[str, list[Tuple[int, int]]]) -> bool:
+        src_found=False
+        dst_found=False
 
         if len(ip_list['ip.src']) > 0:
             if self.is_in_network(ip_src, ip_list['ip.src']):
-                src_found = True
+                src_found=True
 
         if len(ip_list['ip.dst']) > 0:
             if self.is_in_network(ip_dst, ip_list['ip.dst']):
-                dst_found = True
+                dst_found=True
 
         return src_found or dst_found
 
-    def is_in_network(self, address: int, address_list) -> bool:
+    def is_in_network(self, address: int, address_list: list[Tuple[int, int]]) -> bool:
         for ip, mask in address_list:
-            net, broadcast = self.net_broadcast(ip, mask)
+            net, broadcast=self.net_broadcast(ip, mask)
             if address >= net and address <= broadcast:
                 return True
 
         return False
 
-    def net_broadcast(self, ip, mask):
-        host_bits = 32 - mask
-        start = (ip >> host_bits) << host_bits  # clear the host bits
-        end = start | ((1 << host_bits) - 1)
+    def net_broadcast(self, ip: int, mask: int) -> Tuple[int, int]:
+        host_bits=32 - mask
+        start=(ip >> host_bits) << host_bits  # clear the host bits
+        end=start | ((1 << host_bits) - 1)
         return(start, end)
 
-    def build_search_value(self, index_set):
-        pindex = 0
+    def build_search_value(self, index_set) -> int:
+        pindex=0
 
         if 'ETH' in index_set:
-            pindex = pindex + 0x01
+            pindex=pindex + 0x01
         if 'ARP' in index_set:
-            pindex = pindex + 0x02
+            pindex=pindex + 0x02
         if 'IP' in index_set:
-            pindex = pindex + 0x04
+            pindex=pindex + 0x04
         if 'ICMP' in index_set:
-            pindex = pindex + 0x08
+            pindex=pindex + 0x08
         if 'UDP' in index_set:
-            pindex = pindex + 0x10
+            pindex=pindex + 0x10
         if 'TCP' in index_set:
-            pindex = pindex + 0x20
+            pindex=pindex + 0x20
         if 'DNS' in index_set:
-            pindex = pindex + 0x40
+            pindex=pindex + 0x40
         if 'DHCP' in index_set:
-            pindex = pindex + 0x80
+            pindex=pindex + 0x80
         if 'HTTPS' in index_set:
-            pindex = pindex + 0x100
+            pindex=pindex + 0x100
 
         return pindex
