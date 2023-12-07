@@ -10,7 +10,8 @@ TEST_DIR=$(BASE)/test
 
 
 check:
-	mypy main.py pql/ dbase/ packet/ api/
+	mypy app/pql app/dbase app/packet app/api
+	# mypy main.py pql/ dbase/ packet/ api/
 
 run:
 	$(PYTHON) $(MAIN)
