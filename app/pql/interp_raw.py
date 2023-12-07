@@ -2,11 +2,11 @@
 
 from datetime import datetime, timedelta
 
+from dbase.index_manager import PktPtr
+from packet.layers.packet_decode import PacketDecode
 from pql.model import *
 from pql.pcapfile import PcapFile
-from packet.layers.packet_decode import PacketDecode
 from pql.tokens_list import *
-from dbase.index_manager import PktPtr
 
 # ---------------------------------------------
 # Process a pcap file to filter

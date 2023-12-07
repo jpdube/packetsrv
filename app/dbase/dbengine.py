@@ -1,8 +1,8 @@
 from datetime import datetime
 from ipaddress import IPv4Address
-from packet.layers.fields import IPv4Address
 
 from dbase.index_manager import IndexManager
+from packet.layers.fields import IPv4Address
 from packet.layers.packet_builder import PacketBuilder
 from pql.interp_raw import exec_program
 from pql.parse import parse_source
