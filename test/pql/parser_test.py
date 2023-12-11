@@ -1,8 +1,6 @@
-from app.pql.model import IPv4
 import app.pql.parse as parser
-from app.pql.tokens_list import *
 from app.pql.lexer import tokenize
-# import pytest
+from app.pql.tokens_list import *
 
 
 def test_ipv4():
