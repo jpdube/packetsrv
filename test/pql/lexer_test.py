@@ -1,8 +1,7 @@
-# from ipaddress import IPv4Address
+import pytest
+
 from app.pql.lexer import Lexer, tokenize
 from app.pql.tokens_list import *
-# from packet.layers.fields import IPv4Address
-import pytest
 
 
 @pytest.mark.parametrize(
@@ -20,6 +19,7 @@ import pytest
         ("now", TOK_NOW),
         ("and", TOK_LAND),
         ("or", TOK_LOR),
+        ("avg", TOK_AVERAGE),
     )
 )
 def test_keywords(keyword, expected):

@@ -25,6 +25,7 @@ TOK_TO = itoa()
 TOK_INTERVAL = itoa()
 TOK_TIMESTAMP = itoa()
 TOK_TIME = itoa()
+TOK_AVERAGE = itoa()
 
 
 #--- Types
