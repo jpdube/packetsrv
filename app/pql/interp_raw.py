@@ -2,11 +2,13 @@
 
 from datetime import datetime, timedelta
 
+import pql.tokens_list as tokens
 from dbase.index_manager import PktPtr
 from packet.layers.packet_decode import PacketDecode
-from pql.model import *
+from pql.model import (Array, BinOp, Boolean, ConstDecl, Date, Grouping,
+                       Integer, IPv4, Label, LabelByte, Mac, Now,
+                       SelectStatement, Unary)
 from pql.pcapfile import PcapFile
-from pql.tokens_list import *
 
 # ---------------------------------------------
 # Process a pcap file to filter
@@ -119,20 +121,20 @@ def interpret(node, env, packet: PacketDecode):
         elif node.op == "*":
             return "*"
             # return leftval * rightval
-        elif node.op == TOK_PLUS:
+        elif node.op == tokens.TOK_PLUS:
             return leftval + rightval
-        elif node.op == TOK_MINUS:
+        elif node.op == tokens.TOK_MINUS:
             return leftval - rightval
-        elif node.op == TOK_LT:
+        elif node.op == tokens.TOK_LT:
             return leftval < rightval
-        elif node.op == TOK_LE:
+        elif node.op == tokens.TOK_LE:
             return leftval <= rightval
-        elif node.op == TOK_GT:
+        elif node.op == tokens.TOK_GT:
             return leftval > rightval
-        elif node.op == TOK_GE:
+        elif node.op == tokens.TOK_GE:
             # print(f"{leftval},{rightval}")
             return leftval >= rightval
-        elif node.op == TOK_EQ:
+        elif node.op == tokens.TOK_EQ:
             if isinstance(rightval, IPv4):
                 return rightval.is_in_network(leftval)
             elif isinstance(rightval, Mac):
@@ -141,11 +143,11 @@ def interpret(node, env, packet: PacketDecode):
                 return leftval == rightval.value
             else:
                 return leftval == rightval
-        elif node.op == TOK_LAND:
+        elif node.op == tokens.TOK_LAND:
             return leftval and rightval
-        elif node.op == TOK_LOR:
+        elif node.op == tokens.TOK_LOR:
             return leftval or rightval
-        elif node.op == TOK_NE:
+        elif node.op == tokens.TOK_NE:
             if isinstance(rightval, IPv4):
                 return not rightval.is_in_network(leftval)
             elif isinstance(rightval, Mac):

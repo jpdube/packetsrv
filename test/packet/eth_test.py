@@ -1,5 +1,4 @@
-from app.packet.layers.ethernet import Ethernet
-from app.packet.layers.fields import MacAddress
+from packet.layers.ethernet import Ethernet
 
 
 def test_pkt_with_vlan():
