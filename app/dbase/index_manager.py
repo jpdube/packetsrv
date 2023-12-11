@@ -10,14 +10,13 @@ from pql.pcapfile import PcapFile
 
 
 @dataclass
-class PktPtr:
+class PktPtr ():
     file_id: int
     ptr: int
     ip_dst: int
     ip_src: int
     header: Optional[bytes] = None
     packet: Optional[bytes] = None
-
 
 class IndexManager:
     def __init__(self):
