@@ -22,8 +22,10 @@ class DBEngine:
         start_time = datetime.now()
         self.pql = pql
         self.model = parse_source(pql)
-        field_index = self.index_mgr.build_search_value(self.model.index_field)
-        index_result = self.index_mgr.search(field_index, self.model.ip_list)
+        # field_index = self.index_mgr.build_search_value(self.model.index_field)
+        index_result = self.index_mgr.search(
+            self.model.index_field, self.model.ip_list)
+        # index_result = self.index_mgr.search(field_index, self.model.ip_list)
         count = 0
         searched = 0
         self.pkt_found = 0
@@ -38,7 +40,7 @@ class DBEngine:
                 if pkt_result is not None:
                     pb = PacketBuilder()
                     pb.from_bytes(pkt_result.packet, pkt_result.header)
-                    self.process_pkt(pb)
+                    self.get_fields(pb)
                     count += 1
                     self.pkt_found += 1
 
@@ -56,7 +58,10 @@ class DBEngine:
 
         return self.result
 
-    def process_pkt(self, pb: PacketBuilder):
+    def process(self, index_result):
+        ...
+
+    def get_fields(self, pb: PacketBuilder):
         record = {}
         for f in self.model.select_expr:
             if f.value in ["ip.dst", "ip.src"]:

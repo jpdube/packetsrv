@@ -56,11 +56,12 @@ class IndexManager:
                     result.append(pkt)
         return result
 
-    def search(self, search_index: int, ip_list: dict[str, list[int]]) -> Generator[Any, Any, Any]:
+    def search(self, index_field: set[int], ip_list: dict[str, list[int]]) -> Generator[Any, Any, Any]:
         path = Path(Config.pcap_index())
         files_list = list(path.glob("*.pidx"))
         files_list.sort(key=lambda a: int(a.stem))
 
+        search_index = self.build_search_value(index_field)
         pool = mp.Pool()
 
         for index_chunk in self.chunks(files_list, mp.cpu_count()):
