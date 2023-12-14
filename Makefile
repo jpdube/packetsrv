@@ -20,6 +20,10 @@ run:
 test:
 	cd $(TEST_DIR);pytest
 
+.PHONY: test_verbose
+test_verbose:
+	cd $(TEST_DIR);pytest -s
+
 .PHONY: build
 build:
 	#pip freeze > requirements.txt
