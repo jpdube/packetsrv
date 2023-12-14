@@ -1,7 +1,8 @@
 from struct import unpack
-from packet.layers.packet import Packet
-from packet.layers.layer_type import LayerID
 from typing import Dict
+
+from packet.layers.layer_type import LayerID
+from packet.layers.packet import Packet
 
 """
     0               1               2               3
@@ -141,7 +142,7 @@ class TCP(Packet):
     def __str__(self) -> str:
         return f"TCP -> sport: {self.src_port} dport: {self.dst_port} SYN:{self.flag_syn} ACK:{self.flag_ack} FIN:{self.flag_fin} PUSH:{self.flag_push} URG:{self.flag_urg} RST:{self.flag_rst}"
 
-    def get_field(self, fieldname: str):
+    def get_field(self, fieldname: str) -> None | int:
         field = fieldname.split('.')[1]
         if field:
             if field == 'seq_no':
@@ -169,4 +170,4 @@ class TCP(Packet):
             else:
                 return 0
         else:
-            return 0
+            return None

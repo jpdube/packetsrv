@@ -5,13 +5,13 @@ from packet.layers.dhcp import Dhcp
 from packet.layers.dns import Dns
 from packet.layers.ethernet import (ETHER_TYPE_ARP, ETHER_TYPE_IPV4,
                                     ETHER_TYPE_IPV6, Ethernet)
+from packet.layers.frame import Frame
 from packet.layers.icmp_builder import icmp_builder
 from packet.layers.icmp_echo import IcmpEcho
 from packet.layers.ipv4 import IP_PROTO_ICMP, IP_PROTO_TCP, IP_PROTO_UDP, IPV4
 from packet.layers.ipv6 import IPV6
 from packet.layers.layer_type import LayerID
 from packet.layers.packet import Packet
-from packet.layers.frame import Frame
 from packet.layers.tcp import TCP
 from packet.layers.udp import UDP
 from packet.utils.print_hex import HexDump
@@ -162,7 +162,7 @@ class PacketBuilder:
     def get_layer(self, layer_id):
         return self.layers.get(layer_id, None)
 
-    def get_field(self, field: str):
+    def get_field(self, field: str) -> None | int:
         pkt_name = field.split('.')[0]
         if pkt_name == 'eth':
             eth = self.get_layer(LayerID.ETHERNET)
@@ -185,11 +185,8 @@ class PacketBuilder:
             udp = self.get_layer(LayerID.UDP)
             if udp:
                 return udp.get_field(field)
-        else:
-            return 0
 
-        return 0
-        # return None
+        return None
 
     def print_hex(self):
         HexDump.print_hex(self.packet, self.color_range)
