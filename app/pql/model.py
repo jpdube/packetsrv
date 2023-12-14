@@ -156,8 +156,8 @@ class SelectStatement(Statement):
         ip_list,
         where_expr,
         groupby_expr,
-        top_expr=None,
-        limit_expr=None,
+        top_expr=0,
+        limit_expr=0,
         interval=(0, 0),
     ):
         self.select_expr = value
