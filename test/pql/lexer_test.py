@@ -26,7 +26,6 @@ def test_keywords(keyword, expected):
     lexer = Lexer(keyword)
     tokens = lexer.tokenize()
     tok_keyword = tokens[0]
-    print(tok_keyword)
     assert(tok_keyword.type == expected)
 
 
@@ -57,7 +56,6 @@ def test_token1(keyword, expected):
     lexer = Lexer(keyword)
     tokens = lexer.tokenize()
     tok_keyword = tokens[0]
-    print(tok_keyword)
     assert(tok_keyword.type == expected)
 
 
@@ -75,7 +73,6 @@ def test_token2(keyword, expected):
     lexer = Lexer(keyword)
     tokens = lexer.tokenize()
     tok_keyword = tokens[0]
-    print(tok_keyword)
     assert(tok_keyword.type == expected)
 
 
@@ -93,7 +90,6 @@ def test_token2(keyword, expected):
 def test_preparse_token(keyword, expected):
     token = tokenize(keyword)
     tok_keyword = next(token)
-    print(tok_keyword)
     assert(tok_keyword.type == expected)
 
 
@@ -123,12 +119,3 @@ def test_integer():
         assert(tok_date.value == src)
     else:
         assert(False)
-
-
-# def test_ipv4():
-#     src = '192.168.3.124'
-#     lexer = Lexer(src)
-#     tokens = lexer.tokenize()
-#     tok_date = next(tokens)
-#     assert(tok_date.type == Tok.IPV4)
-#     assert(tok_date.value == src)
