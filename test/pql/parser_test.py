@@ -1,6 +1,6 @@
-import app.pql.parse as parser
-from app.pql.lexer import tokenize
-from app.pql.tokens_list import *
+import pql.parse as parser
+from pql.lexer import tokenize
+from pql.tokens_list import *
 
 
 def test_ipv4():
