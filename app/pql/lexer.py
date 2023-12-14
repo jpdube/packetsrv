@@ -24,6 +24,10 @@ _keywords = {
     "false": tl.TOK_FALSE,
     "interval": tl.TOK_INTERVAL,
     "avg": tl.TOK_AVERAGE,
+    "sum": tl.TOK_SUM,
+    "min": tl.TOK_MIN,
+    "max": tl.TOK_MAX,
+    "count": tl.TOK_COUNT,
 }
 
 
@@ -249,8 +253,8 @@ class Preparser:
         if self.index + offset < self.len:
             if self.pql[self.index + offset].type == search_tok:
                 return self.pql[self.index + offset]
-        else:
-            return None
+
+        return None
 
     def advance(self) -> None | Token:
         if self.at_end():

@@ -26,6 +26,10 @@ TOK_INTERVAL = itoa()
 TOK_TIMESTAMP = itoa()
 TOK_TIME = itoa()
 TOK_AVERAGE = itoa()
+TOK_SUM = itoa()
+TOK_MAX = itoa()
+TOK_MIN = itoa()
+TOK_COUNT = itoa()
 
 
 #--- Types
@@ -123,6 +127,11 @@ text_token = {
     TOK_TIMESTAMP: "TIMESTAMP",
     TOK_TIME: "TIME",
     TOK_ARRAY: "ARRAY",
+    TOK_AVERAGE: "AVERAGE",
+    TOK_SUM: "SUM",
+    TOK_MIN: "MIN",
+    TOK_MAX: "MAX",
+    TOK_COUNT: "COUNT",
 }
 
 
