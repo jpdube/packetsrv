@@ -44,7 +44,7 @@ class Tokenizer:
                 col = self.prev_token.col
 
             print(
-                f"Syntax error at: {line} col: {col} token: {self.lookahead}"
+                f"Syntax error at: {line} col: {col} token: {self.lookahead} msg: {error_msg}"
             )
             raise SyntaxError
         else:
