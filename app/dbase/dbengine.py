@@ -24,6 +24,7 @@ class DBEngine:
         self.pql = pql
         self.model = parse_source(pql)
         # field_index = self.index_mgr.build_search_value(self.model.index_field)
+        print(self.model.index_field)
         index_result = self.index_mgr.search(
             self.model.index_field, self.model.ip_list)
         # index_result = self.index_mgr.search(field_index, self.model.ip_list)
@@ -62,7 +63,7 @@ class DBEngine:
         print(self.model.select_expr)
 
         print(
-            f"---> Index scan in Time: {ttl_time} Result: {searched}:{self.pkt_found} TOP: {self.model.top_expr} SELECT: {self.model.select_expr}")
+            f"---> Index scan time: {ttl_time} Result: {searched}:{self.pkt_found} TOP: {self.model.top_expr} SELECT: {self.model.select_expr}")
 
         for p in search_result:
             self.get_fields(p)
