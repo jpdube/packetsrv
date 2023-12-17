@@ -15,6 +15,7 @@ class PktPtr ():
     ptr: int
     ip_dst: int
     ip_src: int
+    pkt_hdr_size: int
     header: Optional[bytes] = None
     packet: Optional[bytes] = None
 
@@ -42,16 +43,17 @@ class IndexManager:
         with open(file_id, "rb") as f:
             buffer = []
             while True:
-                buffer = f.read(20)
+                buffer = f.read(22)
 
                 if not buffer:
                     break
 
-                _, offset, index, ip_dst, ip_src = unpack(
-                    ">IIIII", buffer)
+                _, offset, index, ip_dst, ip_src, pkt_hdr_size= unpack(
+                    ">IIIIIH", buffer)
+                # print(search_index, index)
                 if (search_index & index) == search_index and self.match_ip(ip_src, ip_dst, ip_list):
                     pkt = PktPtr(file_id=int(file_id.stem),
-                                 ptr=offset, ip_dst=ip_dst, ip_src=ip_src)
+                                 ptr=offset, ip_dst=ip_dst, ip_src=ip_src, pkt_hdr_size=pkt_hdr_size)
                     result.append(pkt)
         return result
 

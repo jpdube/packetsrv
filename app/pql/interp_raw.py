@@ -22,7 +22,7 @@ def exec_program(model, pkt_ref: PktPtr):
     env = {}
 
     pd = PacketDecode()
-    hdr, pkt = pfile.get(pkt_ref.ptr)
+    hdr, pkt = pfile.get(pkt_ref.ptr, 0)
     pd.decode(hdr, pkt)
     if interpret(model, env, pd):
         pkt_ref.header = hdr

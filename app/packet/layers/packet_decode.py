@@ -1,8 +1,8 @@
 from struct import unpack
+from typing import List
 
 from packet.layers.fields import IPv4Address
 from packet.utils.print_hex import HexDump
-from typing import List
 
 FRAME_TYPE_8021Q = 0x8100
 FRAME_TYPE_IPV4 = 0x0800
@@ -81,6 +81,31 @@ class PacketDecode:
 
         else:
             return 0
+
+    @property
+    def header_len(self) -> int:
+        hdr_len = 0
+        if self.has_ethernet:
+            hdr_len += self.eth_size
+
+        if self.has_ipv4:
+            hdr_len += self.ip_hdr_len * 4
+
+        if self.has_tcp:
+            hdr_len += self.tcp_offset * 4
+
+        if self.has_udp:
+            hdr_len += 8
+
+        # print(f"Header len: {hdr_len}")
+        return hdr_len
+
+    @property
+    def eth_size(self) -> int:
+        if self.has_vlan:
+            return 18
+        else:
+            return 14
 
     def eth_packet(self, offset: int, length: int) -> bytes:
         return self.packet[offset:offset + length]
@@ -227,7 +252,10 @@ class PacketDecode:
 
     @property
     def has_dns(self) -> bool:
-        return self.ip_proto == 0x01
+        if self.has_udp:
+            return self.udp_dport == 53 or self.udp_sport == 53
+        else:
+            return False
 
     @property
     def has_dhcp(self) -> bool:
@@ -331,6 +359,15 @@ class PacketDecode:
         if self.ip_proto == 0x06:
             # print_hex(self.packet)
             return unpack("!I", self.packet[self.ip_offset + 8:self.ip_offset + 12])[0]
+        else:
+            return 0
+
+    @property
+    def tcp_offset(self) -> int:
+        if self.ip_proto == 0x06:
+            hdr_len = int(self.packet[self.ip_offset + 12])
+            hdr_len = (hdr_len >> 4) & 0x0f
+            return hdr_len
         else:
             return 0
 

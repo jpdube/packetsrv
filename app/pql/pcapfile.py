@@ -36,15 +36,18 @@ class PcapFile:
         except IOError:
             print("IO error")
 
-    def get(self, ptr: int):
+    def get(self, ptr: int, hdr_size: int = 0):
         with open(f"{Config.pcap_path()}/{self.filename}.pcap", "rb") as f:
             f.seek(ptr)
             header = f.read(PCAP_PACKET_HEADER_SIZE)
             if len(header) == 0:
                 return None
 
-            incl_len = unpack("!I", header[12:16])[0]
-            packet = f.read(incl_len)
+            if hdr_size == 0:
+                incl_len = unpack("!I", header[12:16])[0]
+                packet = f.read(incl_len)
+            else:
+                packet = f.read(hdr_size)
 
             return (header, packet)
 
@@ -74,7 +77,8 @@ class PcapFile:
                     first_ts = ts
 
                 raw_index.extend(
-                    pack("!IIIII", ts, offset, self.packet_index(pd), pd.ip_dst, pd.ip_src))
+                    # pack("!IIIII", ts, offset, self.packet_index(pd), pd.ip_dst, pd.ip_src))
+                    pack("!IIIIIH", ts, offset, self.packet_index(pd), pd.ip_dst, pd.ip_src, pd.header_len))
                 offset += incl_len + 16
 
         # print(f"Index file: {Config.pcap_path()}/{file_id}.pidx")
