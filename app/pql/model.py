@@ -3,19 +3,12 @@ from functools import lru_cache
 from typing import List
 
 from packet.layers.fields import IPv4Address, MacAddress
-from pql.constant import const_value
+from pql.pql_constant import const_value
 from pql.tokens_list import human_tokens
 
 
 class Node:
     pass
-    # _next_id = 1
-
-    # def __new__(cls, *args, **kwargs):
-    #     self = super().__new__(cls)
-    #     self.id = Node._next_id
-    #     Node._next_id += 1
-    #     return self
 
 
 class Statement(Node):

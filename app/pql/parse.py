@@ -416,6 +416,8 @@ def parse_unary(tokens):
 
 
 def parse_source(text):
+    global index_field
+    index_field = set()
     tokens = tokenize(text)
     model = parse_select(Tokenizer(tokens))
     return model

@@ -266,6 +266,75 @@ class PacketDecode:
         return self.tcp_dport == 443 or self.tcp_sport == 443
 
     @property
+    def has_ssh(self) -> bool:
+        return self.tcp_dport == 22 or self.tcp_sport == 22
+
+    @property
+    def has_telnet(self) -> bool:
+        return self.tcp_dport == 23 or self.tcp_sport == 23
+
+    @property
+    def has_rdp(self) -> bool:
+        return self.tcp_dport == 3389 or self.tcp_sport == 3389
+
+    @property
+    def has_smtp(self) -> bool:
+        return self.tcp_dport == 25 or self.tcp_sport == 25
+
+    @property
+    def has_imap(self) -> bool:
+        return self.tcp_dport == 143 or self.tcp_sport == 143
+
+    @property
+    def has_imaps(self) -> bool:
+        return self.tcp_dport == 993 or self.tcp_sport == 993
+
+    @property
+    def has_pop3(self) -> bool:
+        return self.tcp_dport == 110 or self.tcp_sport == 110
+
+    @property
+    def has_pop3s(self) -> bool:
+        return self.tcp_dport == 995 or self.tcp_sport == 995
+
+    @property
+    def has_ftp(self) -> bool:
+        return self.tcp_dport == 21 or self.tcp_sport == 21
+
+    @property
+    def has_http(self) -> bool:
+        return self.tcp_dport in [80, 8080] or self.tcp_sport in [80, 8080]
+
+    @property
+    def has_ntp(self) -> bool:
+        return self.tcp_dport == 123 or self.tcp_sport == 123
+
+    @property
+    def has_rtp(self) -> bool:
+        return self.udp_dport == 5004 or self.udp_sport == 5004
+
+    @property
+    def has_rtcp(self) -> bool:
+        return self.udp_dport == 5005 or self.udp_sport == 5005
+
+    @property
+    def has_sip(self) -> bool:
+        return self.udp_dport == 5060 or self.udp_sport == 5060
+
+    @property
+    def has_siptls(self) -> bool:
+        return self.udp_dport == 5061 or self.udp_sport == 5061
+
+    @property
+    def has_bgp(self) -> bool:
+        return self.tcp_dport == 179 or self.tcp_sport == 179
+
+    @property
+    def has_snmp(self) -> bool:
+        snmp_port = (161, 162)
+        return self.tcp_dport in snmp_port or self.tcp_sport in snmp_port or self.udp_dport in snmp_port or self.udp_sport in snmp_port
+
+    @property
     def timestamp(self) -> int:
         ts_sec = unpack("!I", self.header[0:4])[0]
         return ts_sec

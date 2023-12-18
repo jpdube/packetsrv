@@ -1,4 +1,4 @@
-import pql.constant as const
+import pql.pql_constant as const
 import pql.tokens_list as tl
 
 _keywords = {
@@ -30,26 +30,6 @@ _keywords = {
     "count": tl.TOK_COUNT,
 }
 
-
-constants = {
-    "IP_TOS_NET_CTRL": const.CONST_IP_TOS_NET_CTRL,
-    "IP_TOS_INTNET_CTRL": const.CONST_IP_TOS_INTNET_CTRL,
-    "IP_TOS_CRITIC_ECP": const.CONST_IP_TOS_CRITIC_ECP,
-    "IP_TOS_FLASH_OVERRIDE": const.CONST_IP_TOS_FLASH_OVERRIDE,
-    "IP_TOS_FLASH": const.CONST_IP_TOS_FLASH,
-    "IP_TOS_IMMEDIATE": const.CONST_IP_TOS_IMMEDIATE,
-    "IP_TOS_PRIORITY": const.CONST_IP_TOS_PRIORITY,
-    "IP_TOS_ROUTINE": const.CONST_IP_TOS_ROUTINE,
-    "IP_TOS_EF": const.CONST_IP_TOS_EF,
-    "IP_PROTO_ICMP": 0x01,
-    "IP_PROTO_TCP": 0x06,
-    "IP_PROTO_UDP": 0x11,
-    "ETH_PROTO_IPV4": 0x0800,
-    "ETH_PROTO_IPV6": 0x86dd,
-    "ETH_PROTO_ARP": 0x0806,
-    "HTTPS": 443,
-    "DNS": 53
-}
 
 _token1 = {
     "/": tl.TOK_MASK,
@@ -227,7 +207,7 @@ class Lexer:
         value = self.text[tok_start: self.pos]
         if value in _keywords:
             token = Token(_keywords[value], value, self.line, self.col)
-        elif value in constants:
+        elif value in const.const_list:
             token = Token(tl.TOK_CONST, value, self.line, self.col)
         else:
             token = Token(tl.TOK_NAME, value, self.line, self.col)

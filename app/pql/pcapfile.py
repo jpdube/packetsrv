@@ -1,8 +1,8 @@
 from struct import pack, unpack
 
+import pql.packet_index as pkt_index
 from config.config import Config
 from packet.layers.packet_decode import PacketDecode
-from packet.utils.print_hex import HexDump
 
 PCAP_GLOBAL_HEADER_SIZE = 24
 PCAP_PACKET_HEADER_SIZE = 16
@@ -77,41 +77,15 @@ class PcapFile:
                     first_ts = ts
 
                 raw_index.extend(
-                    # pack("!IIIII", ts, offset, self.packet_index(pd), pd.ip_dst, pd.ip_src))
-                    pack("!IIIIIH", ts, offset, self.packet_index(pd), pd.ip_dst, pd.ip_src, pd.header_len))
+                    pack("!IIQIIH", ts, offset, pkt_index.packet_index(pd), pd.ip_dst, pd.ip_src, pd.header_len))
                 offset += incl_len + 16
 
-        # print(f"Index file: {Config.pcap_path()}/{file_id}.pidx")
         with open(f"{Config.pcap_index()}/{file_id}.pidx", "wb") as f:
             f.write(raw_index)
 
         return (first_ts, last_ts, int(file_id))
 
-    def packet_index(self, pd: PacketDecode) -> int:
-        pindex = 0
-
-        if pd.has_ethernet:
-            pindex = pindex + 0x01
-        if pd.has_ipv4:
-            pindex = pindex + 0x04
-        if pd.has_icmp:
-            pindex = pindex + 0x08
-        if pd.has_udp:
-            pindex = pindex + 0x10
-        if pd.has_tcp:
-            pindex = pindex + 0x20
-        if pd.has_dns:
-            pindex = pindex + 0x40
-        if pd.has_dhcp:
-            pindex = pindex + 0x80
-        if pd.has_https:
-            pindex = pindex + 0x100
-
-        # print(f"Bit index: {pindex:x}")
-        return pindex
-
     def build_master_index(self, master_index):
         with open(f"{Config.pcap_master_index()}/master.pidx", "wb") as f:
             for idx in master_index:
-                # print(idx)
                 f.write(pack('!III', *idx))

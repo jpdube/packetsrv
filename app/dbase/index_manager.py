@@ -5,6 +5,7 @@ from pathlib import Path
 from struct import unpack
 from typing import Any, Generator, Optional, Tuple
 
+import pql.packet_index as pkt_index
 from config.config import Config
 from pql.pcapfile import PcapFile
 
@@ -43,14 +44,13 @@ class IndexManager:
         with open(file_id, "rb") as f:
             buffer = []
             while True:
-                buffer = f.read(22)
+                buffer = f.read(26)
 
                 if not buffer:
                     break
 
                 _, offset, index, ip_dst, ip_src, pkt_hdr_size= unpack(
-                    ">IIIIIH", buffer)
-                # print(search_index, index)
+                    ">IIQIIH", buffer)
                 if (search_index & index) == search_index and self.match_ip(ip_src, ip_dst, ip_list):
                     pkt = PktPtr(file_id=int(file_id.stem),
                                  ptr=offset, ip_dst=ip_dst, ip_src=ip_src, pkt_hdr_size=pkt_hdr_size)
@@ -62,7 +62,8 @@ class IndexManager:
         files_list = list(path.glob("*.pidx"))
         files_list.sort(key=lambda a: int(a.stem))
 
-        search_index = self.build_search_value(index_field)
+        search_index = pkt_index.build_search_index(index_field)
+        print(f"Computed index: {search_index:x}")
         pool = mp.Pool()
 
         for index_chunk in self.chunks(files_list, mp.cpu_count()):
@@ -124,27 +125,3 @@ class IndexManager:
         start=(ip >> host_bits) << host_bits  # clear the host bits
         end=start | ((1 << host_bits) - 1)
         return(start, end)
-
-    def build_search_value(self, index_set) -> int:
-        pindex=0
-
-        if 'ETH' in index_set:
-            pindex=pindex + 0x01
-        if 'ARP' in index_set:
-            pindex=pindex + 0x02
-        if 'IP' in index_set:
-            pindex=pindex + 0x04
-        if 'ICMP' in index_set:
-            pindex=pindex + 0x08
-        if 'UDP' in index_set:
-            pindex=pindex + 0x10
-        if 'TCP' in index_set:
-            pindex=pindex + 0x20
-        if 'DNS' in index_set:
-            pindex=pindex + 0x40
-        if 'DHCP' in index_set:
-            pindex=pindex + 0x80
-        if 'HTTPS' in index_set:
-            pindex=pindex + 0x100
-
-        return pindex
