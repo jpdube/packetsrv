@@ -28,6 +28,7 @@ _keywords = {
     "min": tl.TOK_MIN,
     "max": tl.TOK_MAX,
     "count": tl.TOK_COUNT,
+    "as": tl.TOK_AS
 }
 
 
@@ -256,9 +257,122 @@ class Preparser:
             self.get_timestamp()
             self.get_date()
             self.get_time()
+            self.get_count()
+            self.get_sum()
+            self.get_average()
+            self.get_as()
             self.token_list.append(self.advance())
 
         return self.token_list
+
+    def get_as(self):
+        field: str = ""
+        column = 0
+        line = 0
+
+        if self.peek_at(0, tl.TOK_AS) \
+                and self.peek_at(1, tl.TOK_NAME):
+
+            tok = self.advance()  # as
+            if tok:
+                column = tok.col
+                line = tok.line
+
+            fieldname = self.advance()
+            if fieldname:
+                field = fieldname.value
+
+            token = Token(tl.TOK_AS, field, line, column)
+
+            self.token_list.append(token)
+
+    def get_count(self):
+        field: str = ""
+        column = 0
+        line = 0
+
+        if self.peek_at(0, tl.TOK_COUNT) \
+                and self.peek_at(1, tl.TOK_LPAREN)  \
+                and self.peek_at(2, tl.TOK_RPAREN):
+            # and self.peek_at(3, tl.TOK_AS) \
+            # and self.peek_at(4, tl.TOK_NAME):
+
+            tok = self.advance()  # count
+            if tok:
+                column = tok.col
+                line = tok.line
+
+                self.advance()  # skip lparen
+                self.advance()  # skip rparen
+                # self.advance()  # as
+
+            # fieldname = self.advance()
+            # if fieldname:
+            #     field = fieldname.value
+
+            token = Token(tl.TOK_COUNT, field, line, column)
+
+            self.token_list.append(token)
+
+    def get_sum(self):
+        field: str = ""
+        column = 0
+        line = 0
+
+        if self.peek_at(0, tl.TOK_SUM) \
+                and self.peek_at(1, tl.TOK_LPAREN)  \
+                and self.peek_at(2, tl.TOK_NAME) \
+                and self.peek_at(3, tl.TOK_PERIOD) \
+                and self.peek_at(4, tl.TOK_NAME) \
+                and self.peek_at(5, tl.TOK_RPAREN):
+
+            tok = self.advance()  # sum
+            if tok:
+                column = tok.col
+                line = tok.line
+
+                self.advance()  # skip lparen
+                name_part1 = self.advance()
+                self.advance()  # period
+                name_part2 = self.advance()
+
+                if name_part1 and name_part2:
+                    field = f"{name_part1.value}.{name_part2.value}"
+                self.advance()  # skip rparen
+
+            token = Token(tl.TOK_SUM, field, line, column)
+
+            self.token_list.append(token)
+
+    def get_average(self):
+        field: str = ""
+        column = 0
+        line = 0
+
+        if self.peek_at(0, tl.TOK_AVERAGE) \
+                and self.peek_at(1, tl.TOK_LPAREN)  \
+                and self.peek_at(2, tl.TOK_NAME) \
+                and self.peek_at(3, tl.TOK_PERIOD) \
+                and self.peek_at(4, tl.TOK_NAME) \
+                and self.peek_at(5, tl.TOK_RPAREN):
+
+            tok = self.advance()  # sum
+            if tok:
+                column = tok.col
+                line = tok.line
+
+                self.advance()  # skip lparen
+                name_part1 = self.advance()
+                self.advance()  # period
+                name_part2 = self.advance()
+
+                if name_part1 and name_part2:
+                    field = f"{name_part1.value}.{name_part2.value}"
+                self.advance()  # skip rparen
+
+            token = Token(tl.TOK_AVERAGE, field, line, column)
+
+            self.token_list.append(token)
 
     def get_label(self):
         label: str = ""
@@ -423,5 +537,6 @@ def tokenize(pql: str):
     token_list = lexer.tokenize()
     preparser = Preparser(token_list)
     token_list = preparser.parse()
+    print(token_list)
     for t in token_list:
         yield (t)

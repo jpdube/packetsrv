@@ -101,12 +101,27 @@ def test_preparse_token(keyword, expected):
          TOK_WILDCARD, TOK_FROM, TOK_NAME, TOK_EOF]),
         ("select * from a where tcp.sport == 53", [TOK_SELECT,
          TOK_WILDCARD, TOK_FROM, TOK_NAME, TOK_WHERE, TOK_NAME, TOK_EQ, TOK_INTEGER, TOK_EOF]),
+        ("select count() as PKT_TOTAL from a where tcp.dport == HTTPS", [
+         TOK_SELECT, TOK_COUNT, TOK_AS, TOK_FROM, TOK_NAME, TOK_WHERE, TOK_NAME, TOK_EQ, TOK_CONST, TOK_EOF]),
+        ("select sum(frame.inc_len) as PKT_TOTAL from a where tcp.dport == HTTPS", [
+         TOK_SELECT, TOK_SUM, TOK_AS, TOK_FROM, TOK_NAME, TOK_WHERE, TOK_NAME, TOK_EQ, TOK_CONST, TOK_EOF])
     )
 )
 def test_preparse_pql(keyword, expected):
     token = tokenize(keyword)
+    print(list(token))
+    token = tokenize(keyword)
     for (i, tok) in enumerate(token):
         assert(tok.type == expected[i])
+
+
+def test_count():
+    pql = "count () as PKT_TEST"
+    token = tokenize(pql)
+    tok_count = next(token)
+    assert(tok_count.type == TOK_COUNT)
+    tok_as = next(token)
+    assert(tok_as.value == "PKT_TEST")
 
 
 def test_integer():

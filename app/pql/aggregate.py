@@ -1,7 +1,7 @@
 import sys
 from typing import List
 
-from app.packet.layers.packet_builder import PacketBuilder
+from packet.layers.packet_builder import PacketBuilder
 
 
 class Aggregate:
@@ -11,7 +11,8 @@ class Aggregate:
         self.result: int = 0
 
     def __str__(self) -> str:
-        result = f"OPCODE: {type(self).__name__}, fieldname: {self.fieldname}, as: {self.as_of}"
+        result = f"OPCODE: {type(self).__name__}, fieldname: {
+            self.fieldname}, as: {self.as_of}"
         return result
 
     def execute(self, packet_list: list[PacketBuilder]) -> int:

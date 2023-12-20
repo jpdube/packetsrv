@@ -30,6 +30,7 @@ TOK_SUM = itoa()
 TOK_MAX = itoa()
 TOK_MIN = itoa()
 TOK_COUNT = itoa()
+TOK_AS = itoa()
 
 
 #--- Types
@@ -132,6 +133,7 @@ text_token = {
     TOK_MIN: "MIN",
     TOK_MAX: "MAX",
     TOK_COUNT: "COUNT",
+    TOK_AS: "AS",
 }
 
 

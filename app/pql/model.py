@@ -3,6 +3,7 @@ from functools import lru_cache
 from typing import List
 
 from packet.layers.fields import IPv4Address, MacAddress
+from pql.aggregate import Aggregate
 from pql.pql_constant import const_value
 from pql.tokens_list import human_tokens
 
@@ -152,6 +153,7 @@ class SelectStatement(Statement):
         top_expr=0,
         limit_expr=0,
         interval=(0, 0),
+        aggregate: list[Aggregate] = []
     ):
         self.select_expr = value
         self.from_fields = from_fields
@@ -164,6 +166,7 @@ class SelectStatement(Statement):
         self.offset = None
         self.limit = None
         self.interval = interval
+        self.aggregate: list[Aggregate] = aggregate
         if isinstance(limit_expr, List) and len(limit_expr) == 2:
             self.offset = limit_expr[0]
             self.limit = limit_expr[1]
@@ -173,15 +176,18 @@ class SelectStatement(Statement):
         return self.interval[0] != 0 and self.interval[1] != 0
 
     def __repr__(self) -> str:
-        return f"""SelectStatement Select: {self.select_expr}, 
-                   From: {repr(self.from_fields)}, 
-                   Index: {self.index_field}, IP: {self.ip_list}, 
-                   Include: {self.include}, 
-                   Where: {repr(self.where_expr)}, 
-                   Group By: {self.groupby_expr}, 
-                   Top: {self.top_expr}, 
-                   Limit: {self.offset},{self.limit}, 
-                   Interval: {self.interval[0]} to {self.interval[1]}"""
+        return f"""SelectStatement Select: {self.select_expr},
+                   From: {repr(self.from_fields)},
+                   Index: {self.index_field}, IP: {self.ip_list},
+                   Include: {self.include},
+                   Where: {repr(self.where_expr)},
+                   Group By: {self.groupby_expr},
+                   Top: {self.top_expr},
+                   Limit: {self.offset},{self.limit},
+                   Interval: {self.interval[0]} to {self.interval[1]},
+                   Aggregate: {self.aggregate}
+
+                   """
 
 
 class String(Expression):

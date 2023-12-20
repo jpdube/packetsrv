@@ -1,6 +1,7 @@
 # from packet.layers.ipv4 import IPV4
 import pql.tokens_list as tl
-from pql.lexer import Lexer, tokenize
+from pql.aggregate import Average, Count, Sum
+from pql.lexer import tokenize
 from pql.model import *
 
 index_field = set()
@@ -44,7 +45,8 @@ class Tokenizer:
                 col = self.prev_token.col
 
             print(
-                f"Syntax error at: {line} col: {col} token: {self.lookahead} msg: {error_msg}"
+                f"Syntax error at: {line} col: {col} token: {
+                    self.lookahead} msg: {error_msg}"
             )
             raise SyntaxError
         else:
@@ -97,15 +99,30 @@ def parse_assignment(tokens):
 def parse_select(tokens):
     tokens.expect(tl.TOK_SELECT)
     fields = []
+    aggregates = []
     if tokens.peek(tl.TOK_WILDCARD):
         field = tokens.expect(tl.TOK_WILDCARD)
         fields.append(Label("*"))
     else:
         while True:
-            field = tokens.expect(tl.TOK_NAME)
-            # print(f'SELECT fields: {field}')
-            if field:
-                fields.append(Label(field.value))
+            if tokens.peek(tl.TOK_COUNT):
+                aggr_tok = tokens.expect(tl.TOK_COUNT)
+                as_tok = tokens.expect(tl.TOK_AS)
+                aggregates.append(Count(fieldname="", as_of=as_tok.value))
+            if tokens.peek(tl.TOK_SUM):
+                aggr_tok = tokens.expect(tl.TOK_SUM)
+                as_tok = tokens.expect(tl.TOK_AS)
+                aggregates.append(
+                    Sum(fieldname=aggr_tok.value, as_of=as_tok.value))
+            if tokens.peek(tl.TOK_AVERAGE):
+                aggr_tok = tokens.expect(tl.TOK_AVERAGE)
+                as_tok = tokens.expect(tl.TOK_AS)
+                aggregates.append(
+                    Average(fieldname=aggr_tok.value, as_of=as_tok.value))
+            if tokens.peek(tl.TOK_NAME):
+                field = tokens.expect(tl.TOK_NAME)
+                if field:
+                    fields.append(Label(field.value))
 
             if tokens.accept(tl.TOK_DELIMITER) is None:
                 break
@@ -164,7 +181,8 @@ def parse_select(tokens):
                            groupby_value,
                            top_value,
                            limit_fields,
-                           (interval_start, interval_end)
+                           (interval_start, interval_end),
+                           aggregates
                            )
 
 

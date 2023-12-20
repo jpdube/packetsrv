@@ -7,6 +7,7 @@ from dbase.index_manager import IndexManager, PktPtr
 from packet.layers.packet_builder import PacketBuilder
 from pql.interp_raw import exec_program
 from pql.parse import parse_source
+from pql.query_result import QueryResult
 
 
 class DBEngine:
@@ -35,6 +36,7 @@ class DBEngine:
         print(self.model.interval)
 
         search_result = []
+        query_result = QueryResult(self.model)
 
         pool = mp.Pool()
         for idx in index_result:
@@ -47,7 +49,7 @@ class DBEngine:
                 for r in result:
                     searched += 1
                     if r is not None:
-                        search_result.append(r)
+                        query_result.add_packet(r)
                         self.pkt_found += 1
 
                     if self.pkt_found >= self.model.top_expr:
@@ -60,37 +62,19 @@ class DBEngine:
                 break
 
         ttl_time = datetime.now() - start_time
-        print(self.model.select_expr)
 
         print(
             f"---> Index scan time: {ttl_time} Result: {searched}:{self.pkt_found} TOP: {self.model.top_expr} SELECT: {self.model.select_expr}")
 
-        for p in search_result:
-            self.get_fields(p)
-
-        return self.result
+        return query_result.get_result()
 
     def search_pkt(self, pkt_ptr: PktPtr, where_expr):
         pkt_result = exec_program(where_expr, pkt_ptr)
         if pkt_result is not None:
             pb = PacketBuilder()
             pb.from_bytes(pkt_result.packet, pkt_result.header)
-            self.get_fields(pb)
             return pb
 
     def chunks(self, l: list[Any], n: int) -> Generator[Any, Any, Any]:
         for i in range(0, len(l), n):
             yield l[i:i + n]
-
-    def process(self, index_result):
-        ...
-
-    def get_fields(self, pb: PacketBuilder):
-        record = {}
-        for f in self.model.select_expr:
-            if f.value in ["ip.dst", "ip.src"]:
-                field_value = f"{IPv4Address(pb.get_field(f.value))}"
-            else:
-                field_value = pb.get_field(f.value)
-            record[f.value] = field_value
-        self.result.append(record)
