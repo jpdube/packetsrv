@@ -121,7 +121,30 @@ def test_count():
     tok_count = next(token)
     assert(tok_count.type == TOK_COUNT)
     tok_as = next(token)
+    assert(tok_as.type == TOK_AS)
     assert(tok_as.value == "PKT_TEST")
+
+
+def test_sum():
+    pql = "sum (frame.inclen) as PKT_SUM"
+    token = tokenize(pql)
+    tok_count = next(token)
+    assert(tok_count.type == TOK_SUM)
+    assert(tok_count.value == "frame.inclen")
+    tok_as = next(token)
+    assert(tok_as.type == TOK_AS)
+    assert(tok_as.value == "PKT_SUM")
+
+
+def test_average():
+    pql = "avg (frame.inclen) as PKT_AVG"
+    token = tokenize(pql)
+    tok_count = next(token)
+    assert(tok_count.type == TOK_AVERAGE)
+    assert(tok_count.value == "frame.inclen")
+    tok_as = next(token)
+    assert(tok_as.type == TOK_AS)
+    assert(tok_as.value == "PKT_AVG")
 
 
 def test_integer():
