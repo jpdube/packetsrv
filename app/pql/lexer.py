@@ -260,6 +260,8 @@ class Preparser:
             self.get_count()
             self.get_sum()
             self.get_average()
+            self.get_min()
+            self.get_max()
             self.get_as()
             self.token_list.append(self.advance())
 
@@ -294,8 +296,6 @@ class Preparser:
         if self.peek_at(0, tl.TOK_COUNT) \
                 and self.peek_at(1, tl.TOK_LPAREN)  \
                 and self.peek_at(2, tl.TOK_RPAREN):
-            # and self.peek_at(3, tl.TOK_AS) \
-            # and self.peek_at(4, tl.TOK_NAME):
 
             tok = self.advance()  # count
             if tok:
@@ -304,13 +304,68 @@ class Preparser:
 
                 self.advance()  # skip lparen
                 self.advance()  # skip rparen
-                # self.advance()  # as
-
-            # fieldname = self.advance()
-            # if fieldname:
-            #     field = fieldname.value
 
             token = Token(tl.TOK_COUNT, field, line, column)
+
+            self.token_list.append(token)
+
+    def get_min(self):
+        field: str = ""
+        column = 0
+        line = 0
+
+        if self.peek_at(0, tl.TOK_MIN) \
+                and self.peek_at(1, tl.TOK_LPAREN)  \
+                and self.peek_at(2, tl.TOK_NAME) \
+                and self.peek_at(3, tl.TOK_PERIOD) \
+                and self.peek_at(4, tl.TOK_NAME) \
+                and self.peek_at(5, tl.TOK_RPAREN):
+
+            tok = self.advance()  # sum
+            if tok:
+                column = tok.col
+                line = tok.line
+
+                self.advance()  # skip lparen
+                name_part1 = self.advance()
+                self.advance()  # period
+                name_part2 = self.advance()
+
+                if name_part1 and name_part2:
+                    field = f"{name_part1.value}.{name_part2.value}"
+                self.advance()  # skip rparen
+
+            token = Token(tl.TOK_MIN, field, line, column)
+
+            self.token_list.append(token)
+
+    def get_max(self):
+        field: str = ""
+        column = 0
+        line = 0
+
+        if self.peek_at(0, tl.TOK_MAX) \
+                and self.peek_at(1, tl.TOK_LPAREN)  \
+                and self.peek_at(2, tl.TOK_NAME) \
+                and self.peek_at(3, tl.TOK_PERIOD) \
+                and self.peek_at(4, tl.TOK_NAME) \
+                and self.peek_at(5, tl.TOK_RPAREN):
+
+            tok = self.advance()  # sum
+            if tok:
+                column = tok.col
+                line = tok.line
+
+                self.advance()  # skip lparen
+                name_part1 = self.advance()
+                self.advance()  # period
+                name_part2 = self.advance()
+
+                if name_part1 and name_part2:
+                    field = f"{name_part1.value}.{name_part2.value}"
+                self.advance()  # skip rparen
+
+            token = Token(tl.TOK_MAX, field, line, column)
 
             self.token_list.append(token)
 

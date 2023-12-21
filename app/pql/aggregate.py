@@ -1,10 +1,11 @@
 import sys
+from abc import ABC
 from typing import List
 
 from packet.layers.packet_builder import PacketBuilder
 
 
-class Aggregate:
+class Aggregate(ABC):
     def __init__(self, fieldname: str, as_of: str):
         self.fieldname: str = fieldname
         self.as_of: str = as_of
@@ -66,7 +67,7 @@ class Min(Aggregate):
         min_value: int = sys.maxsize
         for pkt in packet_list:
             test_value = pkt.get_field(self.fieldname)
-            if test_value and test_value < min_value:
+            if test_value < min_value:
                 min_value = test_value
 
         return min_value
@@ -77,10 +78,11 @@ class Max(Aggregate):
         super().__init__(fieldname, as_of)
 
     def execute(self, packet_list: List[PacketBuilder]) -> int:
-        max_value = 0
+        max_value: int = 0
         for pkt in packet_list:
             test_value = pkt.get_field(self.fieldname)
-            if test_value and test_value > max_value:
-                max_value = test_value
+            if test_value:
+                if int(test_value) > max_value:
+                    max_value = int(test_value)
 
         return max_value

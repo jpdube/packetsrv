@@ -1,6 +1,6 @@
 # from packet.layers.ipv4 import IPV4
 import pql.tokens_list as tl
-from pql.aggregate import Average, Count, Sum
+from pql.aggregate import Aggregate, Average, Count, Max, Min, Sum
 from pql.lexer import tokenize
 from pql.model import *
 
@@ -96,6 +96,36 @@ def parse_assignment(tokens):
     return Store(var_name.value, value)
 
 
+def parse_aggregate(tokens) -> None | Aggregate:
+
+    if tokens.peek(tl.TOK_COUNT):
+        aggr_tok = tokens.expect(tl.TOK_COUNT)
+        as_tok = tokens.expect(tl.TOK_AS)
+        return Count(fieldname="", as_of=as_tok.value)
+
+    if tokens.peek(tl.TOK_SUM):
+        aggr_tok = tokens.expect(tl.TOK_SUM)
+        as_tok = tokens.expect(tl.TOK_AS)
+        return Sum(fieldname=aggr_tok.value, as_of=as_tok.value)
+
+    if tokens.peek(tl.TOK_AVERAGE):
+        aggr_tok = tokens.expect(tl.TOK_AVERAGE)
+        as_tok = tokens.expect(tl.TOK_AS)
+        return Average(fieldname=aggr_tok.value, as_of=as_tok.value)
+
+    if tokens.peek(tl.TOK_MIN):
+        aggr_tok = tokens.expect(tl.TOK_MIN)
+        as_tok = tokens.expect(tl.TOK_AS)
+        return Min(fieldname=aggr_tok.value, as_of=as_tok.value)
+
+    if tokens.peek(tl.TOK_MAX):
+        aggr_tok = tokens.expect(tl.TOK_MAX)
+        as_tok = tokens.expect(tl.TOK_AS)
+        return Max(fieldname=aggr_tok.value, as_of=as_tok.value)
+
+    return None
+
+
 def parse_select(tokens):
     tokens.expect(tl.TOK_SELECT)
     fields = []
@@ -105,20 +135,10 @@ def parse_select(tokens):
         fields.append(Label("*"))
     else:
         while True:
-            if tokens.peek(tl.TOK_COUNT):
-                aggr_tok = tokens.expect(tl.TOK_COUNT)
-                as_tok = tokens.expect(tl.TOK_AS)
-                aggregates.append(Count(fieldname="", as_of=as_tok.value))
-            if tokens.peek(tl.TOK_SUM):
-                aggr_tok = tokens.expect(tl.TOK_SUM)
-                as_tok = tokens.expect(tl.TOK_AS)
-                aggregates.append(
-                    Sum(fieldname=aggr_tok.value, as_of=as_tok.value))
-            if tokens.peek(tl.TOK_AVERAGE):
-                aggr_tok = tokens.expect(tl.TOK_AVERAGE)
-                as_tok = tokens.expect(tl.TOK_AS)
-                aggregates.append(
-                    Average(fieldname=aggr_tok.value, as_of=as_tok.value))
+            aggr = parse_aggregate(tokens)
+            if aggr:
+                aggregates.append(aggr)
+
             if tokens.peek(tl.TOK_NAME):
                 field = tokens.expect(tl.TOK_NAME)
                 if field:
