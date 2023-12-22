@@ -2,7 +2,7 @@ import sys
 
 from packet.layers.fields import IPv4Address
 from packet.layers.packet_builder import PacketBuilder
-from pql.aggregate import Count
+from pql.aggregate import Bandwidth
 from pql.model import SelectStatement
 
 
@@ -40,6 +40,9 @@ class QueryResult:
     def aggregate(self) -> None:
         record = {}
         for aggr in self.model.aggregate:
+            if isinstance(aggr, Bandwidth):
+                aggr.time_range(self.ts_start, self.ts_end)
+
             record[aggr.as_of] = aggr.execute(self.packet_list)
         self.result.insert(0, record)
 

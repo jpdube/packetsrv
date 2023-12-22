@@ -1,6 +1,6 @@
 # from packet.layers.ipv4 import IPV4
 import pql.tokens_list as tl
-from pql.aggregate import Aggregate, Average, Count, Max, Min, Sum
+from pql.aggregate import Aggregate, Average, Bandwidth, Count, Max, Min, Sum
 from pql.lexer import tokenize
 from pql.model import *
 
@@ -122,6 +122,11 @@ def parse_aggregate(tokens) -> None | Aggregate:
         aggr_tok = tokens.expect(tl.TOK_MAX)
         as_tok = tokens.expect(tl.TOK_AS)
         return Max(fieldname=aggr_tok.value, as_of=as_tok.value)
+
+    if tokens.peek(tl.TOK_BANDWIDTH):
+        aggr_tok = tokens.expect(tl.TOK_BANDWIDTH)
+        as_tok = tokens.expect(tl.TOK_AS)
+        return Bandwidth(fieldname=aggr_tok.value, as_of=as_tok.value)
 
     return None
 

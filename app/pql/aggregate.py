@@ -1,5 +1,5 @@
 import sys
-from abc import ABC
+from abc import ABC, abstractmethod
 from typing import List
 
 from packet.layers.packet_builder import PacketBuilder
@@ -16,8 +16,9 @@ class Aggregate(ABC):
             self.fieldname}, as: {self.as_of}"
         return result
 
+    @abstractmethod
     def execute(self, packet_list: list[PacketBuilder]) -> int:
-        return 0
+        pass
 
 
 class Sum(Aggregate):
@@ -67,7 +68,7 @@ class Min(Aggregate):
         min_value: int = sys.maxsize
         for pkt in packet_list:
             test_value = pkt.get_field(self.fieldname)
-            if test_value < min_value:
+            if test_value and (test_value < min_value):
                 min_value = test_value
 
         return min_value
@@ -81,8 +82,25 @@ class Max(Aggregate):
         max_value: int = 0
         for pkt in packet_list:
             test_value = pkt.get_field(self.fieldname)
-            if test_value:
-                if int(test_value) > max_value:
-                    max_value = int(test_value)
+            if test_value and (int(test_value) > max_value):
+                max_value = int(test_value)
 
         return max_value
+
+
+class Bandwidth(Aggregate):
+    def __init__(self, fieldname: str, as_of: str):
+        super().__init__(fieldname, as_of)
+
+    def time_range(self, start_ts: int, end_ts: int) -> None:
+        self.start_ts = start_ts
+        self.end_ts = end_ts
+
+    def execute(self, packet_list: List[PacketBuilder]) -> int:
+        ttl_bytes: int = 0
+        for pkt in packet_list:
+            bw_value = pkt.get_field(self.fieldname)
+            if bw_value:
+                ttl_bytes += bw_value
+
+        return int(ttl_bytes / (self.end_ts - self.start_ts)) * 8

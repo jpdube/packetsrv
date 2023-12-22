@@ -31,6 +31,7 @@ TOK_MAX = itoa()
 TOK_MIN = itoa()
 TOK_COUNT = itoa()
 TOK_AS = itoa()
+TOK_BANDWIDTH = itoa()
 
 
 #--- Types
@@ -134,6 +135,7 @@ text_token = {
     TOK_MAX: "MAX",
     TOK_COUNT: "COUNT",
     TOK_AS: "AS",
+    TOK_BANDWIDTH: "BANDWIDTH",
 }
 
 

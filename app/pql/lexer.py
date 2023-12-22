@@ -28,7 +28,8 @@ _keywords = {
     "min": tl.TOK_MIN,
     "max": tl.TOK_MAX,
     "count": tl.TOK_COUNT,
-    "as": tl.TOK_AS
+    "as": tl.TOK_AS,
+    "bandwidth": tl.TOK_BANDWIDTH,
 }
 
 
@@ -262,6 +263,7 @@ class Preparser:
             self.get_average()
             self.get_min()
             self.get_max()
+            self.get_bandwidth()
             self.get_as()
             self.token_list.append(self.advance())
 
@@ -306,6 +308,36 @@ class Preparser:
                 self.advance()  # skip rparen
 
             token = Token(tl.TOK_COUNT, field, line, column)
+
+            self.token_list.append(token)
+
+    def get_bandwidth(self):
+        field: str = ""
+        column = 0
+        line = 0
+
+        if self.peek_at(0, tl.TOK_BANDWIDTH) \
+                and self.peek_at(1, tl.TOK_LPAREN)  \
+                and self.peek_at(2, tl.TOK_NAME) \
+                and self.peek_at(3, tl.TOK_PERIOD) \
+                and self.peek_at(4, tl.TOK_NAME) \
+                and self.peek_at(5, tl.TOK_RPAREN):
+
+            tok = self.advance()  # sum
+            if tok:
+                column = tok.col
+                line = tok.line
+
+                self.advance()  # skip lparen
+                name_part1 = self.advance()
+                self.advance()  # period
+                name_part2 = self.advance()
+
+                if name_part1 and name_part2:
+                    field = f"{name_part1.value}.{name_part2.value}"
+                self.advance()  # skip rparen
+
+            token = Token(tl.TOK_BANDWIDTH, field, line, column)
 
             self.token_list.append(token)
 
