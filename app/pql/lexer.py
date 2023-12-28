@@ -6,11 +6,12 @@ _keywords = {
     "from": tl.TOK_FROM,
     "include": tl.TOK_INCLUDE,
     "where": tl.TOK_WHERE,
-    "order by": tl.TOK_ORDER_BY,
+    "order": tl.TOK_ORDER_BY,
+    "by": tl.TOK_BY,
+    "group": tl.TOK_GROUP_BY,
     "asc": tl.TOK_ASC,
     "desc": tl.TOK_DESC,
     "between": tl.TOK_BETWEEN,
-    "groupby": tl.TOK_GROUP_BY,
     "top": tl.TOK_TOP,
     "limit": tl.TOK_LIMIT,
     "in": tl.TOK_IN,
@@ -252,7 +253,6 @@ class Preparser:
 
     def parse(self):
         while not self.at_end():
-            self.get_label()
             self.get_ip_address()
             self.get_mac_address()
             self.get_timestamp()
@@ -265,9 +265,48 @@ class Preparser:
             self.get_max()
             self.get_bandwidth()
             self.get_as()
+            self.order_by()
+            self.group_by()
+            self.get_label()
             self.token_list.append(self.advance())
 
         return self.token_list
+
+    def group_by(self):
+        field: str = ""
+        column = 0
+        line = 0
+
+        if self.peek_at(0, tl.TOK_GROUP_BY) \
+                and self.peek_at(1, tl.TOK_BY):
+
+            tok = self.advance()  # group
+            if tok:
+                column = tok.col
+                line = tok.line
+
+            _ = self.advance()  # by
+            token = Token(tl.TOK_GROUP_BY, field, line, column)
+
+            self.token_list.append(token)
+
+    def order_by(self):
+        field: str = ""
+        column = 0
+        line = 0
+
+        if self.peek_at(0, tl.TOK_ORDER_BY) \
+                and self.peek_at(1, tl.TOK_BY):
+
+            tok = self.advance()  # group
+            if tok:
+                column = tok.col
+                line = tok.line
+
+            _ = self.advance()  # by
+            token = Token(tl.TOK_ORDER_BY, field, line, column)
+
+            self.token_list.append(token)
 
     def get_as(self):
         field: str = ""
@@ -622,6 +661,7 @@ class Preparser:
 def tokenize(pql: str):
     lexer = Lexer(pql)
     token_list = lexer.tokenize()
+    print(token_list)
     preparser = Preparser(token_list)
     token_list = preparser.parse()
     print(token_list)

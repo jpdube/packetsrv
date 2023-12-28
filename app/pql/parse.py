@@ -174,7 +174,7 @@ def parse_select(tokens):
             field = tokens.expect(tl.TOK_NAME)
             # print(f'SELECT fields: {field}')
             if field:
-                groupby_value.append(Label(field.value))
+                groupby_value.append(field.value)
 
             if tokens.accept(tl.TOK_DELIMITER) is None:
                 break

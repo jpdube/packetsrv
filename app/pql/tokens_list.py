@@ -6,6 +6,7 @@ TOK_INCLUDE = itoa()
 TOK_WHERE = itoa()
 TOK_ORDER_BY = itoa()
 TOK_GROUP_BY = itoa()
+TOK_BY = itoa()
 TOK_ASC = itoa()
 TOK_DESC = itoa()
 TOK_BETWEEN = itoa()
@@ -83,6 +84,7 @@ text_token = {
     TOK_WHERE: "WHERE",
     TOK_ORDER_BY: "ORDER BY",
     TOK_GROUP_BY: "GROUP BY",
+    TOK_BY: "BY",
     TOK_ASC: "ASC",
     TOK_DESC: "DESC",
     TOK_BETWEEN: "BETWEEN",

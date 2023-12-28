@@ -149,7 +149,7 @@ class SelectStatement(Statement):
         index_field,
         ip_list,
         where_expr,
-        groupby_expr,
+        groupby_fields,
         top_expr=0,
         limit_expr=0,
         interval=(0, 0),
@@ -161,7 +161,7 @@ class SelectStatement(Statement):
         self.index_field = index_field
         self.ip_list = ip_list
         self.where_expr = where_expr
-        self.groupby_expr = groupby_expr
+        self.groupby_fields = groupby_fields
         self.top_expr = top_expr
         self.offset = None
         self.limit = None
@@ -181,7 +181,7 @@ class SelectStatement(Statement):
                    Index: {self.index_field}, IP: {self.ip_list},
                    Include: {self.include},
                    Where: {repr(self.where_expr)},
-                   Group By: {self.groupby_expr},
+                   Group By: {self.groupby_fields},
                    Top: {self.top_expr},
                    Limit: {self.offset},{self.limit},
                    Interval: {self.interval[0]} to {self.interval[1]},
