@@ -1,8 +1,8 @@
 import multiprocessing as mp
+import sqlite3
 from dataclasses import dataclass
 from datetime import datetime
 from pathlib import Path
-from struct import unpack
 from typing import Any, Generator, Optional, Tuple
 
 import pql.packet_index as pkt_index
@@ -10,7 +10,7 @@ from config.config import Config
 from pql.pcapfile import PcapFile
 
 
-@dataclass
+@dataclass(slots=False)
 class PktPtr ():
     file_id: int
     ptr: int
@@ -39,27 +39,47 @@ class IndexManager:
         ttl_time = datetime.now() - start_time
         print(f"---> Total Index Time: {ttl_time}")
 
+
     def search_pkt(self, file_id: int, search_index: int, ip_list: dict[str, list[Tuple[int, int]]]):
         result = []
-        with open(file_id, "rb") as f:
-            buffer = []
-            while True:
-                buffer = f.read(26)
+        conn = sqlite3.connect(str(file_id))
+        c = conn.cursor()
+        params = []
+        params.append(search_index)
+        params.append(search_index)
 
-                if not buffer:
-                    break
+        sql = """
+              select pkt_ptr
+              from pkt_index
+              where (pindex & ?) = ?
+                        
+              """
+        if len(ip_list["ip.src"]) > 0:
+            sql += " and ip_src between ? and ? "
+            net, brdcast = self.net_broadcast(ip_list["ip.src"][0][0], ip_list["ip.src"][0][1])
+            params.append(net)
+            params.append(brdcast)
 
-                _, offset, index, ip_dst, ip_src, pkt_hdr_size= unpack(
-                    ">IIQIIH", buffer)
-                if (search_index & index) == search_index and self.match_ip(ip_src, ip_dst, ip_list):
-                    pkt = PktPtr(file_id=int(file_id.stem),
-                                 ptr=offset, ip_dst=ip_dst, ip_src=ip_src, pkt_hdr_size=pkt_hdr_size)
-                    result.append(pkt)
+        if len(ip_list["ip.dst"]) > 0:
+            sql += " and ip_dst between ? and ? "
+            net, brdcast = self.net_broadcast(ip_list["ip.dst"][0][0], ip_list["ip.dst"][0][1])
+            params.append(net)
+            params.append(brdcast)
+
+        c.execute(sql, params)
+
+        rows = c.fetchall()
+        for r in rows:
+            pkt = PktPtr(file_id=int(file_id.stem),
+                                 ptr=r[0], ip_dst=0, ip_src=0, pkt_hdr_size=0)
+                                 # ptr=r[0], ip_dst=r[1], ip_src=r[2], pkt_hdr_size=r[3])
+            result.append(pkt)
+
         return result
 
     def search(self, index_field: set[int], ip_list: dict[str, list[int]]) -> Generator[Any, Any, Any]:
         path = Path(Config.pcap_index())
-        files_list = list(path.glob("*.pidx"))
+        files_list = list(path.glob("*.db"))
         files_list.sort(key=lambda a: int(a.stem))
 
         search_index = pkt_index.build_search_index(index_field)
@@ -75,6 +95,7 @@ class IndexManager:
 
             for r in result:
                 yield (r)
+
 
     def chunks(self, l: list[Any], n: int) -> Generator[Any, Any, Any]:
         for i in range(0, len(l), n):

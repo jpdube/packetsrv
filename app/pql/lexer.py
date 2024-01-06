@@ -661,9 +661,7 @@ class Preparser:
 def tokenize(pql: str):
     lexer = Lexer(pql)
     token_list = lexer.tokenize()
-    print(token_list)
     preparser = Preparser(token_list)
     token_list = preparser.parse()
-    print(token_list)
     for t in token_list:
         yield (t)
