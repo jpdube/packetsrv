@@ -1,4 +1,7 @@
 import sys
+from collections import defaultdict
+from itertools import groupby
+from operator import itemgetter
 
 from packet.layers.fields import IPv4Address
 from packet.layers.packet_builder import PacketBuilder
@@ -34,10 +37,38 @@ class QueryResult:
         self.process_pkt(packet)
 
     def get_result(self) -> list[dict[str, str | int]]:
+        if self.model.has_groupby:
+            self.group_by()
+            return self.result
+            # return [{"group by": "True"}]
         self.aggregate()
         return self.result
 
+    def group_by(self):
+        grp_result = defaultdict(list)
+
+        record = {}
+        for idx, pkt in enumerate(self.packet_list):
+            tmp_list = []
+            for grp_field in self.model.groupby_fields:
+                tmp_list.append(pkt.get_field(grp_field))
+
+            key = (*tmp_list,)
+            grp_result[key].append(idx)
+
+        for key, aggr in grp_result.items():
+            record = {}
+            for i, k in enumerate(key):
+                record[self.model.groupby_fields[i]] = f"{IPv4Address(k)}"
+            record['aggr'] = len(aggr)
+            print(record)
+            self.result.append(record)
+        # print(grp_result)
+
     def aggregate(self) -> None:
+        if len(self.model.aggregate) == 0:
+            return
+
         record = {}
         for aggr in self.model.aggregate:
             if isinstance(aggr, Bandwidth):

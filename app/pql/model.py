@@ -143,7 +143,7 @@ class Now(Expression):
 class SelectStatement(Statement):
     def __init__(
         self,
-        value,
+        select_fields: list[str],
         from_fields,
         include_field,
         index_field,
@@ -155,7 +155,7 @@ class SelectStatement(Statement):
         interval=(0, 0),
         aggregate: list[Aggregate] = []
     ):
-        self.select_expr = value
+        self.select_expr = select_fields
         self.from_fields = from_fields
         self.include = include_field
         self.index_field = index_field
@@ -174,6 +174,10 @@ class SelectStatement(Statement):
     @property
     def has_interval(self) -> bool:
         return self.interval[0] != 0 and self.interval[1] != 0
+
+    @property
+    def has_groupby(self) -> bool:
+        return len(self.groupby_fields) > 0
 
     def __repr__(self) -> str:
         return f"""SelectStatement Select: {self.select_expr},
