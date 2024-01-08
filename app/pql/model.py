@@ -177,7 +177,7 @@ class SelectStatement(Statement):
 
     @property
     def has_groupby(self) -> bool:
-        return len(self.groupby_fields) > 0
+        return self.groupby_fields is not None
 
     def __repr__(self) -> str:
         return f"""SelectStatement Select: {self.select_expr},
