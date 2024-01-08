@@ -12,8 +12,8 @@ class Aggregate(ABC):
         self.result: int = 0
 
     def __str__(self) -> str:
-        result = f"OPCODE: {type(self).__name__}, fieldname: {
-            self.fieldname}, as: {self.as_of}"
+        result = f"""OPCODE: {type(self).__name__}, fieldname: {
+            self.fieldname}, as: {self.as_of}"""
         return result
 
     @abstractmethod
