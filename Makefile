@@ -14,6 +14,7 @@ check:
 	# mypy main.py pql/ dbase/ packet/ api/
 
 run:
+	# $(PYTHON) setup.py build_ext --inplace
 	$(PYTHON) $(MAIN)
 
 .PHONY: test
