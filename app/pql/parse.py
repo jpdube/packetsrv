@@ -131,6 +131,66 @@ def parse_aggregate(tokens) -> None | Aggregate:
     return None
 
 
+def parse_from(tokens):
+    tokens.expect(tl.TOK_FROM)
+    from_fields = []
+    while True:
+        ffield = tokens.expect(tl.TOK_NAME)
+        if ffield:
+            from_fields.append(Label(ffield.value))
+        if tokens.accept(tl.TOK_DELIMITER) is None:
+            break
+
+    return from_fields
+
+
+def parse_where(tokens):
+    where_value = None
+    if tokens.peek(tl.TOK_WHERE):
+        tokens.expect(tl.TOK_WHERE)
+        where_value = parse_expression(tokens)
+
+    return where_value
+
+
+def parse_groupby(tokens):
+    groupby_value = None
+    if tokens.peek(tl.TOK_GROUP_BY):
+        tokens.expect(tl.TOK_GROUP_BY)
+        groupby_value = []
+        while True:
+            field = tokens.expect(tl.TOK_NAME)
+            # print(f'SELECT fields: {field}')
+            if field:
+                groupby_value.append(field.value)
+
+            if tokens.accept(tl.TOK_DELIMITER) is None:
+                break
+    return groupby_value
+
+
+def parse_top(tokens):
+    top_value = None
+    if tokens.peek(tl.TOK_TOP):
+        tokens.expect(tl.TOK_TOP)
+        top_value = int(tokens.expect(tl.TOK_INTEGER).value)
+
+    return top_value
+
+
+def parse_limit(tokens):
+    limit_fields = []
+    if tokens.peek(tl.TOK_LIMIT):
+        tokens.expect(tl.TOK_LIMIT)
+        offset = tokens.expect(tl.TOK_INTEGER)
+        limit_fields.append(offset)
+        tokens.expect(tl.TOK_DELIMITER)
+        limit = tokens.expect(tl.TOK_INTEGER)
+        limit_fields.append(limit)
+
+    return limit_fields
+
+
 def parse_select(tokens):
     tokens.expect(tl.TOK_SELECT)
     fields = []
@@ -147,54 +207,18 @@ def parse_select(tokens):
             if tokens.peek(tl.TOK_NAME):
                 field = tokens.expect(tl.TOK_NAME)
                 if field:
-                    fields.append(Label(field.value))
+                    fields.append(field.value)
+                    # fields.append(Label(field.value))
 
             if tokens.accept(tl.TOK_DELIMITER) is None:
                 break
 
-    tokens.expect(tl.TOK_FROM)
-    from_fields = []
-    while True:
-        ffield = tokens.expect(tl.TOK_NAME)
-        if ffield:
-            from_fields.append(Label(ffield.value))
-        if tokens.accept(tl.TOK_DELIMITER) is None:
-            break
-
-    where_value = None
-    if tokens.peek(tl.TOK_WHERE):
-        tokens.expect(tl.TOK_WHERE)
-        where_value = parse_expression(tokens)
-
-    groupby_value = None
-    if tokens.peek(tl.TOK_GROUP_BY):
-        tokens.expect(tl.TOK_GROUP_BY)
-        groupby_value = []
-        while True:
-            field = tokens.expect(tl.TOK_NAME)
-            # print(f'SELECT fields: {field}')
-            if field:
-                groupby_value.append(field.value)
-
-            if tokens.accept(tl.TOK_DELIMITER) is None:
-                break
-
+    from_fields = parse_from(tokens)
+    where_value = parse_where(tokens)
+    groupby_value = parse_groupby(tokens)
     interval_start, interval_end = parse_interval(tokens)
-
-    top_value = None
-    if tokens.peek(tl.TOK_TOP):
-        tokens.expect(tl.TOK_TOP)
-        top_value = int(tokens.expect(tl.TOK_INTEGER).value)
-
-    limit_fields = []
-    if tokens.peek(tl.TOK_LIMIT):
-        tokens.expect(tl.TOK_LIMIT)
-        offset = tokens.expect(tl.TOK_INTEGER)
-        limit_fields.append(offset)
-        tokens.expect(tl.TOK_DELIMITER)
-        limit = tokens.expect(tl.TOK_INTEGER)
-        limit_fields.append(limit)
-
+    top_value = parse_top(tokens)
+    limit_fields = parse_limit(tokens)
     tokens.expect(tl.TOK_SEMI)
 
     return SelectStatement(fields,
