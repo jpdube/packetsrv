@@ -8,6 +8,10 @@ from packet.layers.packet_builder import PacketBuilder
 from pql.interp_raw import exec_program
 from pql.parse import parse_source
 from pql.query_result import QueryResult
+import logging
+
+
+log = logging.getLogger("packetdb")
 
 
 class DBEngine:
@@ -20,19 +24,16 @@ class DBEngine:
         self.index_mgr.create_index()
 
     def run(self, pql: str):
-        print(pql)
+        log.debug(pql)
         start_time = datetime.now()
         self.pql = pql
         self.model = parse_source(pql)
-        # field_index = self.index_mgr.build_search_value(self.model.index_field)
-        print(self.model.index_field)
+        log.debug(self.model.index_field)
         index_result = self.index_mgr.search(
             self.model.index_field, self.model.ip_list)
-        # index_result = self.index_mgr.search(field_index, self.model.ip_list)
         searched = 0
         self.pkt_found = 0
 
-        # search_result = []
         query_result = QueryResult(self.model)
 
         pool = mp.Pool()
@@ -60,7 +61,7 @@ class DBEngine:
 
         ttl_time = datetime.now() - start_time
 
-        print(
+        log.info(
             f"---> Index scan time: {ttl_time} Result: {searched}:{self.pkt_found} TOP: {self.model.top_expr} SELECT: {self.model.select_expr}")
 
         return query_result.get_result()

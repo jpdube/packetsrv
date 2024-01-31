@@ -4,6 +4,11 @@ from struct import pack, unpack
 import pql.packet_index as pkt_index
 from config.config import Config
 from packet.layers.packet_decode import PacketDecode
+import logging
+
+
+log = logging.getLogger("packetdb")
+
 
 PCAP_GLOBAL_HEADER_SIZE = 24
 PCAP_PACKET_HEADER_SIZE = 16

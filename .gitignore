@@ -21,6 +21,7 @@ build/
 config-jpd/
 db/
 .env
+logs/
 
 # Rust
 target/

@@ -8,6 +8,11 @@ from packet.layers.packet_builder import PacketBuilder
 from pql.aggregate import Bandwidth
 from pql.model import SelectStatement
 
+import logging
+
+
+log = logging.getLogger("packetdb")
+
 
 class QueryResult:
     def __init__(self, model: SelectStatement):
@@ -61,7 +66,7 @@ class QueryResult:
             for i, k in enumerate(key):
                 record[self.model.groupby_fields[i]] = f"{IPv4Address(k)}"
             record['aggr'] = len(aggr)
-            print(record)
+            log.debug(record)
             self.result.append(record)
         # print(grp_result)
 
@@ -83,11 +88,11 @@ class QueryResult:
 
         record = {}
         for f in self.model.select_expr:
-            if f.value in ["ip.dst", "ip.src"]:
-                field_value = f"{IPv4Address(pb.get_field(f.value))}"
+            if f in ["ip.dst", "ip.src"]:
+                field_value = f"{IPv4Address(pb.get_field(f))}"
             else:
-                field_value = pb.get_field(f.value)
-            record[f.value] = field_value
+                field_value = pb.get_field(f)
+            record[f] = field_value
 
         if bool(record):
             self.result.append(record)

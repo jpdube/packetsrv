@@ -4,6 +4,11 @@ from typing import List
 from packet.layers.fields import IPv4Address
 from packet.utils.print_hex import HexDump
 
+import logging
+
+
+log = logging.getLogger("packetdb")
+
 FRAME_TYPE_8021Q = 0x8100
 FRAME_TYPE_IPV4 = 0x0800
 FRAME_TYPE_IPV6 = 0x86DD

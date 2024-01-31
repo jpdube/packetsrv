@@ -16,6 +16,11 @@ from packet.layers.tcp import TCP
 from packet.layers.udp import UDP
 from packet.utils.print_hex import HexDump
 
+import logging
+
+
+log = logging.getLogger("packetdb")
+
 
 class PacketBuilder:
     __slots__ = ["packet", "layers", "fields_list", "color_range"]
