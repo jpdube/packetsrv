@@ -7,7 +7,7 @@ from dbase.index_manager import IndexManager, PktPtr
 from packet.layers.packet_builder import PacketBuilder
 from pql.interp_raw import exec_program
 from pql.parse import parse_source
-from pql.query_result import QueryResult
+from dbase.query_result import QueryResult
 import logging
 
 
