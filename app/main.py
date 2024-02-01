@@ -10,7 +10,9 @@ from rich.logging import RichHandler
 log_format = '%(threadName)s %(message)s'
 logging.basicConfig(format=log_format, handlers=[RichHandler()])
 log = logging.getLogger('packetdb')
-log.setLevel(logging.INFO)
+log.setLevel(logging.DEBUG)
+
+
 fh = logging.handlers.TimedRotatingFileHandler(
     'logs/packetdb.log', backupCount=10)
 
