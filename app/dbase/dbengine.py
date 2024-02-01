@@ -9,6 +9,7 @@ from pql.interp_raw import exec_program
 from pql.parse import parse_source
 from dbase.query_result import QueryResult
 import logging
+from config.config import Config
 
 
 log = logging.getLogger("packetdb")
@@ -39,7 +40,7 @@ class DBEngine:
         pool = mp.Pool()
         for idx in index_result:
             params = []
-            for chunk_pkt in self.chunks(idx, mp.cpu_count()):
+            for chunk_pkt in self.chunks(idx, Config.nbr_threads()):
                 for pkt in chunk_pkt:
                     params.append((pkt, self.model.where_expr))
 

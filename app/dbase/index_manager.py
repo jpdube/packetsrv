@@ -32,7 +32,7 @@ class IndexManager:
         path = Path(Config.pcap_path())
         files_list = list(path.glob("*.pcap"))
         pcapfile = PcapFile()
-        pool = mp.Pool()
+        pool = mp.Pool(Config.nbr_threads())
         start_time = datetime.now()
         flist = []
         for i in files_list:
@@ -92,7 +92,7 @@ class IndexManager:
         log.debug(f"Computed index: {search_index:x}")
         pool = mp.Pool()
 
-        for index_chunk in self.chunks(files_list, mp.cpu_count()):
+        for index_chunk in self.chunks(files_list, Config.nbr_threads()):
             params = []
             for idx in index_chunk:
                 params.append((idx, search_index, ip_list))

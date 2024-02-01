@@ -1,5 +1,10 @@
 import os
 from dotenv import load_dotenv
+import multiprocessing as mp
+
+import logging
+
+log = logging.getLogger("packetdb")
 
 
 class Config:
@@ -20,6 +25,22 @@ class Config:
     @classmethod
     def pcap_master_index(cls) -> str:
         return os.getenv('PCAP_MASTER_INDEX', '')
+
+    @classmethod
+    def nbr_threads(cls) -> int:
+        nbr_threads = os.getenv('NBR_THREADS', mp.cpu_count())
+        try:
+            cpu_threads = int(nbr_threads)
+        except ValueError:
+            log.info(f"Invalid value for NBR_THREADS: {
+                     nbr_threads} using default core count")
+            cpu_threads = mp.cpu_count()
+
+        if cpu_threads > mp.cpu_count():
+            cpu_threads = mp.cpu_count()
+
+        log.debug(f"Config nbr_cores: {cpu_threads}")
+        return cpu_threads
 
     @classmethod
     def nbr_files_to_process(cls) -> int:
