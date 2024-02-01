@@ -16,6 +16,7 @@ from packet.layers.tcp import TCP
 from packet.layers.udp import UDP
 from packet.utils.print_hex import HexDump
 
+import base64
 import logging
 
 
@@ -175,7 +176,9 @@ class PacketBuilder:
                 return eth.get_field(field)
         elif pkt_name == 'frame':
             frame = self.get_layer(LayerID.HEADER)
-            if frame:
+            if field == 'frame.packet':
+                return self.to_base64()
+            elif frame:
                 return frame.get_field(field)
         elif pkt_name == 'ip':
             ip = self.get_layer(LayerID.IPV4)
@@ -192,6 +195,9 @@ class PacketBuilder:
                 return udp.get_field(field)
 
         return None
+
+    def to_base64(self) -> str:
+        return base64.b64encode(self.packet).decode("ascii")
 
     def print_hex(self):
         HexDump.print_hex(self.packet, self.color_range)

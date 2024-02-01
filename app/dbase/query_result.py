@@ -94,5 +94,7 @@ class QueryResult:
                 field_value = pb.get_field(f)
             record[f] = field_value
 
+            # record["packet"] = base64.b64encode(pb.packet).decode("ascii")
+
         if bool(record):
             self.result.append(record)
