@@ -170,7 +170,7 @@ def parse_groupby(tokens):
 
 
 def parse_top(tokens):
-    top_value = None
+    top_value = 0
     if tokens.peek(tl.TOK_TOP):
         tokens.expect(tl.TOK_TOP)
         top_value = int(tokens.expect(tl.TOK_INTEGER).value)
@@ -179,7 +179,7 @@ def parse_top(tokens):
 
 
 def parse_offset(tokens):
-    top_value = None
+    top_value = 0
     if tokens.peek(tl.TOK_OFFSET):
         tokens.expect(tl.TOK_OFFSET)
         top_value = int(tokens.expect(tl.TOK_INTEGER).value)

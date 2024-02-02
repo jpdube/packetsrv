@@ -34,6 +34,7 @@ class DBEngine:
             self.model.index_field, self.model.ip_list)
         searched = 0
         self.pkt_found = 0
+        offset_ptr = 0
 
         query_result = QueryResult(self.model)
 
@@ -48,8 +49,13 @@ class DBEngine:
                 for r in result:
                     searched += 1
                     if r is not None:
-                        query_result.add_packet(r)
-                        self.pkt_found += 1
+                        if offset_ptr > self.model.offset:
+                            query_result.add_packet(r)
+                            self.pkt_found += 1
+                        else:
+                            log.debug(
+                                f"Skipping for offset: {self.model.offset}:{offset_ptr}")
+                        offset_ptr += 1
 
                     if self.pkt_found >= self.model.top_expr:
                         break
@@ -63,7 +69,7 @@ class DBEngine:
         ttl_time = datetime.now() - start_time
 
         log.info(
-            f"---> Index scan time: {ttl_time} Result: {searched}:{self.pkt_found} TOP: {self.model.top_expr} SELECT: {self.model.select_expr}")
+            f"---> Index scan time: {ttl_time} Result: {searched}:{self.pkt_found} TOP: {self.model.top_expr} OFFSET: {self.model.offset} TO_FETCH: {self.model.packet_to_fetch} SELECT: {self.model.select_expr}")
 
         return query_result.get_result()
 

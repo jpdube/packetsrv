@@ -163,14 +163,18 @@ class SelectStatement(Statement):
         self.ip_list = ip_list
         self.where_expr = where_expr
         self.groupby_fields = groupby_fields
-        self.top_expr = top_expr
-        self.offset = offset_expr
+        self.top_expr = int(top_expr)
+        self.offset = int(offset_expr)
         # self.limit = None
         self.interval = interval
         self.aggregate: list[Aggregate] = aggregate
-        if isinstance(limit_expr, List) and len(limit_expr) == 2:
-            self.offset = limit_expr[0]
-            self.limit = limit_expr[1]
+        # if isinstance(limit_expr, List) and len(limit_expr) == 2:
+        #     self.offset = limit_expr[0]
+        #     self.limit = limit_expr[1]
+
+    @property
+    def packet_to_fetch(self) -> int:
+        return self.offset + self.top_expr
 
     @property
     def has_interval(self) -> bool:

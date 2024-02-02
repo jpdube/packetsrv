@@ -13,6 +13,7 @@ _keywords = {
     "desc": tl.TOK_DESC,
     "between": tl.TOK_BETWEEN,
     "top": tl.TOK_TOP,
+    "offset": tl.TOK_OFFSET,
     "limit": tl.TOK_LIMIT,
     "in": tl.TOK_IN,
     "and": tl.TOK_LAND,
