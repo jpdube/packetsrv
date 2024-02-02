@@ -5,6 +5,7 @@ import logging
 import logging.config
 import logging.handlers
 from rich.logging import RichHandler
+from threading import Thread
 
 
 log_format = '%(threadName)s %(message)s'
@@ -26,5 +27,9 @@ log.addHandler(fh)
 if __name__ == "__main__":
     log.info("PCAP DB starting...")
     Config.load()
-    db = DBEngine()
-    start()
+    # db = DBEngine()
+
+    api_thread = Thread(target=start, daemon=True)
+    api_thread.start()
+    api_thread.join()
+    # start()
