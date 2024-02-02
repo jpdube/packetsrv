@@ -151,7 +151,8 @@ class SelectStatement(Statement):
         where_expr,
         groupby_fields,
         top_expr=0,
-        limit_expr=0,
+        offset_expr=0,
+        # limit_expr=0,
         interval=(0, 0),
         aggregate: list[Aggregate] = []
     ):
@@ -163,8 +164,8 @@ class SelectStatement(Statement):
         self.where_expr = where_expr
         self.groupby_fields = groupby_fields
         self.top_expr = top_expr
-        self.offset = None
-        self.limit = None
+        self.offset = offset_expr
+        # self.limit = None
         self.interval = interval
         self.aggregate: list[Aggregate] = aggregate
         if isinstance(limit_expr, List) and len(limit_expr) == 2:
@@ -187,7 +188,7 @@ class SelectStatement(Statement):
                    Where: {repr(self.where_expr)},
                    Group By: {self.groupby_fields},
                    Top: {self.top_expr},
-                   Limit: {self.offset},{self.limit},
+                   Offset: {self.offset},
                    Interval: {self.interval[0]} to {self.interval[1]},
                    Aggregate: {self.aggregate}
 

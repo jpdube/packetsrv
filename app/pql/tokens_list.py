@@ -11,6 +11,7 @@ TOK_ASC = itoa()
 TOK_DESC = itoa()
 TOK_BETWEEN = itoa()
 TOK_TOP = itoa()
+TOK_OFFSET = itoa()
 TOK_LIMIT = itoa()
 TOK_IN = itoa()
 TOK_LAND = itoa()
@@ -35,7 +36,7 @@ TOK_AS = itoa()
 TOK_BANDWIDTH = itoa()
 
 
-#--- Types
+# --- Types
 TOK_INTEGER = itoa()
 TOK_FLOAT = itoa()
 TOK_IPV4 = itoa()
@@ -89,6 +90,7 @@ text_token = {
     TOK_DESC: "DESC",
     TOK_BETWEEN: "BETWEEN",
     TOK_TOP: "TOP",
+    TOK_OFFSET: "OFFSET",
     TOK_LAND: "LAND",
     TOK_LOR: "LOR",
     TOK_NOW: "NOW",

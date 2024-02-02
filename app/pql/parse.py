@@ -137,7 +137,7 @@ def parse_from(tokens):
     while True:
         ffield = tokens.expect(tl.TOK_NAME)
         if ffield:
-            from_fields.append(Label(ffield.value))
+            from_fields.append(ffield.value)
         if tokens.accept(tl.TOK_DELIMITER) is None:
             break
 
@@ -173,6 +173,15 @@ def parse_top(tokens):
     top_value = None
     if tokens.peek(tl.TOK_TOP):
         tokens.expect(tl.TOK_TOP)
+        top_value = int(tokens.expect(tl.TOK_INTEGER).value)
+
+    return top_value
+
+
+def parse_offset(tokens):
+    top_value = None
+    if tokens.peek(tl.TOK_OFFSET):
+        tokens.expect(tl.TOK_OFFSET)
         top_value = int(tokens.expect(tl.TOK_INTEGER).value)
 
     return top_value
@@ -218,7 +227,8 @@ def parse_select(tokens):
     groupby_value = parse_groupby(tokens)
     interval_start, interval_end = parse_interval(tokens)
     top_value = parse_top(tokens)
-    limit_fields = parse_limit(tokens)
+    offset_value = parse_offset(tokens)
+    # limit_fields = parse_limit(tokens)
     tokens.expect(tl.TOK_SEMI)
 
     return SelectStatement(fields,
@@ -229,7 +239,8 @@ def parse_select(tokens):
                            where_value,
                            groupby_value,
                            top_value,
-                           limit_fields,
+                           offset_value,
+                           #    limit_fields,
                            (interval_start, interval_end),
                            aggregates
                            )

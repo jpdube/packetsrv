@@ -13,9 +13,9 @@ def query():
             db = DBEngine()
             result = db.run(pql["query"])
             return jsonify({"result": result})
-        except(SyntaxError):
+        except (SyntaxError):
             return jsonify({"error": "Synatx error in pql"})
 
 
 def start():
-    app.run(host="0.0.0.0", port=8080)
+    app.run(host="0.0.0.0", port=8080, debug=False)
