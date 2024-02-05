@@ -19,11 +19,11 @@ run:
 
 .PHONY: test
 test:
-	cd $(TEST_DIR);pytest
+	clear;cd $(TEST_DIR);pytest
 
 .PHONY: test_verbose
 test_verbose:
-	cd $(TEST_DIR);pytest -s
+	clear;cd $(TEST_DIR);pytest -s
 
 .PHONY: build
 build:
