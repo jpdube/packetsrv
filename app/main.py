@@ -32,4 +32,3 @@ if __name__ == "__main__":
     api_thread = Thread(target=start, daemon=True)
     api_thread.start()
     api_thread.join()
-    # start()
