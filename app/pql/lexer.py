@@ -128,14 +128,14 @@ _token_comment = {"//", "/*", "*/"}
 class Token:
     def __init__(self, type: int, value: str, line: int, col: int):
         # def __init__(self, type: Tok, value: str, line: int, col: int):
-        self.type = type
+        self.type: Tokens = type
         # self.type: Tok = type
         self.value: str = value
         self.line: int = line
         self.col: int = col
 
     def __repr__(self):
-        return f"({self.type:x}:{Tokens.human_tokens(self.type)}, {self.value}, {self.line}, {self.col})"
+        return f"({self.type:x}:{self.type}, {self.value}, {self.line}, {self.col})"
 
 
 class Lexer:

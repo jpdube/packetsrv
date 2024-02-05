@@ -2,6 +2,13 @@ from enum import Enum, auto
 
 
 class Tokens(Enum):
+
+    def __eq__(self, other) -> bool:
+        return self.value == other.value
+
+    def __str__(self) -> str:
+        return self.name
+
     TOK_SELECT = auto()
     TOK_FROM = auto()
     TOK_INCLUDE = auto()

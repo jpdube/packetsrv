@@ -114,11 +114,11 @@ def interpret(node, env, packet: PacketDecode):
 
         # if node.op == "/":
         #     return IPv4(leftval).to_network(rightval)[0] <= IPv4(leftval).to_network(rightval)[1]
-        if node.op == "to":
+        if node.op == Tokens.TOK_TO:
             return f"(ip_src = {leftval} and ip_dst = {rightval}) or (ip_dst = {leftval} and ip_src = {rightval})"
-        elif node.op == "in":
-            return rightval.is_in_network(leftval)
-        elif node.op == "*":
+        # elif node.op == "in":
+        #     rern rightval.is_in_network(leftval)
+        elif node.op == Tokens.TOK_WILDCARD:
             return "*"
             # return leftval * rightval
         elif node.op == Tokens.TOK_PLUS:
