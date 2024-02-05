@@ -1,66 +1,126 @@
 import pql.pql_constant as const
-import pql.tokens_list as tl
+from pql.tokens_list import Tokens
 
 _keywords = {
-    "select": tl.TOK_SELECT,
-    "from": tl.TOK_FROM,
-    "include": tl.TOK_INCLUDE,
-    "where": tl.TOK_WHERE,
-    "order": tl.TOK_ORDER_BY,
-    "by": tl.TOK_BY,
-    "group": tl.TOK_GROUP_BY,
-    "asc": tl.TOK_ASC,
-    "desc": tl.TOK_DESC,
-    "between": tl.TOK_BETWEEN,
-    "top": tl.TOK_TOP,
-    "offset": tl.TOK_OFFSET,
-    "limit": tl.TOK_LIMIT,
-    "in": tl.TOK_IN,
-    "and": tl.TOK_LAND,
-    "or": tl.TOK_LOR,
-    "now": tl.TOK_NOW,
-    "filter": tl.TOK_FILTER,
-    "output": tl.TOK_OUTPUT,
-    "to": tl.TOK_TO,
-    "true": tl.TOK_TRUE,
-    "false": tl.TOK_FALSE,
-    "interval": tl.TOK_INTERVAL,
-    "avg": tl.TOK_AVERAGE,
-    "sum": tl.TOK_SUM,
-    "min": tl.TOK_MIN,
-    "max": tl.TOK_MAX,
-    "count": tl.TOK_COUNT,
-    "as": tl.TOK_AS,
-    "bandwidth": tl.TOK_BANDWIDTH,
+    "select": Tokens.TOK_SELECT,
+    "from": Tokens.TOK_FROM,
+    "include": Tokens.TOK_INCLUDE,
+    "where": Tokens.TOK_WHERE,
+    "order": Tokens.TOK_ORDER_BY,
+    "by": Tokens.TOK_BY,
+    "group": Tokens.TOK_GROUP_BY,
+    "asc": Tokens.TOK_ASC,
+    "desc": Tokens.TOK_DESC,
+    "between": Tokens.TOK_BETWEEN,
+    "top": Tokens.TOK_TOP,
+    "offset": Tokens.TOK_OFFSET,
+    "limit": Tokens.TOK_LIMIT,
+    "in": Tokens.TOK_IN,
+    "and": Tokens.TOK_LAND,
+    "or": Tokens.TOK_LOR,
+    "now": Tokens.TOK_NOW,
+    "filter": Tokens.TOK_FILTER,
+    "output": Tokens.TOK_OUTPUT,
+    "to": Tokens.TOK_TO,
+    "true": Tokens.TOK_TRUE,
+    "false": Tokens.TOK_FALSE,
+    "interval": Tokens.TOK_INTERVAL,
+    "avg": Tokens.TOK_AVERAGE,
+    "sum": Tokens.TOK_SUM,
+    "min": Tokens.TOK_MIN,
+    "max": Tokens.TOK_MAX,
+    "count": Tokens.TOK_COUNT,
+    "as": Tokens.TOK_AS,
+    "bandwidth": Tokens.TOK_BANDWIDTH,
 }
 
 
 _token1 = {
-    "/": tl.TOK_MASK,
-    "*": tl.TOK_WILDCARD,
-    ";": tl.TOK_SEMI,
-    ",": tl.TOK_DELIMITER,
-    ">": tl.TOK_GT,
-    "<": tl.TOK_LT,
-    "{": tl.TOK_LBRACE,
-    "}": tl.TOK_RBRACE,
-    "+": tl.TOK_PLUS,
-    "-": tl.TOK_MINUS,
-    "(": tl.TOK_LPAREN,
-    ")": tl.TOK_RPAREN,
-    "[": tl.TOK_INDEX_START,
-    "]": tl.TOK_INDEX_END,
-    ":": tl.TOK_COLON,
-    "'": tl.TOK_SINGLE_QUOTE,
-    ".": tl.TOK_PERIOD,
+    "/": Tokens.TOK_MASK,
+    "*": Tokens.TOK_WILDCARD,
+    ";": Tokens.TOK_SEMI,
+    ",": Tokens.TOK_DELIMITER,
+    ">": Tokens.TOK_GT,
+    "<": Tokens.TOK_LT,
+    "{": Tokens.TOK_LBRACE,
+    "}": Tokens.TOK_RBRACE,
+    "+": Tokens.TOK_PLUS,
+    "-": Tokens.TOK_MINUS,
+    "(": Tokens.TOK_LPAREN,
+    ")": Tokens.TOK_RPAREN,
+    "[": Tokens.TOK_INDEX_START,
+    "]": Tokens.TOK_INDEX_END,
+    ":": Tokens.TOK_COLON,
+    "'": Tokens.TOK_SINGLE_QUOTE,
+    ".": Tokens.TOK_PERIOD,
 }
 
 _token2 = {
-    "==": tl.TOK_EQ,
-    "<=": tl.TOK_LE,
-    ">=": tl.TOK_GE,
-    "!=": tl.TOK_NE,
+    "==": Tokens.TOK_EQ,
+    "<=": Tokens.TOK_LE,
+    ">=": Tokens.TOK_GE,
+    "!=": Tokens.TOK_NE,
 }
+# _keywords = {
+#     "select": Tokens.TOK_SELECT,
+#     "from": Tokens.TOK_FROM,
+#     "include": Tokens.TOK_INCLUDE,
+#     "where": Tokens.TOK_WHERE,
+#     "order": Tokens.TOK_ORDER_BY,
+#     "by": Tokens.TOK_BY,
+#     "group": Tokens.TOK_GROUP_BY,
+#     "asc": Tokens.TOK_ASC,
+#     "desc": Tokens.TOK_DESC,
+#     "between": Tokens.TOK_BETWEEN,
+#     "top": Tokens.TOK_TOP,
+#     "offset": Tokens.TOK_OFFSET,
+#     "limit": Tokens.TOK_LIMIT,
+#     "in": Tokens.TOK_IN,
+#     "and": Tokens.TOK_LAND,
+#     "or": Tokens.TOK_LOR,
+#     "now": Tokens.TOK_NOW,
+#     "filter": Tokens.TOK_FILTER,
+#     "output": Tokens.TOK_OUTPUT,
+#     "to": Tokens.TOK_TO,
+#     "true": Tokens.TOK_TRUE,
+#     "false": Tokens.TOK_FALSE,
+#     "interval": Tokens.TOK_INTERVAL,
+#     "avg": Tokens.TOK_AVERAGE,
+#     "sum": Tokens.TOK_SUM,
+#     "min": Tokens.TOK_MIN,
+#     "max": Tokens.TOK_MAX,
+#     "count": Tokens.TOK_COUNT,
+#     "as": Tokens.TOK_AS,
+#     "bandwidth": Tokens.TOK_BANDWIDTH,
+# }
+
+
+# _token1 = {
+#     "/": Tokens.TOK_MASK,
+#     "*": Tokens.TOK_WILDCARD,
+#     ";": Tokens.TOK_SEMI,
+#     ",": Tokens.TOK_DELIMITER,
+#     ">": Tokens.TOK_GT,
+#     "<": Tokens.TOK_LT,
+#     "{": Tokens.TOK_LBRACE,
+#     "}": Tokens.TOK_RBRACE,
+#     "+": Tokens.TOK_PLUS,
+#     "-": Tokens.TOK_MINUS,
+#     "(": Tokens.TOK_LPAREN,
+#     ")": Tokens.TOK_RPAREN,
+#     "[": Tokens.TOK_INDEX_START,
+#     "]": Tokens.TOK_INDEX_END,
+#     ":": Tokens.TOK_COLON,
+#     "'": Tokens.TOK_SINGLE_QUOTE,
+#     ".": Tokens.TOK_PERIOD,
+# }
+
+# _token2 = {
+#     "==": Tokens.TOK_EQ,
+#     "<=": Tokens.TOK_LE,
+#     ">=": Tokens.TOK_GE,
+#     "!=": Tokens.TOK_NE,
+# }
 
 _token_comment = {"//", "/*", "*/"}
 
@@ -75,7 +135,7 @@ class Token:
         self.col: int = col
 
     def __repr__(self):
-        return f"({self.type:x}:{tl.human_tokens(self.type)}, {self.value}, {self.line}, {self.col})"
+        return f"({self.type:x}:{Tokens.human_tokens(self.type)}, {self.value}, {self.line}, {self.col})"
 
 
 class Lexer:
@@ -161,7 +221,7 @@ class Lexer:
 
         # --- End of file parsing
         self.token_list.append(
-            Token(tl.TOK_EOF, "EOF", self.line, self.col))
+            Token(Tokens.TOK_EOF, "EOF", self.line, self.col))
         return self.token_list
         # yield (Token(TOK_EOF, "EOF", self.line, self.col))
 
@@ -176,7 +236,7 @@ class Lexer:
 
         value = self.text[tok_start + 2: self.pos]
         int_value = int(value, 16)
-        token = Token(tl.TOK_INTEGER, str(int_value), self.line, self.col)
+        token = Token(Tokens.TOK_INTEGER, str(int_value), self.line, self.col)
 
         self.col += self.pos - (self.pos - len(value))
         return token
@@ -192,9 +252,9 @@ class Lexer:
 
         value = self.text[tok_start: self.pos]
         if value.count(".") == 1:
-            token = Token(tl.TOK_FLOAT, value, self.line, self.col)
+            token = Token(Tokens.TOK_FLOAT, value, self.line, self.col)
         else:
-            token = Token(tl.TOK_INTEGER, value, self.line, self.col)
+            token = Token(Tokens.TOK_INTEGER, value, self.line, self.col)
 
         self.col += self.pos - (self.pos - len(value))
         return token
@@ -212,9 +272,9 @@ class Lexer:
         if value in _keywords:
             token = Token(_keywords[value], value, self.line, self.col)
         elif value in const.const_list:
-            token = Token(tl.TOK_CONST, value, self.line, self.col)
+            token = Token(Tokens.TOK_CONST, value, self.line, self.col)
         else:
-            token = Token(tl.TOK_NAME, value, self.line, self.col)
+            token = Token(Tokens.TOK_NAME, value, self.line, self.col)
 
         self.col += self.pos - (self.pos - len(value))
         return token
@@ -278,8 +338,8 @@ class Preparser:
         column = 0
         line = 0
 
-        if self.peek_at(0, tl.TOK_GROUP_BY) \
-                and self.peek_at(1, tl.TOK_BY):
+        if self.peek_at(0, Tokens.TOK_GROUP_BY) \
+                and self.peek_at(1, Tokens.TOK_BY):
 
             tok = self.advance()  # group
             if tok:
@@ -287,7 +347,7 @@ class Preparser:
                 line = tok.line
 
             _ = self.advance()  # by
-            token = Token(tl.TOK_GROUP_BY, field, line, column)
+            token = Token(Tokens.TOK_GROUP_BY, field, line, column)
 
             self.token_list.append(token)
 
@@ -296,8 +356,8 @@ class Preparser:
         column = 0
         line = 0
 
-        if self.peek_at(0, tl.TOK_ORDER_BY) \
-                and self.peek_at(1, tl.TOK_BY):
+        if self.peek_at(0, Tokens.TOK_ORDER_BY) \
+                and self.peek_at(1, Tokens.TOK_BY):
 
             tok = self.advance()  # group
             if tok:
@@ -305,7 +365,7 @@ class Preparser:
                 line = tok.line
 
             _ = self.advance()  # by
-            token = Token(tl.TOK_ORDER_BY, field, line, column)
+            token = Token(Tokens.TOK_ORDER_BY, field, line, column)
 
             self.token_list.append(token)
 
@@ -314,8 +374,8 @@ class Preparser:
         column = 0
         line = 0
 
-        if self.peek_at(0, tl.TOK_AS) \
-                and self.peek_at(1, tl.TOK_NAME):
+        if self.peek_at(0, Tokens.TOK_AS) \
+                and self.peek_at(1, Tokens.TOK_NAME):
 
             tok = self.advance()  # as
             if tok:
@@ -326,7 +386,7 @@ class Preparser:
             if fieldname:
                 field = fieldname.value
 
-            token = Token(tl.TOK_AS, field, line, column)
+            token = Token(Tokens.TOK_AS, field, line, column)
 
             self.token_list.append(token)
 
@@ -335,9 +395,9 @@ class Preparser:
         column = 0
         line = 0
 
-        if self.peek_at(0, tl.TOK_COUNT) \
-                and self.peek_at(1, tl.TOK_LPAREN)  \
-                and self.peek_at(2, tl.TOK_RPAREN):
+        if self.peek_at(0, Tokens.TOK_COUNT) \
+                and self.peek_at(1, Tokens.TOK_LPAREN)  \
+                and self.peek_at(2, Tokens.TOK_RPAREN):
 
             tok = self.advance()  # count
             if tok:
@@ -347,7 +407,7 @@ class Preparser:
                 self.advance()  # skip lparen
                 self.advance()  # skip rparen
 
-            token = Token(tl.TOK_COUNT, field, line, column)
+            token = Token(Tokens.TOK_COUNT, field, line, column)
 
             self.token_list.append(token)
 
@@ -356,12 +416,12 @@ class Preparser:
         column = 0
         line = 0
 
-        if self.peek_at(0, tl.TOK_BANDWIDTH) \
-                and self.peek_at(1, tl.TOK_LPAREN)  \
-                and self.peek_at(2, tl.TOK_NAME) \
-                and self.peek_at(3, tl.TOK_PERIOD) \
-                and self.peek_at(4, tl.TOK_NAME) \
-                and self.peek_at(5, tl.TOK_RPAREN):
+        if self.peek_at(0, Tokens.TOK_BANDWIDTH) \
+                and self.peek_at(1, Tokens.TOK_LPAREN)  \
+                and self.peek_at(2, Tokens.TOK_NAME) \
+                and self.peek_at(3, Tokens.TOK_PERIOD) \
+                and self.peek_at(4, Tokens.TOK_NAME) \
+                and self.peek_at(5, Tokens.TOK_RPAREN):
 
             tok = self.advance()  # sum
             if tok:
@@ -377,7 +437,7 @@ class Preparser:
                     field = f"{name_part1.value}.{name_part2.value}"
                 self.advance()  # skip rparen
 
-            token = Token(tl.TOK_BANDWIDTH, field, line, column)
+            token = Token(Tokens.TOK_BANDWIDTH, field, line, column)
 
             self.token_list.append(token)
 
@@ -386,12 +446,12 @@ class Preparser:
         column = 0
         line = 0
 
-        if self.peek_at(0, tl.TOK_MIN) \
-                and self.peek_at(1, tl.TOK_LPAREN)  \
-                and self.peek_at(2, tl.TOK_NAME) \
-                and self.peek_at(3, tl.TOK_PERIOD) \
-                and self.peek_at(4, tl.TOK_NAME) \
-                and self.peek_at(5, tl.TOK_RPAREN):
+        if self.peek_at(0, Tokens.TOK_MIN) \
+                and self.peek_at(1, Tokens.TOK_LPAREN)  \
+                and self.peek_at(2, Tokens.TOK_NAME) \
+                and self.peek_at(3, Tokens.TOK_PERIOD) \
+                and self.peek_at(4, Tokens.TOK_NAME) \
+                and self.peek_at(5, Tokens.TOK_RPAREN):
 
             tok = self.advance()  # sum
             if tok:
@@ -407,7 +467,7 @@ class Preparser:
                     field = f"{name_part1.value}.{name_part2.value}"
                 self.advance()  # skip rparen
 
-            token = Token(tl.TOK_MIN, field, line, column)
+            token = Token(Tokens.TOK_MIN, field, line, column)
 
             self.token_list.append(token)
 
@@ -416,12 +476,12 @@ class Preparser:
         column = 0
         line = 0
 
-        if self.peek_at(0, tl.TOK_MAX) \
-                and self.peek_at(1, tl.TOK_LPAREN)  \
-                and self.peek_at(2, tl.TOK_NAME) \
-                and self.peek_at(3, tl.TOK_PERIOD) \
-                and self.peek_at(4, tl.TOK_NAME) \
-                and self.peek_at(5, tl.TOK_RPAREN):
+        if self.peek_at(0, Tokens.TOK_MAX) \
+                and self.peek_at(1, Tokens.TOK_LPAREN)  \
+                and self.peek_at(2, Tokens.TOK_NAME) \
+                and self.peek_at(3, Tokens.TOK_PERIOD) \
+                and self.peek_at(4, Tokens.TOK_NAME) \
+                and self.peek_at(5, Tokens.TOK_RPAREN):
 
             tok = self.advance()  # sum
             if tok:
@@ -437,7 +497,7 @@ class Preparser:
                     field = f"{name_part1.value}.{name_part2.value}"
                 self.advance()  # skip rparen
 
-            token = Token(tl.TOK_MAX, field, line, column)
+            token = Token(Tokens.TOK_MAX, field, line, column)
 
             self.token_list.append(token)
 
@@ -446,12 +506,12 @@ class Preparser:
         column = 0
         line = 0
 
-        if self.peek_at(0, tl.TOK_SUM) \
-                and self.peek_at(1, tl.TOK_LPAREN)  \
-                and self.peek_at(2, tl.TOK_NAME) \
-                and self.peek_at(3, tl.TOK_PERIOD) \
-                and self.peek_at(4, tl.TOK_NAME) \
-                and self.peek_at(5, tl.TOK_RPAREN):
+        if self.peek_at(0, Tokens.TOK_SUM) \
+                and self.peek_at(1, Tokens.TOK_LPAREN)  \
+                and self.peek_at(2, Tokens.TOK_NAME) \
+                and self.peek_at(3, Tokens.TOK_PERIOD) \
+                and self.peek_at(4, Tokens.TOK_NAME) \
+                and self.peek_at(5, Tokens.TOK_RPAREN):
 
             tok = self.advance()  # sum
             if tok:
@@ -467,7 +527,7 @@ class Preparser:
                     field = f"{name_part1.value}.{name_part2.value}"
                 self.advance()  # skip rparen
 
-            token = Token(tl.TOK_SUM, field, line, column)
+            token = Token(Tokens.TOK_SUM, field, line, column)
 
             self.token_list.append(token)
 
@@ -476,12 +536,12 @@ class Preparser:
         column = 0
         line = 0
 
-        if self.peek_at(0, tl.TOK_AVERAGE) \
-                and self.peek_at(1, tl.TOK_LPAREN)  \
-                and self.peek_at(2, tl.TOK_NAME) \
-                and self.peek_at(3, tl.TOK_PERIOD) \
-                and self.peek_at(4, tl.TOK_NAME) \
-                and self.peek_at(5, tl.TOK_RPAREN):
+        if self.peek_at(0, Tokens.TOK_AVERAGE) \
+                and self.peek_at(1, Tokens.TOK_LPAREN)  \
+                and self.peek_at(2, Tokens.TOK_NAME) \
+                and self.peek_at(3, Tokens.TOK_PERIOD) \
+                and self.peek_at(4, Tokens.TOK_NAME) \
+                and self.peek_at(5, Tokens.TOK_RPAREN):
 
             tok = self.advance()  # sum
             if tok:
@@ -497,7 +557,7 @@ class Preparser:
                     field = f"{name_part1.value}.{name_part2.value}"
                 self.advance()  # skip rparen
 
-            token = Token(tl.TOK_AVERAGE, field, line, column)
+            token = Token(Tokens.TOK_AVERAGE, field, line, column)
 
             self.token_list.append(token)
 
@@ -506,9 +566,9 @@ class Preparser:
         column = 0
         line = 0
 
-        if self.peek_at(0, tl.TOK_NAME) \
-                and self.peek_at(1, tl.TOK_PERIOD)  \
-                and self.peek_at(2, tl.TOK_NAME):
+        if self.peek_at(0, Tokens.TOK_NAME) \
+                and self.peek_at(1, Tokens.TOK_PERIOD)  \
+                and self.peek_at(2, Tokens.TOK_NAME):
 
             for i in range(0, 3):
                 tok = self.advance()
@@ -519,7 +579,7 @@ class Preparser:
 
                     label += tok.value
 
-            token = Token(tl.TOK_NAME, label, line, column)
+            token = Token(Tokens.TOK_NAME, label, line, column)
 
             self.token_list.append(token)
 
@@ -528,13 +588,13 @@ class Preparser:
         column = 0
         line = 0
 
-        if self.peek_at(0, tl.TOK_INTEGER) \
-                and self.peek_at(1, tl.TOK_PERIOD)  \
-                and self.peek_at(2, tl.TOK_INTEGER) \
-                and self.peek_at(3, tl.TOK_PERIOD)  \
-                and self.peek_at(4, tl.TOK_INTEGER) \
-                and self.peek_at(5, tl.TOK_PERIOD)  \
-                and self.peek_at(6, tl.TOK_INTEGER):
+        if self.peek_at(0, Tokens.TOK_INTEGER) \
+                and self.peek_at(1, Tokens.TOK_PERIOD)  \
+                and self.peek_at(2, Tokens.TOK_INTEGER) \
+                and self.peek_at(3, Tokens.TOK_PERIOD)  \
+                and self.peek_at(4, Tokens.TOK_INTEGER) \
+                and self.peek_at(5, Tokens.TOK_PERIOD)  \
+                and self.peek_at(6, Tokens.TOK_INTEGER):
 
             for i in range(0, 7):
                 tok = self.advance()
@@ -545,7 +605,7 @@ class Preparser:
 
                     ip_address += tok.value
 
-            token = Token(tl.TOK_IPV4, ip_address, line, column)
+            token = Token(Tokens.TOK_IPV4, ip_address, line, column)
 
             self.token_list.append(token)
 
@@ -554,17 +614,17 @@ class Preparser:
         column = 0
         line = 0
 
-        if self.peek_at(0, tl.TOK_INTEGER) \
-                and self.peek_at(1, tl.TOK_COLON)  \
-                and self.peek_at(2, tl.TOK_INTEGER) \
-                and self.peek_at(3, tl.TOK_COLON)  \
-                and self.peek_at(4, tl.TOK_INTEGER) \
-                and self.peek_at(5, tl.TOK_COLON)  \
-                and self.peek_at(6, tl.TOK_INTEGER) \
-                and self.peek_at(7, tl.TOK_COLON)  \
-                and self.peek_at(8, tl.TOK_INTEGER) \
-                and self.peek_at(9, tl.TOK_COLON)  \
-                and self.peek_at(10, tl.TOK_INTEGER):
+        if self.peek_at(0, Tokens.TOK_INTEGER) \
+                and self.peek_at(1, Tokens.TOK_COLON)  \
+                and self.peek_at(2, Tokens.TOK_INTEGER) \
+                and self.peek_at(3, Tokens.TOK_COLON)  \
+                and self.peek_at(4, Tokens.TOK_INTEGER) \
+                and self.peek_at(5, Tokens.TOK_COLON)  \
+                and self.peek_at(6, Tokens.TOK_INTEGER) \
+                and self.peek_at(7, Tokens.TOK_COLON)  \
+                and self.peek_at(8, Tokens.TOK_INTEGER) \
+                and self.peek_at(9, Tokens.TOK_COLON)  \
+                and self.peek_at(10, Tokens.TOK_INTEGER):
 
             for i in range(0, 11):
                 tok = self.advance()
@@ -575,7 +635,7 @@ class Preparser:
 
                     mac_address += tok.value
 
-            token = Token(tl.TOK_MAC, mac_address, line, column)
+            token = Token(Tokens.TOK_MAC, mac_address, line, column)
 
             self.token_list.append(token)
 
@@ -584,16 +644,16 @@ class Preparser:
         column = 0
         line = 0
 
-        if self.peek_at(0, tl.TOK_INTEGER) \
-                and self.peek_at(1, tl.TOK_MINUS)  \
-                and self.peek_at(2, tl.TOK_INTEGER) \
-                and self.peek_at(3, tl.TOK_MINUS)  \
-                and self.peek_at(4, tl.TOK_INTEGER) \
-                and self.peek_at(5, tl.TOK_INTEGER) \
-                and self.peek_at(6, tl.TOK_COLON)  \
-                and self.peek_at(7, tl.TOK_INTEGER) \
-                and self.peek_at(8, tl.TOK_COLON)  \
-                and self.peek_at(9, tl.TOK_INTEGER):
+        if self.peek_at(0, Tokens.TOK_INTEGER) \
+                and self.peek_at(1, Tokens.TOK_MINUS)  \
+                and self.peek_at(2, Tokens.TOK_INTEGER) \
+                and self.peek_at(3, Tokens.TOK_MINUS)  \
+                and self.peek_at(4, Tokens.TOK_INTEGER) \
+                and self.peek_at(5, Tokens.TOK_INTEGER) \
+                and self.peek_at(6, Tokens.TOK_COLON)  \
+                and self.peek_at(7, Tokens.TOK_INTEGER) \
+                and self.peek_at(8, Tokens.TOK_COLON)  \
+                and self.peek_at(9, Tokens.TOK_INTEGER):
 
             for i in range(0, 10):
                 tok = self.advance()
@@ -606,7 +666,7 @@ class Preparser:
                         timestamp += " "
                     timestamp += tok.value
 
-            token = Token(tl.TOK_TIMESTAMP, timestamp, line, column)
+            token = Token(Tokens.TOK_TIMESTAMP, timestamp, line, column)
 
             self.token_list.append(token)
 
@@ -615,11 +675,11 @@ class Preparser:
         column = 0
         line = 0
 
-        if self.peek_at(0, tl.TOK_INTEGER) \
-                and self.peek_at(1, tl.TOK_MINUS)  \
-                and self.peek_at(2, tl.TOK_INTEGER) \
-                and self.peek_at(3, tl.TOK_MINUS)  \
-                and self.peek_at(4, tl.TOK_INTEGER):
+        if self.peek_at(0, Tokens.TOK_INTEGER) \
+                and self.peek_at(1, Tokens.TOK_MINUS)  \
+                and self.peek_at(2, Tokens.TOK_INTEGER) \
+                and self.peek_at(3, Tokens.TOK_MINUS)  \
+                and self.peek_at(4, Tokens.TOK_INTEGER):
 
             for i in range(0, 5):
                 tok = self.advance()
@@ -630,7 +690,7 @@ class Preparser:
 
                     date_value += tok.value
 
-            token = Token(tl.TOK_DATE, date_value, line, column)
+            token = Token(Tokens.TOK_DATE, date_value, line, column)
 
             self.token_list.append(token)
 
@@ -639,11 +699,11 @@ class Preparser:
         column = 0
         line = 0
 
-        if self.peek_at(0, tl.TOK_INTEGER) \
-                and self.peek_at(1, tl.TOK_COLON)  \
-                and self.peek_at(2, tl.TOK_INTEGER) \
-                and self.peek_at(3, tl.TOK_COLON)  \
-                and self.peek_at(4, tl.TOK_INTEGER):
+        if self.peek_at(0, Tokens.TOK_INTEGER) \
+                and self.peek_at(1, Tokens.TOK_COLON)  \
+                and self.peek_at(2, Tokens.TOK_INTEGER) \
+                and self.peek_at(3, Tokens.TOK_COLON)  \
+                and self.peek_at(4, Tokens.TOK_INTEGER):
 
             for i in range(0, 5):
                 tok = self.advance()
@@ -654,7 +714,7 @@ class Preparser:
 
                     timestamp += tok.value
 
-            token = Token(tl.TOK_TIME, timestamp, line, column)
+            token = Token(Tokens.TOK_TIME, timestamp, line, column)
 
             self.token_list.append(token)
 

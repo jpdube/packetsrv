@@ -5,7 +5,6 @@ from typing import List
 from packet.layers.fields import IPv4Address, MacAddress
 from pql.aggregate import Aggregate
 from pql.pql_constant import const_value
-from pql.tokens_list import human_tokens
 
 
 class Node:
