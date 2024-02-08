@@ -61,67 +61,6 @@ _token2 = {
     ">=": Tokens.TOK_GE,
     "!=": Tokens.TOK_NE,
 }
-# _keywords = {
-#     "select": Tokens.TOK_SELECT,
-#     "from": Tokens.TOK_FROM,
-#     "include": Tokens.TOK_INCLUDE,
-#     "where": Tokens.TOK_WHERE,
-#     "order": Tokens.TOK_ORDER_BY,
-#     "by": Tokens.TOK_BY,
-#     "group": Tokens.TOK_GROUP_BY,
-#     "asc": Tokens.TOK_ASC,
-#     "desc": Tokens.TOK_DESC,
-#     "between": Tokens.TOK_BETWEEN,
-#     "top": Tokens.TOK_TOP,
-#     "offset": Tokens.TOK_OFFSET,
-#     "limit": Tokens.TOK_LIMIT,
-#     "in": Tokens.TOK_IN,
-#     "and": Tokens.TOK_LAND,
-#     "or": Tokens.TOK_LOR,
-#     "now": Tokens.TOK_NOW,
-#     "filter": Tokens.TOK_FILTER,
-#     "output": Tokens.TOK_OUTPUT,
-#     "to": Tokens.TOK_TO,
-#     "true": Tokens.TOK_TRUE,
-#     "false": Tokens.TOK_FALSE,
-#     "interval": Tokens.TOK_INTERVAL,
-#     "avg": Tokens.TOK_AVERAGE,
-#     "sum": Tokens.TOK_SUM,
-#     "min": Tokens.TOK_MIN,
-#     "max": Tokens.TOK_MAX,
-#     "count": Tokens.TOK_COUNT,
-#     "as": Tokens.TOK_AS,
-#     "bandwidth": Tokens.TOK_BANDWIDTH,
-# }
-
-
-# _token1 = {
-#     "/": Tokens.TOK_MASK,
-#     "*": Tokens.TOK_WILDCARD,
-#     ";": Tokens.TOK_SEMI,
-#     ",": Tokens.TOK_DELIMITER,
-#     ">": Tokens.TOK_GT,
-#     "<": Tokens.TOK_LT,
-#     "{": Tokens.TOK_LBRACE,
-#     "}": Tokens.TOK_RBRACE,
-#     "+": Tokens.TOK_PLUS,
-#     "-": Tokens.TOK_MINUS,
-#     "(": Tokens.TOK_LPAREN,
-#     ")": Tokens.TOK_RPAREN,
-#     "[": Tokens.TOK_INDEX_START,
-#     "]": Tokens.TOK_INDEX_END,
-#     ":": Tokens.TOK_COLON,
-#     "'": Tokens.TOK_SINGLE_QUOTE,
-#     ".": Tokens.TOK_PERIOD,
-# }
-
-# _token2 = {
-#     "==": Tokens.TOK_EQ,
-#     "<=": Tokens.TOK_LE,
-#     ">=": Tokens.TOK_GE,
-#     "!=": Tokens.TOK_NE,
-# }
-
 _token_comment = {"//", "/*", "*/"}
 
 
