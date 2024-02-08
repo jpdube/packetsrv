@@ -3,6 +3,10 @@ from flask import Flask, jsonify, request
 from config.config_db import ConfigDB
 from config.config import Config
 
+import logging
+
+log = logging.getLogger("packetdb")
+
 app = Flask(__name__)
 
 
@@ -10,7 +14,7 @@ app = Flask(__name__)
 def query():
     pql = request.get_json()
     if pql is not None:
-        print(f"Got PQL <----- {pql}")
+        log.debug(f"Got PQL <----- {pql}")
         try:
             db = DBEngine()
             result = db.run(pql["query"])
@@ -23,7 +27,6 @@ def query():
 def node():
     try:
         configdb = ConfigDB()
-        # configdb.load()
         return jsonify({"result": configdb.node_info})
     except (SyntaxError):
         return jsonify({"error": "Node config not found"})
