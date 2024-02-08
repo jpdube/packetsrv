@@ -15,6 +15,18 @@ class Config:
         load_dotenv()
 
     @classmethod
+    def dbase_path(cls) -> str:
+        return os.getenv('DBASE_PATH', '')
+
+    @classmethod
+    def config_path(cls) -> str:
+        return os.getenv('CONFIG_PATH', '')
+
+    @classmethod
+    def config_dbase(cls) -> str:
+        return f"{cls.config_path()}/config.db"
+
+    @classmethod
     def pcap_path(cls) -> str:
         return os.getenv('PCAP_PATH', '')
 
