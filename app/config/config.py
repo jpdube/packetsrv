@@ -53,11 +53,3 @@ class Config:
 
         log.debug(f"Config nbr_cores: {cpu_threads}")
         return cpu_threads
-
-    @classmethod
-    def nbr_files_to_process(cls) -> int:
-        nbr_files = os.getenv('NBR_FILES_TO_PROCESS')
-        if nbr_files is not None:
-            return int(nbr_files)
-        else:
-            return 2
