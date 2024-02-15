@@ -8,6 +8,7 @@ from threading import Thread
 import os
 from signal import signal, SIGINT
 from config.config_db import ConfigDB
+from server.file_monitor import start_db_watcher
 
 log_format = '%(threadName)s %(message)s'
 logging.basicConfig(format=log_format, handlers=[RichHandler()])
@@ -38,8 +39,10 @@ if __name__ == "__main__":
     Config.load()
     configdb = ConfigDB()
     configdb.check_tables()
-    log.info(f"Node: {configdb.node_name} is online at {
+    log.info(f"Node: {configdb.node_info} is online at {
              configdb.node_location}")
+
+    start_db_watcher("/Users/jpdube/pcapdb/db/pcap")
 
     api_thread = Thread(target=start, daemon=True)
     api_thread.start()
