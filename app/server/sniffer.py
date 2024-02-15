@@ -8,11 +8,11 @@ import psutil
 
 class Sniffer:
     def __init__(self):
-        ...
+        pass
 
     def start(self, name: str, iface: str, username: str):
         output_dir = f"/Users/jpdube/sniffer/{name}/"
-        cmd = f"tcpdump -i {iface} -C 2 -W 5 -w {
+        cmd = f"tcpdump -i {iface} -C 2 -W 10000 -w {
             output_dir} -Z {username} -z {output_dir}move.sh"
         print(f"CMD: {cmd}")
         p = subprocess.Popen(cmd, shell=True)
