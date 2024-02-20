@@ -3,7 +3,8 @@
 from datetime import datetime, timedelta
 
 from pql.tokens_list import Tokens
-from dbase.index_manager import PktPtr
+from dbase.packet_ptr import PktPtr
+from packet.layers.packet_hdr import PktHeader
 from packet.layers.packet_decode import PacketDecode
 from pql.model import (Array, BinOp, Boolean, ConstDecl, Date, Grouping,
                        Integer, IPv4, Label, LabelByte, Mac, Now,

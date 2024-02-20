@@ -3,6 +3,7 @@ from typing import List
 
 from packet.layers.fields import IPv4Address
 from packet.utils.print_hex import HexDump
+from packet.layers.packet_hdr import PktHeader
 
 import logging
 
@@ -32,14 +33,13 @@ class PacketDecode:
 
     def __init__(self):
         self.packet = bytes()
-        self.header = bytes()
+        self.header = None
         self.offset = 0
 
-    def decode(self, header: bytes, packet: bytes):
-        self.header = bytes(header)
+    def decode(self, header: PktHeader, packet: bytes):
+        self.header = header
         self.packet = bytes(packet)
         self.offset = 18 if self.has_vlan else 14
-        # print_hex(self.packet)
 
     def get_byte_field(self, field_name: str, offset: int, length: int) -> bytes | None:
         if field_name == "eth":
@@ -102,7 +102,6 @@ class PacketDecode:
         if self.has_udp:
             hdr_len += 8
 
-        # print(f"Header len: {hdr_len}")
         return hdr_len
 
     @property
@@ -341,21 +340,19 @@ class PacketDecode:
 
     @property
     def timestamp(self) -> int:
-        ts_sec = unpack("!I", self.header[0:4])[0]
-        return ts_sec
-        # return datetime.fromtimestamp(ts_sec)
+        return self.header.timestamp
 
     @property
     def ts_offset(self) -> int:
-        return unpack("!I", self.header[4:8])[0]
+        return self.header.ts_offset
 
     @property
     def inc_len(self) -> int:
-        return unpack("!I", self.header[8:12])[0]
+        return self.header.incl_len
 
     @property
     def orig_len(self) -> int:
-        return unpack("!I", self.header[12:16])[0]
+        return self.header.orig_len
 
     @property
     def mac_dst(self) -> int:
@@ -423,7 +420,6 @@ class PacketDecode:
     @property
     def tcp_seq_no(self) -> int:
         if self.ip_proto == 0x06:
-            # print_hex(self.packet)
             return unpack("!I", self.packet[self.ip_offset + 4:self.ip_offset + 8])[0]
         else:
             return 0
@@ -431,7 +427,6 @@ class PacketDecode:
     @property
     def tcp_ack_no(self) -> int:
         if self.ip_proto == 0x06:
-            # print_hex(self.packet)
             return unpack("!I", self.packet[self.ip_offset + 8:self.ip_offset + 12])[0]
         else:
             return 0
@@ -448,10 +443,8 @@ class PacketDecode:
     @property
     def tcp_flag(self) -> int:
         if self.ip_proto == 0x06:
-            # print_hex(self.packet)
             flag = unpack(
                 "!H", self.packet[self.ip_offset + 12:self.ip_offset + 14])[0]
-            # print(f"EO: {self.offset}, IPO: {self.ip_offset}, FLAG: {flag:x}")
             return flag
         else:
             return 0
@@ -474,7 +467,6 @@ class PacketDecode:
     @property
     def tcp_flag_ack(self) -> bool:
         if self.ip_proto == 0x06:
-            # print_hex(self.packet)
             return (self.tcp_flag & 0x10) == 0x10
         else:
             return False
@@ -482,7 +474,6 @@ class PacketDecode:
     @property
     def tcp_flag_push(self) -> bool:
         if self.ip_proto == 0x06:
-            # print_hex(self.packet)
             return (self.tcp_flag & 0x08) == 0x08
         else:
             return False
@@ -490,7 +481,6 @@ class PacketDecode:
     @property
     def tcp_flag_fin(self) -> bool:
         if self.ip_proto == 0x06:
-            # print_hex(self.packet)
             return (self.tcp_flag & 0x01) == 0x01
         else:
             return False
@@ -498,7 +488,6 @@ class PacketDecode:
     @property
     def tcp_flag_urg(self) -> bool:
         if self.ip_proto == 0x06:
-            # print_hex(self.packet)
             return (self.tcp_flag & 0x20) == 0x20
         else:
             return False
@@ -506,7 +495,6 @@ class PacketDecode:
     @property
     def tcp_flag_rst(self) -> bool:
         if self.ip_proto == 0x06:
-            # print_hex(self.packet)
             return (self.tcp_flag & 0x04) == 0x04
         else:
             return False

@@ -15,6 +15,7 @@ from packet.layers.packet import Packet
 from packet.layers.tcp import TCP
 from packet.layers.udp import UDP
 from packet.utils.print_hex import HexDump
+from packet.layers.packet_hdr import PktHeader
 
 import base64
 import logging
@@ -52,12 +53,12 @@ class PacketBuilder:
         for v in self.layers.values():
             print(f"{v}")
 
-    def from_bytes(self, raw_packet, header=None):
+    def from_bytes(self, raw_packet, header: PktHeader | Frame = None):
         self.layers: Dict[LayerID, Packet] = {}
         self.packet = raw_packet
 
         if header is not None:
-            if isinstance(header, bytes):
+            if isinstance(header, PktHeader):
                 ph = Frame(header)
                 self.add(ph)
             elif isinstance(header, Frame):

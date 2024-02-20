@@ -4,6 +4,8 @@ from struct import pack, unpack
 import pql.packet_index as pkt_index
 from config.config import Config
 from packet.layers.packet_decode import PacketDecode
+from packet.layers.packet_hdr import PktHeader
+
 import logging
 
 
@@ -12,6 +14,17 @@ log = logging.getLogger("packetdb")
 
 PCAP_GLOBAL_HEADER_SIZE = 24
 PCAP_PACKET_HEADER_SIZE = 16
+MAGIC_BE = 0xa1b2c3d4
+MAGIC_LE = 0xd4c3b2a1
+
+
+def decode_header(header: bytes, byte_order: str) -> PktHeader:
+    timestamp = unpack(byte_order, header[0:4])[0]
+    ts_offset = unpack(byte_order, header[4:8])[0]
+    orig_len = unpack(byte_order, header[8:12])[0]
+    inc_len = unpack(byte_order, header[12:16])[0]
+
+    return PktHeader(timestamp=timestamp, ts_offset=ts_offset, orig_len=orig_len, incl_len=inc_len)
 
 
 class PcapFile:
@@ -26,46 +39,65 @@ class PcapFile:
     def next(self):
         try:
             with open(f"{Config.pcap_path()}/{self.filename}.pcap", "rb") as fd:
-                _ = fd.read(PCAP_GLOBAL_HEADER_SIZE)
+                glob_header = fd.read(PCAP_GLOBAL_HEADER_SIZE)
+                if unpack("!I", glob_header[0:4])[0] == MAGIC_BE:
+                    byte_order = "!I"
+                else:
+                    byte_order = "<I"
+
                 self.offset += 24
 
                 while True:
                     header = fd.read(PCAP_PACKET_HEADER_SIZE)
                     if len(header) == 0:
                         break
+                    else:
+                        pkt_header = decode_header(header, byte_order)
 
-                    incl_len = unpack("!I", header[12:16])[0]
+                    incl_len = pkt_header.incl_len
                     packet = fd.read(incl_len)
 
-                    yield (header, packet, self.offset)
+                    yield (pkt_header, packet, self.offset)
                     self.offset += incl_len + 16
         except IOError:
-            print("IO error")
+            log.error("IO error")
 
     def get(self, ptr: int, hdr_size: int = 0):
-        with open(f"{Config.pcap_path()}/{self.filename}.pcap", "rb") as f:
-            f.seek(ptr)
-            header = f.read(PCAP_PACKET_HEADER_SIZE)
+        with open(f"{Config.pcap_path()}/{self.filename}.pcap", "rb") as fd:
+            glob_header = fd.read(PCAP_GLOBAL_HEADER_SIZE)
+            if unpack("!I", glob_header[0:4])[0] == MAGIC_BE:
+                byte_order = "!I"
+            else:
+                byte_order = "<I"
+
+            fd.seek(ptr)
+            header = fd.read(PCAP_PACKET_HEADER_SIZE)
             if len(header) == 0:
                 return None
 
-            if hdr_size == 0:
-                incl_len = unpack("!I", header[12:16])[0]
-                packet = f.read(incl_len)
-            else:
-                packet = f.read(hdr_size)
+            pkt_header = decode_header(header, byte_order)
 
-            return (header, packet)
+            if hdr_size == 0:
+                incl_len = pkt_header.incl_len
+                packet = fd.read(incl_len)
+            else:
+                packet = fd.read(hdr_size)
+
+            return (pkt_header, packet)
 
     def create_index(self, file_id):
         offset = 0
         pd = PacketDecode()
-        # raw_index = bytearray()
         index_list = []
         first_ts = None
         last_ts = None
         with open(f"{Config.pcap_path()}/{file_id}.pcap", "rb") as fd:
-            _ = fd.read(PCAP_GLOBAL_HEADER_SIZE)
+            glob_header = fd.read(PCAP_GLOBAL_HEADER_SIZE)
+            if unpack("!I", glob_header[0:4])[0] == MAGIC_BE:
+                byte_order = "!I"
+            else:
+                byte_order = "<I"
+
             offset += 24
 
             while True:
@@ -73,10 +105,11 @@ class PcapFile:
                 if len(header) == 0:
                     break
 
-                incl_len = unpack("!I", header[12:16])[0]
+                pkt_header = decode_header(header, byte_order)
+                incl_len = pkt_header.incl_len
                 packet = fd.read(incl_len)
 
-                pd.decode(header, packet)
+                pd.decode(pkt_header, packet)
                 ts = pd.get_field('pkt.timestamp')
                 last_ts = ts
                 if first_ts is None:
@@ -98,7 +131,7 @@ class PcapFile:
 
         db_name = f"{Config.pcap_index()}/{file_id}.db"
         self.create_db_index(db_name, index_list)
-        print(f"{db_name} completed...")
+        log.info(f"{db_name} completed...")
 
         return (first_ts, last_ts, int(file_id))
 

@@ -1,27 +1,18 @@
 import multiprocessing as mp
 import sqlite3
-from dataclasses import dataclass
 from datetime import datetime
 from pathlib import Path
-from typing import Any, Generator, Optional, Tuple
+from typing import Any, Generator, Tuple
 
 import pql.packet_index as pkt_index
 from config.config import Config
 from pql.pcapfile import PcapFile
+from dbase.packet_ptr import PktPtr
+
+
 import logging
 
 log = logging.getLogger("packetdb")
-
-
-@dataclass(slots=False)
-class PktPtr ():
-    file_id: int
-    ptr: int
-    ip_dst: int
-    ip_src: int
-    pkt_hdr_size: int
-    header: Optional[bytes] = None
-    packet: Optional[bytes] = None
 
 
 class IndexManager:
@@ -73,11 +64,9 @@ class IndexManager:
 
         c.execute(sql, params)
 
-        rows = c.fetchall()
-        for r in rows:
+        for r in c.fetchall():
             pkt = PktPtr(file_id=int(file_id.stem),
                          ptr=r[0], ip_dst=0, ip_src=0, pkt_hdr_size=0)
-            # ptr=r[0], ip_dst=r[1], ip_src=r[2], pkt_hdr_size=r[3])
             result.append(pkt)
 
         return result
