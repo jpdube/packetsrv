@@ -1,13 +1,15 @@
-from api.server import start
-from config.config import Config
 import logging
 import logging.config
 import logging.handlers
-from rich.logging import RichHandler
-from threading import Thread
 import os
-from signal import signal, SIGINT
+from signal import SIGINT, signal
+from threading import Thread
+
+from api.server import start
+from config.config import Config
 from config.config_db import ConfigDB
+from rich.logging import RichHandler
+
 from server.file_monitor import start_db_watcher
 
 log_format = '%(threadName)s %(message)s'
@@ -38,11 +40,15 @@ if __name__ == "__main__":
     log.info("PCAP DB starting...")
     Config.load()
     configdb = ConfigDB()
+    # configdb.drop_tables()
     configdb.check_tables()
     log.info(f"Node: {configdb.node_info} is online at {
              configdb.node_location}")
 
-    start_db_watcher("/Users/jpdube/pcapdb/db/pcap")
+    start_db_watcher("/opt3/capture/pcap", 1)
+    from dbase.dbengine import DBEngine
+    dbengine = DBEngine()
+    # dbengine.index_db()
 
     api_thread = Thread(target=start, daemon=True)
     api_thread.start()
