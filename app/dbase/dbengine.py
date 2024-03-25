@@ -10,6 +10,8 @@ from pql.parse import parse_source
 from dbase.query_result import QueryResult
 import logging
 from config.config import Config
+# from scapy.layers import *
+from scapy.all import sr1,Ether, IP, UDP, TCP
 
 
 log = logging.getLogger("packetdb")
@@ -76,6 +78,14 @@ class DBEngine:
     def search_pkt(self, pkt_ptr: PktPtr, where_expr):
         pkt_result = exec_program(where_expr, pkt_ptr)
         if pkt_result is not None:
+            # spkt = Ether(pkt_result.packet)
+            # spkt.show()
+            
+            # if IP in spkt:
+            #     ip_val = spkt[IP]
+            #     print(ip_val)
+                # log.info(spkt[IP].src)
+
             pb = PacketBuilder()
             pb.from_bytes(pkt_result.packet, pkt_result.header)
             return pb

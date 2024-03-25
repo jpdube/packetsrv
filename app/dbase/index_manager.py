@@ -72,7 +72,7 @@ class IndexManager:
         return result
 
     def search(self, index_field: set[int], ip_list: dict[str, list[int]]) -> Generator[Any, Any, Any]:
-        log.debug("Search index started")
+        log.debug(f"Search index started: {index_field}")
         path = Path(Config.pcap_index())
         files_list = list(path.glob("*.db"))
         files_list.sort(key=lambda a: int(a.stem))
