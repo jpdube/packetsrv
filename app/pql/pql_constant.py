@@ -38,7 +38,8 @@ const_list = {
     "RTCP": 5005,
     "SIP": 5060,
     "SIP_TLS": 5061,
-    "BGP": 179
+    "BGP": 179,
+    "DHCP": 67
 }
 
 
