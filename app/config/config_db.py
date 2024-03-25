@@ -1,22 +1,23 @@
-import sqlite3
-
-from dataclasses import dataclass
-from typing import Optional, Dict
-from config.config import Config
-
 import logging
+import sqlite3
+from dataclasses import dataclass
+from typing import Dict, Optional
+
+from config.config import Config
 
 log = logging.getLogger("packetdb")
 
+
 @dataclass
 class CaptureProfile:
-    id : int
+    id: int
     name: str
-    descriptio: str
+    description: str
     iface: str
     state: int
     date_created: int
     folder: str
+    filter: str
     pcap_file_size: int
     username: str
     rotation: int
@@ -149,21 +150,22 @@ class ConfigDB:
                             sequence_no,
                             from capture where id = ?;
                             """, profile_id)
+
         row = self.cursor.fetchone()
         if len(row) == 1:
             log.warn(f"Got next id: {row[0][0]}")
             record = row[0]
             capture_profile = CaptureProfile(id=record[0],
-                                             name=record[1], 
-                                             description=record[2], 
-                                             iface=record[3], 
-                                             state=record[4], 
-                                             date_created=record[5], 
-                                             folder=record[6], 
+                                             name=record[1],
+                                             description=record[2],
+                                             iface=record[3],
+                                             state=record[4],
+                                             date_created=record[5],
+                                             folder=record[6],
                                              filter=record[7],
-                                             pcap_file_size=record[8], 
-                                             username=record[9], 
-                                             rotation=record[10], 
+                                             pcap_file_size=record[8],
+                                             username=record[9],
+                                             rotation=record[10],
                                              created_by=record[11],
                                              sequence_no=record[12])
 
@@ -173,7 +175,8 @@ class ConfigDB:
         self.conn = sqlite3.connect(Config.config_dbase())
         self.cursor = self.conn.cursor()
         id = 0
-        self.cursor.execute("select sequence_no from capture where id = ?;", (profile_id, ))
+        self.cursor.execute(
+            "select sequence_no from capture where id = ?;", (profile_id, ))
         row = self.cursor.fetchall()
         if len(row) == 1:
             log.warn(f"Got next id: {row[0][0]} for profile: {profile_id}")
