@@ -1,10 +1,27 @@
 import sqlite3
 
+from dataclasses import dataclass
+from typing import Optional, Dict
 from config.config import Config
 
 import logging
 
 log = logging.getLogger("packetdb")
+
+@dataclass
+class CaptureProfile:
+    id : int
+    name: str
+    descriptio: str
+    iface: str
+    state: int
+    date_created: int
+    folder: str
+    pcap_file_size: int
+    username: str
+    rotation: int
+    created_by: int
+    sequence_no: int
 
 
 class ConfigDB:
@@ -27,8 +44,7 @@ class ConfigDB:
                       name text, 
                       location text,
                       nbr_threads integer default 2,
-                      database_path text,
-                      packet_seq_no integer                   
+                      database_path text
                       );
                   """)
         self.cursor.execute("""
@@ -44,7 +60,8 @@ class ConfigDB:
                       pcap_file_size integer default 2,
                       username text not null,
                       rotation integer default 7 not null,
-                      created_by integer not null
+                      created_by integer not null,
+                      sequence_no integer not null
                             
                       );
                   """)
@@ -85,31 +102,86 @@ class ConfigDB:
     def node_info(self) -> dict[str, str | int]:
         node_info = {}
         self.cursor.execute(
-            "select name, location, nbr_threads, database_path, packet_seq_no from config limit 1;")
+            "select name, location, nbr_threads, database_path from config limit 1;")
         row = self.cursor.fetchall()
         if len(row) == 1:
             node_info["name"] = row[0][0]
             node_info["location"] = row[0][1]
             node_info["nbr_threads"] = row[0][2]
             node_info["database_path"] = row[0][3]
-            node_info["packet_seq_no"] = row[0][4]
 
         return node_info
 
-    @property
-    def next_id(self) -> int:
+    # @property
+    # def next_id(self) -> int:
+    #     self.conn = sqlite3.connect(Config.config_dbase())
+    #     self.cursor = self.conn.cursor()
+    #     id = 0
+    #     self.cursor.execute("select packet_seq_no from config limit 1;")
+    #     row = self.cursor.fetchall()
+    #     if len(row) == 1:
+    #         log.warn(f"Got next id: {row[0][0]}")
+    #         id = row[0][0]
+    #         self.cursor.execute("begin transaction;")
+
+    #         self.cursor.execute(
+    #             "update config set packet_seq_no = ? where id = 1;", (id + 1,))
+    #         self.cursor.execute("commit transaction;")
+    #         self.conn.commit()
+
+    #     return id
+
+    def capture_profile(self, profile_id: int) -> CaptureProfile:
+        self.cursor.execute("""
+                            select
+                            id,
+                            name,
+                            description, 
+                            iface,
+                            state,
+                            date_create,
+                            folder,            
+                            filter,
+                            pcap_file_size,
+                            username,
+                            rotation,
+                            created_by,
+                            sequence_no,
+                            from capture where id = ?;
+                            """, profile_id)
+        row = self.cursor.fetchone()
+        if len(row) == 1:
+            log.warn(f"Got next id: {row[0][0]}")
+            record = row[0]
+            capture_profile = CaptureProfile(id=record[0],
+                                             name=record[1], 
+                                             description=record[2], 
+                                             iface=record[3], 
+                                             state=record[4], 
+                                             date_created=record[5], 
+                                             folder=record[6], 
+                                             filter=record[7],
+                                             pcap_file_size=record[8], 
+                                             username=record[9], 
+                                             rotation=record[10], 
+                                             created_by=record[11],
+                                             sequence_no=record[12])
+
+        return capture_profile
+
+    def capture_next_id(self, profile_id) -> int:
         self.conn = sqlite3.connect(Config.config_dbase())
         self.cursor = self.conn.cursor()
         id = 0
-        self.cursor.execute("select packet_seq_no from config limit 1;")
+        self.cursor.execute("select sequence_no from capture where id = ?;", (profile_id, ))
         row = self.cursor.fetchall()
         if len(row) == 1:
-            log.warn(f"Got next id: {row[0][0]}")
+            log.warn(f"Got next id: {row[0][0]} for profile: {profile_id}")
             id = row[0][0]
             self.cursor.execute("begin transaction;")
 
             self.cursor.execute(
-                "update config set packet_seq_no = ? where id = 1;", (id + 1,))
+                "update capture set sequence_no = ? where id = ?;", (id + 1, profile_id,))
             self.cursor.execute("commit transaction;")
             self.conn.commit()
 
