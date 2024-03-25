@@ -263,7 +263,10 @@ class PacketDecode:
 
     @property
     def has_dhcp(self) -> bool:
-        return self.ip_proto == 0x01
+        if self.has_udp:
+            return self.udp_dport in (67, 68) or self.udp_sport in (67, 68)
+        else:
+            return False
 
     @property
     def has_https(self) -> bool:
