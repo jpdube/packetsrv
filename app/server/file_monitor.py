@@ -1,15 +1,12 @@
-from watchdog.observers import Observer
-from watchdog.events import FileSystemEventHandler
-import time
-import os
-from threading import Thread
+import logging
 import multiprocessing as mp
-import glob
+import os
+import time
 
 from config.config_db import ConfigDB
 from pql.pcapfile import PcapFile
-import logging
-
+from watchdog.events import FileSystemEventHandler
+from watchdog.observers import Observer
 
 log = logging.getLogger("packetdb")
 
@@ -64,10 +61,11 @@ def capture_thread(in_queue: mp.Queue, profile_id: int):
         new_file = in_queue.get()
         file_id = configdb.capture_next_id(profile_id)
         log.debug(f"Next file id: {file_id} -- Capture file: {new_file}")
+        # TODO: Remove hard coded path
         os.rename(new_file, f"/opt3/capture/pcap/{file_id}.pcap")
         flist.append(file_id)
         file_count = in_queue.qsize()
-        for f in range(file_count):
+        for _ in range(file_count):
             new_file = in_queue.get()
             file_id = configdb.capture_next_id(profile_id)
             log.debug(f"Next file id: {file_id} -- Capture file: {new_file}")
