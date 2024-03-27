@@ -53,6 +53,9 @@ _token1 = {
     ":": Tokens.TOK_COLON,
     "'": Tokens.TOK_SINGLE_QUOTE,
     ".": Tokens.TOK_PERIOD,
+    "&": Tokens.TOK_BIT_AND,
+    "|": Tokens.TOK_BIT_OR,
+    "^": Tokens.TOK_BIT_XOR,
 }
 
 _token2 = {
@@ -60,6 +63,8 @@ _token2 = {
     "<=": Tokens.TOK_LE,
     ">=": Tokens.TOK_GE,
     "!=": Tokens.TOK_NE,
+    "<<": Tokens.TOK_BITSHIFT_LEFT,
+    ">>": Tokens.TOK_BITSHIFT_RIGHT,
 }
 _token_comment = {"//", "/*", "*/"}
 
@@ -74,7 +79,7 @@ class Token:
         self.col: int = col
 
     def __repr__(self):
-        return f"({self.type:x}:{self.type}, {self.value}, {self.line}, {self.col})"
+        return f"({self.type}:{self.type}, {self.value}, {self.line}, {self.col})"
 
 
 class Lexer:
@@ -165,8 +170,10 @@ class Lexer:
         # yield (Token(TOK_EOF, "EOF", self.line, self.col))
 
     def is_hex_digit(self, c: str) -> bool:
-        return c.isdigit() and self.text[self.pos + 1] == 'x'
-        # return c.isdigit() or c == '.'
+        if self.pos + 1 < self.text_len:
+            return c.isdigit() and self.text[self.pos + 1] == 'x'
+        else:
+            return False
 
     def read_hex_digit(self) -> Token:
         tok_start = self.pos
