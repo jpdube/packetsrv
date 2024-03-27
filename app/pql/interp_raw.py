@@ -2,14 +2,14 @@
 
 from datetime import datetime, timedelta
 
-from pql.tokens_list import Tokens
 from dbase.packet_ptr import PktPtr
-from packet.layers.packet_hdr import PktHeader
 from packet.layers.packet_decode import PacketDecode
+from packet.layers.packet_hdr import PktHeader
 from pql.model import (Array, BinOp, Boolean, ConstDecl, Date, Grouping,
                        Integer, IPv4, Label, LabelByte, Mac, Now,
                        SelectStatement, Unary)
 from pql.pcapfile import PcapFile
+from pql.tokens_list import Tokens
 
 # ---------------------------------------------
 # Process a pcap file to filter
@@ -155,6 +155,16 @@ def interpret(node, env, packet: PacketDecode):
                 return leftval != rightval.to_int
             else:
                 return leftval != rightval
+        elif node.op == Tokens.TOK_BITSHIFT_RIGHT:
+            return int(leftval) >> int(rightval)
+        elif node.op == Tokens.TOK_BITSHIFT_LEFT:
+            return int(leftval) << int(rightval)
+        elif node.op == Tokens.TOK_BIT_AND:
+            return int(leftval) & int(rightval)
+        elif node.op == Tokens.TOK_BIT_OR:
+            return int(leftval) | int(rightval)
+        elif node.op == Tokens.TOK_BIT_XOR:
+            return int(leftval) ^ int(rightval)
 
     elif isinstance(node, list):
         result = None

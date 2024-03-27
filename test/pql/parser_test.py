@@ -1,6 +1,47 @@
-import pql.parse as parser
-from pql.lexer import tokenize
-from pql.tokens_list import *
+import app.pql.parse as parser
+from app.pql.lexer import tokenize
+from app.pql.model import BinOp, Integer, Label
+from app.pql.tokens_list import *
+
+
+def test_bit_shift_right():
+    tokens = tokenize("ip.version >> 4")
+    model = parser.parse_expression(parser.Tokenizer(tokens))
+    assert (model.op == Tokens.TOK_BITSHIFT_RIGHT)
+    assert (model.left.value == "ip.version")
+    assert (model.right.value == 4)
+
+
+def test_bit_shift_left():
+    tokens = tokenize("ip.version << 4")
+    model = parser.parse_expression(parser.Tokenizer(tokens))
+    assert (model.op == Tokens.TOK_BITSHIFT_LEFT)
+    assert (model.left.value == "ip.version")
+    assert (model.right.value == 4)
+
+
+def test_bit_shift_and():
+    tokens = tokenize("ip.version & 0x0f")
+    model = parser.parse_expression(parser.Tokenizer(tokens))
+    assert (model.op == Tokens.TOK_BIT_AND)
+    assert (model.left.value == "ip.version")
+    assert (model.right.value == 0x0f)
+
+
+def test_bit_shift_or():
+    tokens = tokenize("ip.version | 0x0f")
+    model = parser.parse_expression(parser.Tokenizer(tokens))
+    assert (model.op == Tokens.TOK_BIT_OR)
+    assert (model.left.value == "ip.version")
+    assert (model.right.value == 0x0f)
+
+
+def test_bit_shift_xor():
+    tokens = tokenize("ip.version ^ 0x0f")
+    model = parser.parse_expression(parser.Tokenizer(tokens))
+    assert (model.op == Tokens.TOK_BIT_XOR)
+    assert (model.left.value == "ip.version")
+    assert (model.right.value == 0x0f)
 
 
 def test_ipv4():

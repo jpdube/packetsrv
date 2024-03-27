@@ -82,9 +82,14 @@ class Tokens(Enum):
     TOK_SINGLE_QUOTE = auto()
     TOK_COLON = auto()
     TOK_PERIOD = auto()
+    TOK_BIT_AND = auto()
+    TOK_BIT_OR = auto()
+    TOK_BIT_XOR = auto()
 
     # --- Two character keywords
     TOK_EQ = auto()
     TOK_LE = auto()
     TOK_GE = auto()
     TOK_NE = auto()
+    TOK_BITSHIFT_RIGHT = auto()
+    TOK_BITSHIFT_LEFT = auto()

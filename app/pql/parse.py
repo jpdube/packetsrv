@@ -1,9 +1,9 @@
 # from packet.layers.ipv4 import IPV4
-from pql.tokens_list import Tokens
 # import pql.tokens_list as tl
 from pql.aggregate import Aggregate, Average, Bandwidth, Count, Max, Min, Sum
 from pql.lexer import tokenize
 from pql.model import *
+from pql.tokens_list import Tokens
 
 index_field = set()
 # ip_list = set()
@@ -389,11 +389,16 @@ def parse_relation(tokens):
     leftval = parse_sum(tokens)
 
     optok = tokens.accept(Tokens.TOK_LT, Tokens.TOK_LE, Tokens.TOK_GT,
-                          Tokens.TOK_GE, Tokens.TOK_EQ, Tokens.TOK_NE, Tokens.TOK_IN, Tokens.TOK_BETWEEN, Tokens.TOK_TO)
-    # Tokens.TOK_GE, Tokens.TOK_EQ, Tokens.TOK_NE, Tokens.TOK_IN, Tokens.TOK_BETWEEN, Tokens.TOK_TO)
+                          Tokens.TOK_GE, Tokens.TOK_EQ, Tokens.TOK_NE,
+                          Tokens.TOK_IN, Tokens.TOK_BETWEEN,
+                          Tokens.TOK_TO, Tokens.TOK_BITSHIFT_LEFT,
+                          Tokens.TOK_BITSHIFT_RIGHT, Tokens.TOK_BIT_AND,
+                          Tokens.TOK_BIT_OR, Tokens.TOK_BIT_XOR)
     if not optok:
         return leftval
-    return BinOp(optok.type, leftval, parse_sum(tokens))
+    binop = BinOp(optok.type, leftval, parse_sum(tokens))
+
+    return binop
 
 
 def parse_sum(tokens):
