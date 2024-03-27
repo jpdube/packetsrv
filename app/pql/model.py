@@ -289,4 +289,4 @@ class BinOp(Expression):
         self.right = right
 
     def __repr__(self):
-        return f"BinOp({human_tokens(self.op)}, {self.left}, {self.right})"
+        return f"BinOp({self.op}, {self.left}, {self.right})"
