@@ -2,7 +2,7 @@ from struct import pack
 from time import time_ns
 from typing import Tuple
 from ipaddress import *
-#IPv4Interface, IPv4Network, IPv4Address
+# IPv4Interface, IPv4Network, IPv4Address
 import json
 
 
@@ -114,18 +114,14 @@ class Timestamp(Field):
 #         self.size = size
 
 
-class MacAddress(Field):
+class MacAddress():
     def __init__(self, mac) -> None:
-        super().__init__(mac)
-        # mac_addr = ((raw_mac[0] as u64) & 0x00000000000000ff) << 40;
-        # mac_addr += ((raw_mac[1] as u64) & 0x00000000000000ff) << 32;
-        # mac_addr += ((raw_mac[2] as u64) & 0x00000000000000ff) << 24;
-        # mac_addr += ((raw_mac[3] as u64) & 0x00000000000000ff) << 16;
-        # mac_addr += ((raw_mac[4] as u64) & 0x00000000000000ff) << 8;
-        # mac_addr += (raw_mac[5] as u64) & 0x00000000000000ff;
+        self.value = []
 
         if isinstance(mac, str):
             self.value = self.from_string(mac)
+        elif isinstance(mac, bytes):
+            self.value = mac
 
     def from_string(self, mac_addr):
         if mac_addr.count(":") == 5:
@@ -151,9 +147,6 @@ class MacAddress(Field):
         response += self.value[5] & 0x00_00_00_00_00_00_00_FF
 
         return response
-
-    def toJSON(self):
-        return json.dumps({'mac': self.__str__()})
 
     @property
     def binary(self):

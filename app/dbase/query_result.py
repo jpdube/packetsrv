@@ -7,6 +7,7 @@ from packet.layers.fields import IPv4Address
 from packet.layers.packet_builder import PacketBuilder
 from pql.aggregate import Bandwidth
 from pql.model import SelectStatement
+from packet.layers.field_type import get_type
 
 import logging
 
@@ -22,7 +23,11 @@ class QueryResult:
         self.ts_end = 0
         self.model = model
         self.packet_list = []
-        self.result = []
+        self.result = {
+            "errors": ["No errors"],
+            "columns": [],
+            "result": [],
+        }
 
     def add_packet(self, packet: PacketBuilder):
         self.packet_list.append(packet)
@@ -41,7 +46,12 @@ class QueryResult:
 
         self.process_pkt(packet)
 
+    def get_columns(self):
+        for field in self.model.select_expr:
+            self.result["columns"].append({field: get_type(field)})
+
     def get_result(self) -> list[dict[str, str | int]]:
+        self.get_columns()
         if self.model.has_groupby:
             self.group_by()
             return self.result
@@ -67,7 +77,7 @@ class QueryResult:
                 record[self.model.groupby_fields[i]] = f"{IPv4Address(k)}"
             record['aggr'] = len(aggr)
             log.debug(record)
-            self.result.append(record)
+            self.result["result"].append(record)
         # print(grp_result)
 
     def aggregate(self) -> None:
@@ -80,7 +90,7 @@ class QueryResult:
                 aggr.time_range(self.ts_start, self.ts_end)
 
             record[aggr.as_of] = aggr.execute(self.packet_list)
-        self.result.insert(0, record)
+        self.result["result"].insert(0, record)
 
     def process_pkt(self, pb: PacketBuilder):
         if len(self.model.select_expr) == 0:
@@ -90,11 +100,14 @@ class QueryResult:
         for f in self.model.select_expr:
             if f in ["ip.dst", "ip.src"]:
                 field_value = f"{IPv4Address(pb.get_field(f))}"
+            elif f in ["eth.src", "eth.dst"]:
+                field_value = str(pb.get_field(f))
             else:
                 field_value = pb.get_field(f)
+
             record[f] = field_value
 
             # record["packet"] = base64.b64encode(pb.packet).decode("ascii")
 
         if bool(record):
-            self.result.append(record)
+            self.result["result"].append(record)

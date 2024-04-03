@@ -18,7 +18,8 @@ def query():
         try:
             db = DBEngine()
             result = db.run(pql["query"])
-            return jsonify({"result": result})
+            return jsonify(result)
+            # return jsonify({"result": result})
         except (SyntaxError):
             return jsonify({"error": "Synatx error in pql"})
 
