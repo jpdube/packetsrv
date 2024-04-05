@@ -1,17 +1,17 @@
+import logging
 import multiprocessing as mp
 from datetime import datetime
-from ipaddress import IPv4Address
 from typing import Any, Generator
 
+from config.config import Config
 from dbase.index_manager import IndexManager, PktPtr
+from dbase.query_result import QueryResult
 from packet.layers.packet_builder import PacketBuilder
 from pql.interp_raw import exec_program
 from pql.parse import parse_source
-from dbase.query_result import QueryResult
-import logging
-from config.config import Config
+
 # from scapy.layers import *
-from scapy.all import sr1,Ether, IP, UDP, TCP
+# from scapy.all import sr1,Ether, IP, UDP, TCP
 
 
 log = logging.getLogger("packetdb")
@@ -40,7 +40,7 @@ class DBEngine:
 
         query_result = QueryResult(self.model)
 
-        pool = mp.Pool()
+        pool = mp.Pool(Config.nbr_threads())
         for idx in index_result:
             params = []
             for chunk_pkt in self.chunks(idx, Config.nbr_threads()):
@@ -80,11 +80,11 @@ class DBEngine:
         if pkt_result is not None:
             # spkt = Ether(pkt_result.packet)
             # spkt.show()
-            
+
             # if IP in spkt:
             #     ip_val = spkt[IP]
             #     print(ip_val)
-                # log.info(spkt[IP].src)
+            # log.info(spkt[IP].src)
 
             pb = PacketBuilder()
             pb.from_bytes(pkt_result.packet, pkt_result.header)
