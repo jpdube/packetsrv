@@ -1,3 +1,4 @@
+import logging
 import multiprocessing as mp
 import sqlite3
 from datetime import datetime
@@ -6,11 +7,8 @@ from typing import Any, Generator, Tuple
 
 import pql.packet_index as pkt_index
 from config.config import Config
-from pql.pcapfile import PcapFile
 from dbase.packet_ptr import PktPtr
-
-
-import logging
+from pql.pcapfile import PcapFile
 
 log = logging.getLogger("packetdb")
 
@@ -46,7 +44,7 @@ class IndexManager:
               select pkt_ptr
               from pkt_index
               where (pindex & ?) = ?
-                        
+
               """
         if len(ip_list["ip.src"]) > 0:
             sql += " and ip_src between ? and ? "
