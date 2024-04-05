@@ -1,9 +1,9 @@
+import logging
+
+from config.config import Config
+from config.config_db import ConfigDB
 from dbase.dbengine import DBEngine
 from flask import Flask, jsonify, request
-from config.config_db import ConfigDB
-from config.config import Config
-
-import logging
 
 log = logging.getLogger("packetdb")
 
