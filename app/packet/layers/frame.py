@@ -1,7 +1,8 @@
 from datetime import datetime
+
+from dbase.packet_ptr import PktHeader
 from packet.layers.layer_type import LayerID
 from packet.layers.packet import Packet
-from dbase.packet_ptr import PktHeader
 
 
 class Frame(Packet):
@@ -50,7 +51,7 @@ class Frame(Packet):
             if field == 'ts_sec':
                 return self.ts_sec
             elif field == 'timestamp':
-                return self.ts_format
+                return self.ts_sec
             elif field == 'ts_usec':
                 return self.ts_usec
             elif field == 'origlen':
