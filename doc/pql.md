@@ -75,6 +75,45 @@ select <fields>
 from sensor
 where ip[4:2] == [0,1]
 ```
+## Interval
+###Interval with dates
+
+You can use full dates in the intervals
+
+```
+select <field>
+from sensor
+where <condition>
+interval 2022-03-15 13:55:00 to 2022-03-15 14:05:00
+top 10;
+
+```
+
+## Interval
+###Interval with relative time
+
+Relative time is very usefull in dashboard where you want to pull 
+information at intervals
+
+In PQL you can use the following modifiers:
+s: second
+m: minute
+h: hour
+d: day
+w: week
+M: monthe
+
+
+The following example is unsing an interval from now to the last 30 seconds
+```
+select <field>
+from sensor
+where <condition>
+interval now() to now(-30s)
+top 10;
+
+```
+
 ## Bit operations
 
 ### Bit AND
