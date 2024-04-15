@@ -32,8 +32,9 @@ class DBEngine:
         self.pql = pql
         self.model = parse_source(pql)
         log.debug(self.model.index_field)
-        index_result = self.index_mgr.search(
-            self.model.index_field, self.model.ip_list)
+        index_result = self.index_mgr.search(self.model)
+        # index_result = self.index_mgr.search(
+        #     self.model.index_field, self.model.ip_list)
         searched = 0
         self.pkt_found = 0
         offset_ptr = 0

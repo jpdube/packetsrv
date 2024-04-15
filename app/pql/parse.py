@@ -1,5 +1,8 @@
 # from packet.layers.ipv4 import IPV4
 # import pql.tokens_list as tl
+import datetime
+import time
+
 from pql.aggregate import Aggregate, Average, Bandwidth, Count, Max, Min, Sum
 from pql.lexer import tokenize
 from pql.model import *
@@ -256,7 +259,16 @@ def parse_interval(tokens):
         tokens.expect(Tokens.TOK_TO)
         interval_end = tokens.expect(Tokens.TOK_TIMESTAMP).value
 
-    return (interval_start, interval_end)
+        return (date_to_timestamp(interval_start), date_to_timestamp(interval_end))
+    else:
+        return (0, 0)
+
+
+def date_to_timestamp(str_datetime: str) -> int:
+    element = datetime.strptime(str_datetime, "%Y-%m-%d %H:%M:%S")
+    timestamp = datetime.timestamp(element)
+
+    return int(timestamp)
 
 
 def parse_date(tokens):

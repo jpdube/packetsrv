@@ -8,6 +8,7 @@ from typing import Any, Generator, Tuple
 import pql.packet_index as pkt_index
 from config.config import Config
 from dbase.packet_ptr import PktPtr
+from pql.model import SelectStatement
 from pql.pcapfile import PcapFile
 
 log = logging.getLogger("packetdb")
@@ -32,7 +33,7 @@ class IndexManager:
         ttl_time = datetime.now() - start_time
         log.info(f"---> Total Index Time: {ttl_time}")
 
-    def search_pkt(self, file_id: int, search_index: int, ip_list: dict[str, list[Tuple[int, int]]]):
+    def search_pkt(self, file_id: Path, search_index: int, ip_list: dict[str, list[Tuple[int, int]]]):
         result = []
         conn = sqlite3.connect(str(file_id))
         c = conn.cursor()
@@ -69,25 +70,64 @@ class IndexManager:
 
         return result
 
-    def search(self, index_field: set[int], ip_list: dict[str, list[int]]) -> Generator[Any, Any, Any]:
-        log.debug(f"Search index started: {index_field}")
-        path = Path(Config.pcap_index())
-        files_list = list(path.glob("*.db"))
-        files_list.sort(key=lambda a: int(a.stem))
+    def search(self, model: SelectStatement) -> Generator[Any, Any, Any]:
 
-        search_index = pkt_index.build_search_index(index_field)
+        log.debug(f"Search index started: {model.index_field}")
+
+        # --- Check for interval
+        interval_result = self.search_interval(model)
+        if interval_result:
+            log.info(f"{len(interval_result)} found in master index")
+            files_list = interval_result
+        else:
+            path = Path(Config.pcap_index())
+            files_list = list(path.glob("*.db"))
+            files_list.sort(key=lambda a: int(a.stem))
+
+        search_index = pkt_index.build_search_index(model.index_field)
         log.debug(f"Computed index: {search_index:x}")
         pool = mp.Pool()
 
         for index_chunk in self.chunks(files_list, Config.nbr_threads()):
             params = []
             for idx in index_chunk:
-                params.append((idx, search_index, ip_list))
+                params.append((idx, search_index, model.ip_list))
 
             result = pool.starmap(self.search_pkt, params)
 
             for r in result:
                 yield (r)
+
+    def search_interval(self, model: SelectStatement) -> None | list[Path]:
+        if not model.has_interval:
+            return None
+
+        log.debug(f"Interval s: {model.start_interval}, e: {
+                  model.end_interval}")
+
+        conn = sqlite3.connect(Config.pcap_master_index())
+        c = conn.cursor()
+        params = []
+        params.append(model.start_interval)
+        params.append(model.end_interval)
+        params.append(model.start_interval)
+        params.append(model.end_interval)
+
+        sql = """
+                select * from master_index where start_ts >= ? and end_ts <= ? 
+                union all 
+                select * from master_index where ? >= start_ts and ? <= end_ts;
+
+              """
+
+        c.execute(sql, params)
+
+        result = []
+        for r in c.fetchall():
+            filename = f"{Config.pcap_index()}/{r[0]}.db"
+            result.append(Path(filename))
+
+        return result
 
     def chunks(self, l: list[Any], n: int) -> Generator[Any, Any, Any]:
         for i in range(0, len(l), n):

@@ -180,6 +180,20 @@ class SelectStatement(Statement):
         return self.interval[0] != 0 and self.interval[1] != 0
 
     @property
+    def start_interval(self) -> int:
+        if self.has_interval:
+            return self.interval[0]
+        else:
+            return 0
+
+    @property
+    def end_interval(self) -> int:
+        if self.has_interval:
+            return self.interval[1]
+        else:
+            return 0
+
+    @property
     def has_groupby(self) -> bool:
         return self.groupby_fields is not None
 
