@@ -1,16 +1,14 @@
+import logging
 import sys
 from collections import defaultdict
 from itertools import groupby
 from operator import itemgetter
 
+from packet.layers.field_type import get_type
 from packet.layers.fields import IPv4Address
 from packet.layers.packet_builder import PacketBuilder
 from pql.aggregate import Bandwidth
 from pql.model import SelectStatement
-from packet.layers.field_type import get_type
-
-import logging
-
 
 log = logging.getLogger("packetdb")
 
@@ -50,7 +48,7 @@ class QueryResult:
         for field in self.model.select_expr:
             self.result["columns"].append({field: get_type(field)})
 
-    def get_result(self) -> list[dict[str, str | int]]:
+    def get_result(self) -> list[dict[str, str | str]]:
         self.get_columns()
         if self.model.has_groupby:
             self.group_by()
