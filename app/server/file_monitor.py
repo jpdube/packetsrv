@@ -7,7 +7,6 @@ from config.config_db import ConfigDB
 from pql.pcapfile import PcapFile
 from watchdog.events import FileSystemEventHandler
 from watchdog.observers import Observer
-from threading import Thread
 
 log = logging.getLogger("packetdb")
 
@@ -50,25 +49,25 @@ def capture_thread(in_queue: mp.Queue, profile_id: int):
     pool = mp.Pool()
     while True:
         flist = []
-        while not in_queue.empty():
-            new_file = in_queue.get(block=False)
-            log.debug(f"Received file: {new_file}")
+        new_file = in_queue.get()
+        file_id = configdb.capture_next_id(profile_id)
+        log.debug(f"Next file id: {file_id} -- Capture file: {new_file}")
+        # TODO: Remove hard coded path
+        os.rename(new_file, f"/home/jpdube/pcapdb/db/{file_id}.pcap")
+        flist.append(file_id)
+        file_count = in_queue.qsize()
+        for _ in range(file_count):
+            new_file = in_queue.get()
             file_id = configdb.capture_next_id(profile_id)
-            log.debug(
-                f"Next file id: {file_id} -- Capture file: {new_file}")
-            # TODO: Remove hard coded path
-            os.rename(
-                new_file, f"/Users/jpdube/pcapdb/db/pcap/{file_id}.pcap")
+            log.debug(f"Next file id: {
+                      file_id} -- Capture file: {new_file}")
+            os.rename(new_file, f"/home/jpdube/pcapdb/db/{file_id}.pcap")
             flist.append(file_id)
-
-        if len(flist) > 0:
-            log.debug(f"File list: {flist}")
-            pcapfile = PcapFile()
-            result = pool.map(pcapfile.create_index, flist)
-            result.sort(key=lambda a: a[0])
-            pcapfile.build_master_index(result)
-
-        time.sleep(0.5)
+        log.debug(f"File list: {flist}")
+        pcapfile = PcapFile()
+        result = pool.map(pcapfile.create_index, flist)
+        result.sort(key=lambda a: a[0])
+        pcapfile.build_master_index(result)
 
 
 def start_db_watcher(watch_dir: str, profile_id: int):
