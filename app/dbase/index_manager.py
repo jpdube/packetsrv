@@ -29,7 +29,7 @@ class IndexManager:
             flist.append(i.stem)
         result = pool.map(pcapfile.create_index, flist)
         result.sort(key=lambda a: a[0])
-        pcapfile.build_master_index(result)
+        pcapfile.build_master_index(result, clean=True)
         ttl_time = datetime.now() - start_time
         log.info(f"---> Total Index Time: {ttl_time}")
 
@@ -107,11 +107,9 @@ class IndexManager:
 
         conn = sqlite3.connect(Config.pcap_master_index())
         c = conn.cursor()
-        params = []
-        params.append(model.start_interval)
-        params.append(model.end_interval)
-        params.append(model.start_interval)
-        params.append(model.end_interval)
+
+        params = (model.start_interval, model.end_interval,
+                  model.start_interval, model.end_interval)
 
         sql = """
                 select * from master_index where start_ts >= ? and end_ts <= ? 
