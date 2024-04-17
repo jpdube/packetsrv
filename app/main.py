@@ -45,7 +45,8 @@ if __name__ == "__main__":
     log.info(f"Node: {configdb.node_info} is online at {
              configdb.node_location}")
 
-    # start_db_watcher("/opt3/capture/pcap", 1)
+    start_db_watcher(Config.pcap_path(), 1)
+    # start_db_watcher("/Users/jpdube/pcapdb/db/pcap/", 1)
     from dbase.dbengine import DBEngine
     dbengine = DBEngine()
     # dbengine.index_db()
