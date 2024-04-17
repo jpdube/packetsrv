@@ -174,7 +174,7 @@ class PcapFile:
         conn.close()
 
     def build_master_index(self, master_index):
-        db_name = f"{Config.pcap_master_index()}/master.db"
+        db_name = f"{Config.pcap_master_index()}"
         conn = sqlite3.connect(db_name)
         c = conn.cursor()
         c.execute("drop table if exists master_index;")
