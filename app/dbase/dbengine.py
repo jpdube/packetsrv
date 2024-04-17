@@ -9,10 +9,8 @@ from dbase.query_result import QueryResult
 from packet.layers.packet_builder import PacketBuilder
 from pql.interp_raw import exec_program
 from pql.parse import parse_source
-
-# from scapy.layers import *
-# from scapy.all import sr1,Ether, IP, UDP, TCP
-
+from scapy.all import IP, TCP, UDP, Ether, sr1
+from scapy.layers import *
 
 log = logging.getLogger("packetdb")
 
