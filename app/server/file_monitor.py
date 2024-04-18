@@ -3,6 +3,7 @@ import multiprocessing as mp
 import os
 import time
 
+from config.config import Config
 from config.config_db import ConfigDB
 from pql.pcapfile import PcapFile
 from watchdog.events import FileSystemEventHandler
@@ -32,7 +33,6 @@ class PacketDbWatch:
         event_handler = _Handler(capture_queue)
         self.observer.schedule(
             event_handler, watch_dir, recursive=False)
-        # event_handler, self.watchDirectory, recursive=False)
         self.observer.start()
         try:
             while True:
@@ -50,19 +50,18 @@ def capture_thread(in_queue: mp.Queue, profile_id: int):
     while True:
         flist = []
         new_file = in_queue.get()
+
         file_id = configdb.capture_next_id(profile_id)
-        log.debug(f"Next file id: {file_id} -- Capture file: {new_file}")
-        # TODO: Remove hard coded path
-        os.rename(new_file, f"/home/jpdube/pcapdb/db/{file_id}.pcap")
+        os.rename(new_file, f"{Config.pcap_path()}/{file_id}.pcap")
         flist.append(file_id)
         file_count = in_queue.qsize()
+
         for _ in range(file_count):
             new_file = in_queue.get()
             file_id = configdb.capture_next_id(profile_id)
-            log.debug(f"Next file id: {
-                      file_id} -- Capture file: {new_file}")
-            os.rename(new_file, f"/home/jpdube/pcapdb/db/{file_id}.pcap")
+            os.rename(new_file, f"{Config.pcap_path()}/{file_id}.pcap")
             flist.append(file_id)
+
         log.debug(f"File list: {flist}")
         pcapfile = PcapFile()
         result = pool.map(pcapfile.create_index, flist)
@@ -76,5 +75,3 @@ def start_db_watcher(watch_dir: str, profile_id: int):
     mp.Process(target=capture_thread, args=(capture_queue, profile_id)).start()
     mp.Process(target=dbwatch.run, args=(
         capture_queue, watch_dir,), daemon=True).start()
-    # Thread(target=dbwatch.run, args=(capture_queue,), daemon=True).start()
-    # dbwatch.run(capture_queue)
