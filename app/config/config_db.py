@@ -179,7 +179,7 @@ class ConfigDB:
             "select sequence_no from capture where id = ?;", (profile_id, ))
         row = self.cursor.fetchall()
         if len(row) == 1:
-            log.warn(f"Got next id: {row[0][0]} for profile: {profile_id}")
+            log.debug(f"Got next id: {row[0][0]} for profile: {profile_id}")
             id = row[0][0]
             self.cursor.execute("begin transaction;")
 
