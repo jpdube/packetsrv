@@ -2,6 +2,7 @@ import logging
 import logging.config
 import logging.handlers
 import os
+import platform
 from signal import SIGINT, signal
 from threading import Thread
 
@@ -37,7 +38,7 @@ def handler(signal_recv, frame):
 
 if __name__ == "__main__":
     signal(SIGINT, handler)
-    log.info("PCAP DB starting...")
+    log.info(f"PCAP DB starting on plateform {platform.system()}")
     Config.load()
     configdb = ConfigDB()
     # configdb.drop_tables()
