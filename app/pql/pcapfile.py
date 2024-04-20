@@ -179,24 +179,23 @@ class PcapFile:
         if clean:
             c.execute("drop table if exists master_index;")
 
-            c.execute("""
-                      create table if not exists master_index (
-                          id integer primary key autoincrement,
-                          start_ts integer not null,
-                          end_ts integer not null,
-                          file_id integer not null
-                          );
-                      """)
+        c.execute("""
+                    create table if not exists master_index (
+                        id integer primary key autoincrement,
+                        start_ts integer not null,
+                        end_ts integer not null,
+                        file_id integer not null
+                        );
+                    """)
         c.execute('''PRAGMA synchronous = EXTRA''')
         c.execute('''PRAGMA journal_mode = WAL''')
         c.executemany(
             "INSERT INTO master_index (start_ts, end_ts, file_id) VALUES (?,?,?)", master_index)
         conn.commit()
 
-        if clean:
-            c.execute("""
-                      create index if not exists  idx_timestamp
-                      on master_index (start_ts, end_ts);
-                      """)
+        c.execute("""
+                    create index if not exists  idx_timestamp
+                    on master_index (start_ts, end_ts);
+                    """)
 
         conn.close()
