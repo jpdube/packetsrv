@@ -47,10 +47,7 @@ if __name__ == "__main__":
              configdb.node_location}")
 
     start_db_watcher(Config.pcap_path(), 1)
-    # start_db_watcher("/Users/jpdube/pcapdb/db/pcap/", 1)
     from dbase.dbengine import DBEngine
-    # dbengine = DBEngine()
-    # dbengine.index_db()
 
     api_thread = Thread(target=start, daemon=True)
     api_thread.start()
