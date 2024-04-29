@@ -59,8 +59,7 @@ class Ethernet(Packet):
         result = f'{" " * offset}Ethernet ->\n'
         result += f'{" " * offset}   Dst Mac..: {self.dst_mac}\n'
         result += f'{" " * offset}   Src Mac..: {self.src_mac}\n'
-        result += f'{" " *
-                     offset}   Ethertype: {self.ethertype},0x{self.ethertype:04x} \n'
+        result += f'{" " * offset}   Ethertype: {self.ethertype},0x{self.ethertype:04x} \n'
         result += f'{" " * offset}   Vlan ID..: {self.vlan_id}\n'
         return result
 
