@@ -2,7 +2,13 @@ import app.pql.parse as parser
 from app.pql.lexer import tokenize
 from app.pql.model import BinOp, Integer, Label
 from app.pql.tokens_list import *
+from datetime import datetime
 
+def date_to_timestamp(str_datetime: str) -> int:
+    element = datetime.strptime(str_datetime, "%Y-%m-%d %H:%M:%S")
+    timestamp = datetime.timestamp(element)
+
+    return int(timestamp)
 
 def test_bit_shift_right():
     tokens = tokenize("ip.version >> 4")
@@ -72,8 +78,8 @@ def test_date():
 def test_interval():
     tokens = tokenize("interval 2023-11-29 13:00:00 to 2023-11-29 14:00:00")
     model = parser.parse_interval(parser.Tokenizer(tokens))
-    assert (model[0] == "2023-11-29 13:00:00")
-    assert (model[1] == "2023-11-29 14:00:00")
+    assert (model[0] == date_to_timestamp("2023-11-29 13:00:00"))
+    assert (model[1] == date_to_timestamp("2023-11-29 14:00:00"))
 
 
 def test_offset():
