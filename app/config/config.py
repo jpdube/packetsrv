@@ -44,8 +44,7 @@ class Config:
         try:
             cpu_threads = int(nbr_threads)
         except ValueError:
-            log.error(f"Invalid value for NBR_THREADS: {
-                     nbr_threads} using default core count")
+            log.error(f"Invalid value for NBR_THREADS: {nbr_threads} using default core count")
             cpu_threads = mp.cpu_count()
 
         if cpu_threads > mp.cpu_count():

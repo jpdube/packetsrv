@@ -102,8 +102,7 @@ class IndexManager:
         if not model.has_interval:
             return None
 
-        log.debug(f"Interval s: {model.start_interval}, e: {
-                  model.end_interval}")
+        log.debug(f"Interval s: {model.start_interval}, e: {model.end_interval}")
 
         conn = sqlite3.connect(Config.pcap_master_index())
         c = conn.cursor()

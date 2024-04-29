@@ -43,8 +43,7 @@ if __name__ == "__main__":
     configdb = ConfigDB()
     # configdb.drop_tables()
     configdb.check_tables()
-    log.info(f"Node: {configdb.node_info} is online at {
-             configdb.node_location}")
+    log.info(f"Node: {configdb.node_info} is online at {configdb.node_location}")
 
     start_db_watcher(Config.pcap_path(), 1)
     from dbase.dbengine import DBEngine
