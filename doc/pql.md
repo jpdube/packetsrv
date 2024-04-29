@@ -156,3 +156,18 @@ select <fields>
 from sensor
 where (ip[0:1] << 4) == 0x00 
 ```
+## From sources
+
+It's possible to use different sources in PQL. For exmaple, you could query the packet database and join with a json file or another a log file.
+
+Example:
+```
+from source.format  #--- where source is the source of the data and 
+                    #--- the format is packet if absent or otherwise
+                    #--- a file name
+```
+
+### Json format
+
+This is a good example were we can parse the file and obtain the fields and the data from the same file
+
