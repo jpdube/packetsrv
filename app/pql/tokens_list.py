@@ -46,6 +46,7 @@ class Tokens(Enum):
     TOK_COUNT = auto()
     TOK_AS = auto()
     TOK_BANDWIDTH = auto()
+    TOK_DISTINCT = auto()
 
     # --- Types
     TOK_INTEGER = auto()

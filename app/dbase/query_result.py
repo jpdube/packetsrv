@@ -21,11 +21,17 @@ class QueryResult:
         self.ts_end = 0
         self.model = model
         self.packet_list = []
+        self.distinct = []
         self.result = {
             "errors": ["No errors"],
             "columns": [],
             "result": [],
         }
+
+    @property
+    def count_reach(self) -> bool:
+        # log.debug(f"Top reach: {len(self.result['result'])}")
+        return len(self.result['result']) >= self.model.top_expr
 
     def add_packet(self, packet: PacketBuilder):
         self.packet_list.append(packet)
@@ -49,6 +55,7 @@ class QueryResult:
             self.result["columns"].append({field: get_type(field)})
 
     def get_result(self) -> list[dict[str, str | str]]:
+        self.distinct = []
         self.get_columns()
         if self.model.has_groupby:
             self.group_by()
@@ -94,6 +101,7 @@ class QueryResult:
         if len(self.model.select_expr) == 0:
             return
 
+        tmp_hash = ""
         record = {}
         for f in self.model.select_expr:
             if f in ["ip.dst", "ip.src"]:
@@ -103,9 +111,13 @@ class QueryResult:
             else:
                 field_value = pb.get_field(f)
 
+            if self.model.is_distinct:
+                tmp_hash += str(pb.get_field(f))
+
             record[f] = field_value
 
-            # record["packet"] = base64.b64encode(pb.packet).decode("ascii")
+        # log.debug(f"HASH: {tmp_hash}")
 
-        if bool(record):
+        if bool(record) and (not self.model.is_distinct or tmp_hash not in self.distinct):
             self.result["result"].append(record)
+            self.distinct.append(tmp_hash)

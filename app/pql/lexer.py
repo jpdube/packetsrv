@@ -32,6 +32,7 @@ _keywords = {
     "count": Tokens.TOK_COUNT,
     "as": Tokens.TOK_AS,
     "bandwidth": Tokens.TOK_BANDWIDTH,
+    "distinct": Tokens.TOK_DISTINCT,
 }
 
 

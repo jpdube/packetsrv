@@ -143,6 +143,7 @@ class SelectStatement(Statement):
     def __init__(
         self,
         select_fields: list[str],
+        distinct,
         from_fields,
         include_field,
         index_field,
@@ -156,6 +157,7 @@ class SelectStatement(Statement):
         aggregate: list[Aggregate] = []
     ):
         self.select_expr = select_fields
+        self.distinct = distinct
         self.from_fields = from_fields
         self.include = include_field
         self.index_field = index_field
@@ -174,6 +176,10 @@ class SelectStatement(Statement):
     @property
     def packet_to_fetch(self) -> int:
         return self.offset + self.top_expr
+
+    @property
+    def is_distinct(self) -> bool:
+        return self.distinct
 
     @property
     def has_interval(self) -> bool:

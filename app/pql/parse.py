@@ -208,11 +208,18 @@ def parse_select(tokens):
     tokens.expect(Tokens.TOK_SELECT)
     fields = []
     aggregates = []
+    distinct = False
+
+    if tokens.peek(Tokens.TOK_DISTINCT):
+        distinct = True
+        tokens.expect(Tokens.TOK_DISTINCT)
+        
     if tokens.peek(Tokens.TOK_WILDCARD):
         field = tokens.expect(Tokens.TOK_WILDCARD)
         fields.append(Label("*"))
     else:
         while True:
+
             aggr = parse_aggregate(tokens)
             if aggr:
                 aggregates.append(aggr)
@@ -236,6 +243,7 @@ def parse_select(tokens):
     tokens.expect(Tokens.TOK_SEMI)
 
     return SelectStatement(fields,
+                           distinct,
                            from_fields,
                            None,
                            index_field,

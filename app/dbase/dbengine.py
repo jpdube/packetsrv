@@ -58,13 +58,13 @@ class DBEngine:
                                 f"Skipping for offset: {self.model.offset}:{offset_ptr}")
                         offset_ptr += 1
 
-                    if self.pkt_found >= self.model.top_expr:
+                    if query_result.count_reach:
                         break
 
-                if self.pkt_found >= self.model.top_expr:
+                if query_result.count_reach:
                     break
 
-            if self.pkt_found >= self.model.top_expr:
+            if query_result.count_reach:
                 break
 
         ttl_time = datetime.now() - start_time
