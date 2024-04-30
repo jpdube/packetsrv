@@ -35,7 +35,7 @@ assert "Assert vlan data bandwidth"
 # PQL
 
 ## Basic command structure
-```
+```sql
 select proto.field, [proto.field]
 from sensor name
 where <expression>
@@ -46,7 +46,7 @@ interval yyyy-mm-dd hh:MM:ss to yyyy-mm-dd hh:MM:ss
 ```
 ## IPv4 search
 Subnet search
-```
+```sql
 select <fields>
 from sensor
 where ip.src == 192.168.3.230
@@ -54,14 +54,15 @@ where ip.src == 192.168.3.230
 
 ## Subnet search
 Subnet search
-```
+```sql
 select <fields>
 from sensor
 where ip.src == 192.168.3.0/24
 ```
 ## Arrays example 1
 Extract the first byte and compared it to 0x45
-```
+
+```sql
 select <fields>
 from sensor
 where ip[0:1] == [0x45]
@@ -70,7 +71,7 @@ where ip[0:1] == [0x45]
 ## Arrays example 2
 Extract the identification field 2 bytes at offset 4
 
-```
+```sql
 select <fields>
 from sensor
 where ip[4:2] == [0,1]
@@ -80,7 +81,7 @@ where ip[4:2] == [0,1]
 
 You can use full dates in the intervals
 
-```
+```sql
 select <field>
 from sensor
 where <condition>
@@ -105,7 +106,7 @@ M: monthe
 
 
 The following example is unsing an interval from now to the last 30 seconds
-```
+```sql
 select <field>
 from sensor
 where <condition>
@@ -119,7 +120,7 @@ top 10;
 ### Bit AND
 Apply bit mask and 
 
-```
+```sql
 select <fields>
 from sensor
 where (ip[0:1] & 0xf0) == 4 
@@ -127,7 +128,7 @@ where (ip[0:1] & 0xf0) == 4
 ### Bit OR
 Apply bit mask or 
 
-```
+```sql
 select <fields>
 from sensor
 where (ip[0:1] | 0xf0) == 4 
@@ -135,7 +136,7 @@ where (ip[0:1] | 0xf0) == 4
 ### Bit XOR
 Apply bit mask xor 
 
-```
+```sql
 select <fields>
 from sensor
 where (ip[0:1] ^ 0xf0) == 0xb5 
@@ -143,7 +144,7 @@ where (ip[0:1] ^ 0xf0) == 0xb5
 ### Bit shit
 Apply bit shift right
 
-```
+```sql
 select <fields>
 from sensor
 where (ip[0:1] >> 4) == 0x04 
@@ -151,7 +152,7 @@ where (ip[0:1] >> 4) == 0x04
 
 Apply bit shift left
 
-```
+```sql
 select <fields>
 from sensor
 where (ip[0:1] << 4) == 0x00 
@@ -161,7 +162,7 @@ where (ip[0:1] << 4) == 0x00
 It's possible to use different sources in PQL. For exmaple, you could query the packet database and join with a json file or another a log file.
 
 Example:
-```
+```sql
 from source.format  #--- where source is the source of the data and 
                     #--- the format is packet if absent or otherwise
                     #--- a file name
