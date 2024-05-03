@@ -138,7 +138,6 @@ class Now(Expression):
     def __repr__(self) -> str:
         return f"Now ({self.value}, {self.offset}, {self.modifier})"
 
-
 class SelectStatement(Statement):
     def __init__(
         self,
@@ -216,6 +215,13 @@ class SelectStatement(Statement):
                    Aggregate: {self.aggregate}
 
                    """
+
+class AssertStatement(Statement):
+    def __init__(self, pql: SelectStatement, message: str, every: str, notify: str):
+        self.pql = pql
+        self.message = message
+        self.every = every
+        self.notify = notify
 
 
 class String(Expression):

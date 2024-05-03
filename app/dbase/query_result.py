@@ -29,8 +29,11 @@ class QueryResult:
         }
 
     @property
+    def is_empty(self) -> bool:
+        return len(self.result['result']) > 0
+
+    @property
     def count_reach(self) -> bool:
-        # log.debug(f"Top reach: {len(self.result['result'])}")
         return len(self.result['result']) >= self.model.top_expr
 
     def add_packet(self, packet: PacketBuilder):
@@ -115,8 +118,6 @@ class QueryResult:
                 tmp_hash += str(pb.get_field(f))
 
             record[f] = field_value
-
-        # log.debug(f"HASH: {tmp_hash}")
 
         if bool(record) and (not self.model.is_distinct or tmp_hash not in self.distinct):
             self.result["result"].append(record)

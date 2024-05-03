@@ -33,6 +33,10 @@ _keywords = {
     "as": Tokens.TOK_AS,
     "bandwidth": Tokens.TOK_BANDWIDTH,
     "distinct": Tokens.TOK_DISTINCT,
+    "assert": Tokens.TOK_ASSERT,
+    "message": Tokens.TOK_MESSAGE,
+    "every": Tokens.TOK_EVERY,
+    "notify": Tokens.TOK_NOTIFY,
 }
 
 
