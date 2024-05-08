@@ -14,17 +14,48 @@ packet {
     }
 };
 
+# Assert definition
+
+```sql
+
+define "Data and VoIP cross check"
+       assert nbr_packets == 0
+       select count(*) as nbr_packets
+       from a
+       where ip.address == 192.168.3.0/24 and
+             ip.address == 192.168.53.0/24
 
 ```
-assert "Assert vlan data and vlan voip dot not communicate"
-       count == 0
+
+```sql
+
+define "Data average bandwidth < 10Mbps fro HTTPS"
+       assert bw <= 10M
+       select bandwidth(frame.origlen) as bw
+       from a
        where ip.address == 192.168.3.0/24 and
-             ip.address == 192.168.250.0/24
-       interval now to now - 1h
-       every 1h
+             tcp.dport == HTTPS
+             
+       interval now to now - 10m
 
-       count(field)|avg(field)|sum(field)
+```
 
+```sql
+assert "Assert vlan data and vlan voip dot not communicate"
+       select ip.src, ip.dst
+       from a
+       where ip.address == 192.168.3.0/24 and
+             ip.address == 192.168.250.0/24 and 
+       having count() == 0
+       
+message "Found packet crossing vlan boundaries {result}"
+notify it_admin
+
+#-- Imply adding now to now -2h to sql 
+every 2h 
+```
+
+```sql
 assert "Assert vlan data bandwidth"
        (avg(frame.incl_len) / 3600) < 10M
        where ip.src == 192.168.3.0/24 and tcp.port == HTTPS
