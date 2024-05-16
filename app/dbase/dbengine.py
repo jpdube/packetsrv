@@ -18,10 +18,10 @@ log = logging.getLogger("packetdb")
 class DBEngine:
     def __init__(self):
         self.pkt_found = 0
-        # self.index_mgr = IndexManager()
 
     def index_db(self):
-        self.index_mgr.create_index()
+        index_mgr = IndexManager()
+        index_mgr.create_index()
 
     def run(self, pql: str):
         log.debug(pql)
@@ -31,8 +31,6 @@ class DBEngine:
         log.debug(self.model.index_field)
         index_mgr = IndexManager()
         index_result = index_mgr.search(self.model)
-        # index_result = self.index_mgr.search(
-        #     self.model.index_field, self.model.ip_list)
         searched = 0
         self.pkt_found = 0
         offset_ptr = 0
