@@ -1,6 +1,10 @@
+import cProfile
+import io
 import logging
 import multiprocessing as mp
+import pstats
 from datetime import datetime
+from pstats import SortKey
 from typing import Any, Generator
 
 from config.config import Config
@@ -37,6 +41,9 @@ class DBEngine:
 
         query_result = QueryResult(self.model)
 
+        # pr = cProfile.Profile()
+        # pr.enable()
+
         pool = mp.Pool(Config.nbr_threads())
         for idx in index_result:
             params = []
@@ -69,6 +76,13 @@ class DBEngine:
 
         log.info(
             f"---> Index scan time: {ttl_time} Result: {searched}:{self.pkt_found} TOP: {self.model.top_expr} OFFSET: {self.model.offset} TO_FETCH: {self.model.packet_to_fetch} SELECT: {self.model.select_expr}")
+
+        # pr.disable()
+        # s = io.StringIO()
+        # sortby = SortKey.CUMULATIVE
+        # ps = pstats.Stats(pr, stream=s).sort_stats(sortby)
+        # ps.print_stats()
+        # print(s.getvalue())
 
         return query_result.get_result()
 
