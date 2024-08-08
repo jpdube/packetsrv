@@ -9,12 +9,12 @@ from threading import Thread
 from api.server import start
 from config.config import Config
 from config.config_db import ConfigDB
-from rich.logging import RichHandler
-
+# from rich.logging import RichHandler
 from server.file_monitor import start_db_watcher
 
 log_format = '%(threadName)s %(message)s'
-logging.basicConfig(format=log_format, handlers=[RichHandler()])
+logging.basicConfig(format=log_format)
+# logging.basicConfig(format=log_format, handlers=[RichHandler()])
 log = logging.getLogger('packetdb')
 log.setLevel(logging.DEBUG)
 
@@ -43,10 +43,13 @@ if __name__ == "__main__":
     configdb = ConfigDB()
     # configdb.drop_tables()
     configdb.check_tables()
-    log.info(f"Node: {configdb.node_info} is online at {configdb.node_location}")
+    log.info(f"Node: {configdb.node_info} is online at {
+             configdb.node_location}")
 
     start_db_watcher(Config.pcap_path(), 1)
     from dbase.dbengine import DBEngine
+    db = DBEngine()
+    # db.index_db()
 
     api_thread = Thread(target=start, daemon=True)
     api_thread.start()
