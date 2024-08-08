@@ -33,6 +33,52 @@ class IndexManager:
         ttl_time = datetime.now() - start_time
         log.info(f"---> Total Index Time: {ttl_time}")
 
+    def chunk_size(self, proto: int) -> int:
+        result = []
+        db_filename = Config.dbase_path() + "/mindex/packetdb.db"
+        log.error(f"FILENAME: {db_filename}")
+        conn = sqlite3.connect(db_filename)
+        c = conn.cursor()
+
+        sql = """
+            select cast (avg(count) as int) 
+            from proto_stats 
+            where (proto & ?) = ?;
+
+        """
+
+        c.execute(sql, [proto, proto])
+
+        result = c.fetchone()
+
+        return result
+
+    #     pub fn get_count_stats(&self, proto: u32) -> usize {
+    #     let conn =
+    #         Connection::open(format!("{}/packetdb.db", &config::CONFIG.master_index_path)).unwrap();
+
+    #     // let mut stmt = conn.prepare("select cast (avg(count) as int) from proto_stats group by proto having (proto & ?) = ?;").unwrap();
+    #     let mut stmt = conn
+    #         .prepare("select cast (avg(count) as int) from proto_stats where (proto & ?) = ?;")
+    #         .unwrap();
+
+    #     let count_iter = stmt
+    #         .query_map([proto, proto], |row| {
+    #             Ok(StatCount {
+    #                 count: row.get(0).unwrap(),
+    #             })
+    #         })
+    #         .unwrap();
+
+    #     let mut value: usize = 0;
+
+    #     for c in count_iter {
+    #         value = c.unwrap().count;
+    #     }
+
+    #     value
+    # }
+
     def search_pkt(self, file_id: Path, search_index: int, ip_list: dict[str, list[Tuple[int, int]]]):
         result = []
         conn = sqlite3.connect(str(file_id))
@@ -85,6 +131,7 @@ class IndexManager:
             files_list.sort(key=lambda a: int(a.stem))
 
         search_index = pkt_index.build_search_index(model.index_field)
+        log.error(f"CHUNK SIZE: {self.chunk_size(search_index)}")
         log.debug(f"Computed index: {search_index:x}")
         pool = mp.Pool()
 
@@ -102,7 +149,8 @@ class IndexManager:
         if not model.has_interval:
             return None
 
-        log.debug(f"Interval s: {model.start_interval}, e: {model.end_interval}")
+        log.debug(f"Interval s: {model.start_interval}, e: {
+                  model.end_interval}")
 
         conn = sqlite3.connect(Config.pcap_master_index())
         c = conn.cursor()
