@@ -37,9 +37,7 @@ class PacketDecode:
 
     def decode(self, header: PktHeader, packet):
         self.header = header
-        # self.packet = memoryview(packet)
-        # log.debug(f"Packet to decode: {packet}")
-        self.packet = bytes(packet)
+        self.packet = memoryview(packet)
         self.offset = 18 if self.has_vlan else 14
 
     def get_byte_field(self, field_name: str, offset: int, length: int) -> bytes | None:
