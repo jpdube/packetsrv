@@ -1,12 +1,11 @@
+import logging
 from struct import unpack
 from typing import List
 
+import pyarrow as pa
 from packet.layers.fields import IPv4Address
-from packet.utils.print_hex import HexDump
 from packet.layers.packet_hdr import PktHeader
-
-import logging
-
+from packet.utils.print_hex import HexDump
 
 log = logging.getLogger("packetdb")
 
@@ -36,8 +35,10 @@ class PacketDecode:
         self.header = None
         self.offset = 0
 
-    def decode(self, header: PktHeader, packet: bytes):
+    def decode(self, header: PktHeader, packet):
         self.header = header
+        # self.packet = memoryview(packet)
+        # log.debug(f"Packet to decode: {packet}")
         self.packet = bytes(packet)
         self.offset = 18 if self.has_vlan else 14
 
