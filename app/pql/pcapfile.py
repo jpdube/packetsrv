@@ -1,9 +1,8 @@
 import logging
 import sqlite3
-from struct import pack, unpack
+from struct import unpack
 
 import pql.packet_index as pkt_index
-import pyarrow as pa
 from config.config import Config
 from packet.layers.packet_decode import PacketDecode
 from packet.layers.packet_hdr import PktHeader
@@ -61,35 +60,6 @@ class PcapFile:
                     self.offset += incl_len + 16
         except IOError:
             log.error("IO error")
-
-    def get2(self, ptr: int, hdr_size: int = 0):
-        # mem_ptr = pa.memory_map(f"/Users/jpdube/pcapdb/db/index/{file_id}.pidx")
-        # r = mem_ptr.read_buffer(20)
-        mem_fd = pa.memory_map(f"{Config.pcap_path()}/{self.filename}.pcap")
-        glob_header = mem_fd.read_buffer(PCAP_GLOBAL_HEADER_SIZE)
-        if unpack("!I", glob_header[0:4])[0] == MAGIC_BE:
-            byte_order = "!I"
-        else:
-            byte_order = "<I"
-
-        mem_fd.seek(ptr)
-        header = mem_fd.read_buffer(PCAP_PACKET_HEADER_SIZE)
-        if len(header) == 0:
-            return None
-
-        # log.debug(f"Before decode header: {header.to_pybytes()}")
-        pkt_header = decode_header(header, byte_order)
-
-        if hdr_size == 0:
-            incl_len = pkt_header.incl_len
-            packet = mem_fd.read_buffer(incl_len)
-            # log.debug(f"Header size == 0: {packet.to_pybytes()}")
-        else:
-            packet = mem_fd.read_buffer(hdr_size)
-            # log.debug(f"Header size != 0: {packet.to_pybytes()}")
-
-        mem_fd.close()
-        return (pkt_header, memoryview(packet))
 
     def get(self, ptr: int, hdr_size: int = 0):
         with open(f"{Config.pcap_path()}/{self.filename}.pcap", "rb") as fd:
