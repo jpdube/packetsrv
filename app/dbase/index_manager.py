@@ -131,7 +131,7 @@ class IndexManager:
             files_list.sort(key=lambda a: int(a.stem))
 
         search_index = pkt_index.build_search_index(model.index_field)
-        log.error(f"CHUNK SIZE: {self.chunk_size(search_index)}")
+        # log.error(f"CHUNK SIZE: {self.chunk_size(search_index)}")
         log.debug(f"Computed index: {search_index:x}")
         pool = mp.Pool()
 
