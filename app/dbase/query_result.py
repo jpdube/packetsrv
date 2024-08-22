@@ -5,7 +5,7 @@ from itertools import groupby
 from operator import itemgetter
 
 from packet.layers.field_type import get_type
-from packet.layers.fields import IPv4Address
+from packet.layers.fields import IPv4Address, MacAddress
 from packet.layers.packet_builder import PacketBuilder
 from pql.aggregate import Bandwidth
 from pql.model import SelectStatement
@@ -28,13 +28,19 @@ class QueryResult:
             "result": [],
         }
 
+        log.debug(self.model)
+        self.groupby = GroupBy(self.model)
+
     @property
     def is_empty(self) -> bool:
         return len(self.result['result']) > 0
 
     @property
     def count_reach(self) -> bool:
-        return len(self.result['result']) >= self.model.top_expr
+        if self.model.has_groupby:
+            return self.groupby.count >= self.model.top_expr
+        else:
+            return len(self.result['result']) >= self.model.top_expr
 
     def add_packet(self, packet: PacketBuilder):
         self.packet_list.append(packet)
@@ -51,54 +57,22 @@ class QueryResult:
         if ts > self.ts_end:
             self.ts_end = ts
 
-        self.process_pkt(packet)
+        if self.model.has_groupby:
+            self.groupby.add(packet)
+        else:
+            self.process_pkt(packet)
 
     def get_columns(self):
         for field in self.model.select_expr:
             self.result["columns"].append({field: get_type(field)})
 
-    def get_result(self) -> list[dict[str, str | str]]:
+    def get_result(self) -> list:
         self.distinct = []
         self.get_columns()
         if self.model.has_groupby:
-            self.group_by()
-            return self.result
-            # return [{"group by": "True"}]
-        self.aggregate()
+            # self.groupby.print()
+            self.result['result'] = self.groupby.get_result()
         return self.result
-
-    def group_by(self):
-        grp_result = defaultdict(list)
-
-        record = {}
-        for idx, pkt in enumerate(self.packet_list):
-            tmp_list = []
-            for grp_field in self.model.groupby_fields:
-                tmp_list.append(pkt.get_field(grp_field))
-
-            key = (*tmp_list,)
-            grp_result[key].append(idx)
-
-        for key, aggr in grp_result.items():
-            record = {}
-            for i, k in enumerate(key):
-                record[self.model.groupby_fields[i]] = f"{IPv4Address(k)}"
-            record['aggr'] = len(aggr)
-            log.debug(record)
-            self.result["result"].append(record)
-        # print(grp_result)
-
-    def aggregate(self) -> None:
-        if len(self.model.aggregate) == 0:
-            return
-
-        record = {}
-        for aggr in self.model.aggregate:
-            if isinstance(aggr, Bandwidth):
-                aggr.time_range(self.ts_start, self.ts_end)
-
-            record[aggr.as_of] = aggr.execute(self.packet_list)
-        self.result["result"].insert(0, record)
 
     def process_pkt(self, pb: PacketBuilder):
         if len(self.model.select_expr) == 0:
@@ -114,11 +88,60 @@ class QueryResult:
             else:
                 field_value = pb.get_field(f)
 
-            if self.model.is_distinct:
+            if self.model.has_distinct:
                 tmp_hash += str(pb.get_field(f))
 
             record[f] = field_value
 
-        if bool(record) and (not self.model.is_distinct or tmp_hash not in self.distinct):
+        if bool(record) and (not self.model.has_distinct or tmp_hash not in self.distinct):
             self.result["result"].append(record)
             self.distinct.append(tmp_hash)
+
+
+class GroupBy:
+    def __init__(self, model: SelectStatement):
+        self.model = model
+        self.grp_result = defaultdict(list)
+
+    def add(self, packet: PacketBuilder):
+        key = []
+        for grp_field in self.model.groupby_fields:
+            key.append(packet.get_field(grp_field))
+
+        self.grp_result[(*key,)].append(packet)
+
+    @property
+    def count(self) -> int:
+        return len(self.grp_result)
+
+    def get_result(self) -> list:
+        result = []
+        field_value = None
+
+        for key, pkt_list in self.grp_result.items():
+            record = {}
+            for index, k in enumerate(key):
+                if self.model.groupby_fields[index] in ['ip.src', 'ip.dst']:
+                    field_value = str(IPv4Address(k))
+                elif self.model.groupby_fields[index] in ['eth.src', 'eth.dst']:
+                    field_value = str(k)
+                else:
+                    field_value = k
+
+                record[self.model.groupby_fields[index]] = field_value
+
+            for aggr in self.model.aggregate:
+                record[aggr.as_of] = aggr.execute(pkt_list)
+
+            result.append(record)
+
+        # log.debug(f"GroupBy Result: {result}")
+
+        return result
+
+    def print(self):
+        for key, value in self.grp_result.items():
+            log.debug(f"Group ADD: {
+                key}->{len(value)}\n-----------------------------------")
+
+        log.debug(f"Group by total: {len(self.grp_result)}")
