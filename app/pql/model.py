@@ -138,6 +138,7 @@ class Now(Expression):
     def __repr__(self) -> str:
         return f"Now ({self.value}, {self.offset}, {self.modifier})"
 
+
 class SelectStatement(Statement):
     def __init__(
         self,
@@ -177,8 +178,12 @@ class SelectStatement(Statement):
         return self.offset + self.top_expr
 
     @property
-    def is_distinct(self) -> bool:
+    def has_distinct(self) -> bool:
         return self.distinct
+
+    @property
+    def has_groupby(self) -> bool:
+        return self.groupby_fields is not None
 
     @property
     def has_interval(self) -> bool:
@@ -198,10 +203,6 @@ class SelectStatement(Statement):
         else:
             return 0
 
-    @property
-    def has_groupby(self) -> bool:
-        return self.groupby_fields is not None
-
     def __repr__(self) -> str:
         return f"""SelectStatement Select: {self.select_expr},
                    From: {repr(self.from_fields)},
@@ -213,8 +214,10 @@ class SelectStatement(Statement):
                    Offset: {self.offset},
                    Interval: {self.interval[0]} to {self.interval[1]},
                    Aggregate: {self.aggregate}
+                   Distinct: {self.has_distinct}
 
                    """
+
 
 class AssertStatement(Statement):
     def __init__(self, pql: SelectStatement, message: str, every: str, notify: str):
