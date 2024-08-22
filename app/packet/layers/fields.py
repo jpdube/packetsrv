@@ -132,8 +132,14 @@ class MacAddress():
 
             return result
 
+    def __hash__(self):
+        return self.to_int()
+
     def __str__(self) -> str:
         return f"{self.value[0]:02x}:{self.value[1]:02x}:{self.value[2]:02x}:{self.value[3]:02x}:{self.value[4]:02x}:{self.value[5]:02x}"
+
+    # def __repr__(self) -> str:
+    #     return f"{self.value[0]:02x}:{self.value[1]:02x}:{self.value[2]:02x}:{self.value[3]:02x}:{self.value[4]:02x}:{self.value[5]:02x}"
 
     def __eq__(self, other) -> bool:
         return other.value == self.value

@@ -1,3 +1,5 @@
+import base64
+import logging
 from typing import Dict, List, Tuple
 
 from packet.layers.arp import ARP
@@ -12,14 +14,10 @@ from packet.layers.ipv4 import IP_PROTO_ICMP, IP_PROTO_TCP, IP_PROTO_UDP, IPV4
 from packet.layers.ipv6 import IPV6
 from packet.layers.layer_type import LayerID
 from packet.layers.packet import Packet
+from packet.layers.packet_hdr import PktHeader
 from packet.layers.tcp import TCP
 from packet.layers.udp import UDP
 from packet.utils.print_hex import HexDump
-from packet.layers.packet_hdr import PktHeader
-
-import base64
-import logging
-
 
 log = logging.getLogger("packetdb")
 
@@ -109,6 +107,12 @@ class PacketBuilder:
                 self.add(icmp)
 
     def __str__(self) -> str:
+        result = ""
+        for l in self.layers.values():
+            result += f"{l}\n"
+        return result
+
+    def __repr__(self) -> str:
         result = ""
         for l in self.layers.values():
             result += f"{l}\n"
