@@ -1,9 +1,9 @@
+# IPv4Interface, IPv4Network, IPv4Address
+import json
+from ipaddress import *
 from struct import pack
 from time import time_ns
 from typing import Tuple
-from ipaddress import *
-# IPv4Interface, IPv4Network, IPv4Address
-import json
 
 
 class FieldList:
@@ -229,6 +229,12 @@ class IPv4Address():
         return pack(">L", self.value)
 
     def __str__(self) -> str:
+        if self.value is not None:
+            return f"{self.ip_str}"
+        else:
+            return f"IPv4 invalid address"
+
+    def __repr__(self) -> str:
         if self.value is not None:
             return f"{self.ip_str}"
         else:
