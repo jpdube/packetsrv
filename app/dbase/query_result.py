@@ -1,13 +1,10 @@
 import logging
 import sys
 from collections import defaultdict
-from itertools import groupby
-from operator import itemgetter
 
 from packet.layers.field_type import get_type
-from packet.layers.fields import IPv4Address, MacAddress
+from packet.layers.fields import IPv4Address
 from packet.layers.packet_builder import PacketBuilder
-from pql.aggregate import Bandwidth
 from pql.model import SelectStatement
 
 log = logging.getLogger("packetdb")
@@ -134,8 +131,6 @@ class GroupBy:
                 record[aggr.as_of] = aggr.execute(pkt_list)
 
             result.append(record)
-
-        # log.debug(f"GroupBy Result: {result}")
 
         return result
 
