@@ -2,7 +2,6 @@ import logging
 from struct import unpack
 from typing import List
 
-import pyarrow as pa
 from packet.layers.fields import IPv4Address
 from packet.layers.packet_hdr import PktHeader
 from packet.utils.print_hex import HexDump
