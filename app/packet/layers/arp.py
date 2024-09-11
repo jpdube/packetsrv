@@ -61,6 +61,19 @@ class ARP(Packet):
 
         return result
 
+    def export(self) -> dict[str, int | str]:
+        return {
+            "arp.htype": self.htype,
+            "arp.hlen": self.hlen,
+            "arp.ptype": self.ptype,
+            "arp.plen": self.plen,
+            "arp.opcode": self.opcode,
+            "arp.srcmac": self.src_mac,
+            "arp.targetmac": self.target_mac,
+            "arp.srcip": self.src_ip,
+            "arp.targetip": self.target_ip,
+        }
+
     def __str__(self):
         return f"ARP -> Opcode: {self.opcode}, Htype: {self.htype}, PType: {self.ptype}, smac: {self.src_mac}, sip: {self.src_ip}, tmac: {self.target_mac}, tip: {self.target_ip}"
 

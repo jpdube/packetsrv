@@ -114,6 +114,17 @@ class IPV4(Packet):
 
         return result
 
+    def export(self) -> dict[str, int | str]:
+        return {
+            "ip.dst": str(self.src_ip),
+            "ip.src": str(self.dst_ip),
+            "ip.protocol": self.protocol,
+            "ip.ihl": self.ihl,
+            "ip.ttl": self.ttl,
+            "ip.flags": self.flags,
+            "ip.checksum": self.checksum,
+        }
+
     def __str__(self) -> str:
         return f"IPV4 -> src_ip: {self.src_ip}, dst_ip: {self.dst_ip}, proto: {self.protocol}, ttl: {self.ttl}, flags: {self.flags:x}, tos:{self.tos:x}"
 

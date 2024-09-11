@@ -40,6 +40,14 @@ class UDP(Packet):
 
         return result
 
+    def export(self) -> dict[str, int | str]:
+        return {
+            "udp.sport": self.src_port,
+            "udp.dport": self.dst_port,
+            "udp.len": self.length,
+            "udp.checksum": self.checksum,
+        }
+
     def __str__(self) -> str:
         return f"UDP -> Src port: {self.src_port}, Dst Port: {self.dst_port}, Length: {self.length}, Checksum: {self.checksum}"
 

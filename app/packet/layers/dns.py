@@ -221,6 +221,16 @@ class Dns(Packet):
 
         return result
 
+    def export(self) -> dict[str, int | str]:
+        return {
+            "dns.id": self.header.id,
+            "dns.flags": self.header.flags,
+            "dns.qr_flag": self.header.qr_flag,
+            "dns.opcode": self.header.opcode,
+            "dns.recursion": self.header.recursion,
+            "dns.questions": self.header.questions,
+        }
+
     def __str__(self) -> str:
         result = (
             f"DNS ->{self.header} Option: {self.queries}\n"

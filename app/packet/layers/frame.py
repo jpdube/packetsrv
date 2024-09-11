@@ -43,6 +43,14 @@ class Frame(Packet):
 
         return result
 
+    def export(self) -> dict[str, int | str]:
+        return {
+            "frame.timestamp": self.ts_format,
+            "frame.ts_offset": self.ts_usec,
+            "frame.origlen": self.orig_len,
+            "frame.inclen": self.incl_len,
+        }
+
     def get_field(self, fieldname: str):
         field = fieldname.split('.')[1]
         if field:

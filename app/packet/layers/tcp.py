@@ -139,6 +139,17 @@ class TCP(Packet):
 
         return result
 
+    def export(self) -> dict[str, int | str]:
+        return {
+            "tcp.sport": self.src_port,
+            "tcp.dport": self.dst_port,
+            "tcp.seq_no": self.seq_no,
+            "tcp.ack_no": self.ack_no,
+            "tcp.hdr_len": self.header_len,
+            "tcp.flags": self.flags,
+            "tcp.checksum": self.checksum,
+        }
+
     def __str__(self) -> str:
         return f"TCP -> sport: {self.src_port} dport: {self.dst_port} SYN:{self.flag_syn} ACK:{self.flag_ack} FIN:{self.flag_fin} PUSH:{self.flag_push} URG:{self.flag_urg} RST:{self.flag_rst}"
 

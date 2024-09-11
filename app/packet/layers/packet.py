@@ -13,3 +13,7 @@ class Packet(ABC):
     @abstractmethod
     def get_field(self, fieldname: str) -> None | int:
         return None
+
+    @abstractmethod
+    def export(self) -> dict[str, str | int]:
+        return None

@@ -63,6 +63,16 @@ class Ethernet(Packet):
         result += f'{" " * offset}   Vlan ID..: {self.vlan_id}\n'
         return result
 
+    def export(self) -> dict[str, int | str]:
+        return {
+            "eth.src_mac": str(self.src_mac),
+            "eth.dst_mac": str(self.dst_mac),
+            "eth.ethertype": self.ethertype,
+            "eth.vlan": self.vlan_id
+        }
+
+
+
     def __str__(self):
         return f"Ethernet -> dst_mac: {self.dst_mac}, src_mac: {self.src_mac}, protocol: {self.ethertype}/{self.ethertype:04x}, vlan_id: {self.vlan_id}/{self.vlan_id:x}"
 
