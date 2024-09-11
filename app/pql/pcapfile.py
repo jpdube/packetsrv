@@ -1,4 +1,5 @@
 import logging
+import os
 import sqlite3
 from struct import unpack
 
@@ -135,6 +136,9 @@ class PcapFile:
         return (first_ts, last_ts, int(file_id))
 
     def create_db_index(self, db_name: str, index_list):
+        if os.path.exists(db_name):
+            os.remove(db_name)
+
         conn = sqlite3.connect(db_name)
         c = conn.cursor()
         c.execute("drop table if exists pkt_index;")
