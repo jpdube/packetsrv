@@ -63,7 +63,7 @@ class QueryResult:
         for field in self.model.select_expr:
             self.result["columns"].append({field: get_type(field)})
 
-    def get_result(self) -> list:
+    def get_result(self) -> dict:
         self.distinct = []
         self.get_columns()
         if self.model.has_groupby:
