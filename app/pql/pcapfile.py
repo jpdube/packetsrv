@@ -2,6 +2,7 @@ import logging
 import os
 import sqlite3
 from struct import unpack
+from typing import Tuple
 
 import pql.packet_index as pkt_index
 from config.config import Config
@@ -62,7 +63,7 @@ class PcapFile:
         except IOError:
             log.error("IO error")
 
-    def get(self, ptr: int, hdr_size: int = 0):
+    def get(self, ptr: int, hdr_size: int = 0) -> Tuple[PktHeader, bytes] | None:
         with open(f"{Config.pcap_path()}/{self.filename}.pcap", "rb") as fd:
             glob_header = fd.read(PCAP_GLOBAL_HEADER_SIZE)
             if unpack("!I", glob_header[0:4])[0] == MAGIC_BE:
