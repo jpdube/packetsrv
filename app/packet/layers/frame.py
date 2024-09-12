@@ -6,7 +6,7 @@ from packet.layers.packet import Packet
 
 
 class Frame(Packet):
-    name = LayerID.HEADER
+    name = LayerID.FRAME
 
     def __init__(self, header: PktHeader):
         self.header = header

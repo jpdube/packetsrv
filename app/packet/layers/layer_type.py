@@ -10,7 +10,7 @@ class LayerID(Enum):
     UDP = auto()
     ARP = auto()
     ICMP = auto()
-    HEADER = auto()
+    FRAME = auto()
     UNDEFINED = auto()
     DHCP = auto()
 

@@ -77,18 +77,22 @@ class QueryResult:
 
         tmp_hash = ""
         record = {}
-        for f in self.model.select_expr:
-            if f in ["ip.dst", "ip.src"]:
-                field_value = f"{IPv4Address(pb.get_field(f))}"
-            elif f in ["eth.src", "eth.dst"]:
-                field_value = str(pb.get_field(f))
-            else:
-                field_value = pb.get_field(f)
 
-            if self.model.has_distinct:
-                tmp_hash += str(pb.get_field(f))
+        if "frame.all" in self.model.select_expr:
+            record = pb.export()
+        else:
+            for f in self.model.select_expr:
+                if f in ["ip.dst", "ip.src"]:
+                    field_value = f"{IPv4Address(pb.get_field(f))}"
+                elif f in ["eth.src", "eth.dst"]:
+                    field_value = str(pb.get_field(f))
+                else:
+                    field_value = pb.get_field(f)
 
-            record[f] = field_value
+                if self.model.has_distinct:
+                    tmp_hash += str(pb.get_field(f))
+
+                record[f] = field_value
 
         if bool(record) and (not self.model.has_distinct or tmp_hash not in self.distinct):
             self.result["result"].append(record)

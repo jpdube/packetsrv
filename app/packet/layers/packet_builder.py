@@ -119,55 +119,11 @@ class PacketBuilder:
         return result
 
     def export(self) -> Dict:
-        result = []
+        result = {}
         for layer in self.layers.values():
-            record = {
-                 str(layer.name): layer.export()
-            }
-
-            result.append(record)
+            result.update(layer.export())
 
         return result
-
-    # def export(self) -> Dict:
-    #     result = {}
-    #     for layer in self.layers.values():
-    #         if isinstance(layer, Ethernet):
-    #             result["ether.src"] = layer.src_mac.to_int()
-    #             result["ether.dst"] = layer.dst_mac.to_int()
-    #             result["ether.ethertype"] = layer.ethertype
-    #             result["ether.vlan"] = layer.vlan_id
-
-    #         elif isinstance(layer, ARP):
-    #             result["arp.opcode"] = layer.opcode
-    #             result["arp.src_ip"] = layer.src_ip.value
-    #             result["arp.target_ip"] = layer.target_ip.value
-
-    #         elif isinstance(layer, IPV4):
-    #             result["ip.src"] = layer.src_ip.value
-    #             result["ip.dst"] = layer.dst_ip.value
-    #             result["ip.proto"] = layer.protocol
-
-    #         elif isinstance(layer, TCP):
-    #             result["sport"] = layer.src_port
-    #             result["dport"] = layer.dst_port
-
-    #         elif isinstance(layer, UDP):
-    #             result["sport"] = layer.src_port
-    #             result["dport"] = layer.dst_port
-
-    #         elif isinstance(layer, IcmpEcho):
-    #             result["icmp.type"] = layer.type
-    #             result["icmp.code"] = layer.code
-    #             result["icmp.seq"] = layer.sequence_no
-
-    #         elif isinstance(layer, Frame):
-    #             result["orig_len"] = layer.orig_len
-    #             result["incl_len"] = layer.incl_len
-    #             result["ts_offset"] = layer.ts_usec
-    #             result["timestamp"] = layer.ts_format
-
-    #     return result
 
     def summary(self):
         for i, p in enumerate(self.layers.values()):
@@ -184,14 +140,14 @@ class PacketBuilder:
     def get_layer(self, layer_id):
         return self.layers.get(layer_id, None)
 
-    def get_field(self, field: str) -> None | int:
+    def get_field(self, field: str) -> None | int | str | Dict:
         pkt_name = field.split('.')[0]
         if pkt_name == 'eth':
             eth = self.get_layer(LayerID.ETHERNET)
             if eth:
                 return eth.get_field(field)
         elif pkt_name == 'frame':
-            frame = self.get_layer(LayerID.HEADER)
+            frame = self.get_layer(LayerID.FRAME)
             if field == 'frame.packet':
                 return self.to_base64()
             elif field == 'frame.all':
