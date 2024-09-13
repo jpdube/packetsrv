@@ -154,10 +154,14 @@ class PacketBuilder:
                 return self.export()
             elif frame:
                 return frame.get_field(field)
+        elif pkt_name == 'arp':
+            arp = self.get_layer(LayerID.ARP)
+            if arp:
+                return arp.get_field(field)
         elif pkt_name == 'ip':
-            ip = self.get_layer(LayerID.IPV4)
-            if ip:
-                return ip.get_field(field)
+            arp = self.get_layer(LayerID.IPV4)
+            if arp:
+                return arp.get_field(field)
         elif pkt_name == 'tcp':
             tcp = self.get_layer(LayerID.TCP)
             if tcp:

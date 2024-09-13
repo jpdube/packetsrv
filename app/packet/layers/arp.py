@@ -1,11 +1,14 @@
-from packet.layers.fields import IPv4Address, MacAddress
 from struct import unpack
-from packet.layers.packet import Packet
 from typing import Dict
+
+from packet.layers.fields import IPv4Address, MacAddress
+from packet.layers.layer_type import LayerID
+from packet.layers.packet import Packet
 
 
 class ARP(Packet):
-    name = 5
+    name = LayerID.ARP
+
     __slots__ = ["packet"]
 
     def __init__(self, packet):
@@ -32,11 +35,11 @@ class ARP(Packet):
         return unpack("!H", self.packet[6:8])[0]
 
     @property
-    def src_mac(self) -> MacAddress:
+    def sender_mac(self) -> MacAddress:
         return MacAddress(self.packet[8:14])
 
     @property
-    def src_ip(self) -> IPv4Address:
+    def sender_ip(self) -> IPv4Address:
         return IPv4Address(self.packet[14:18])
 
     @property
@@ -54,9 +57,9 @@ class ARP(Packet):
         result += f'{" " * offset}   Protocl type..: {self.ptype}\n'
         result += f'{" " * offset}   Protocol len..: {self.plen}\n'
         result += f'{" " * offset}   Opcode........: {self.opcode}\n'
-        result += f'{" " * offset}   Src MAC.......: {self.src_mac}\n'
+        result += f'{" " * offset}   Src MAC.......: {self.sender_mac}\n'
         result += f'{" " * offset}   Target MAC....: {self.target_mac}\n'
-        result += f'{" " * offset}   Src IP........: {self.src_ip}\n'
+        result += f'{" " * offset}   Src IP........: {self.sender_ip}\n'
         result += f'{" " * offset}   Target IP.....: {self.target_ip}\n'
 
         return result
@@ -68,14 +71,33 @@ class ARP(Packet):
             "arp.ptype": self.ptype,
             "arp.plen": self.plen,
             "arp.opcode": self.opcode,
-            "arp.srcmac": self.src_mac,
+            "arp.srcmac": self.sender_mac,
             "arp.targetmac": self.target_mac,
-            "arp.srcip": self.src_ip,
+            "arp.srcip": self.sender_ip,
             "arp.targetip": self.target_ip,
         }
 
     def __str__(self):
-        return f"ARP -> Opcode: {self.opcode}, Htype: {self.htype}, PType: {self.ptype}, smac: {self.src_mac}, sip: {self.src_ip}, tmac: {self.target_mac}, tip: {self.target_ip}"
+        return f"ARP -> Opcode: {self.opcode}, Htype: {self.htype}, PType: {self.ptype}, smac: {self.sender_mac}, sip: {self.sender_ip}, tmac: {self.target_mac}, tip: {self.target_ip}"
 
     def get_field(self, fieldname: str):
-        ...
+        if fieldname == "arp.htype":
+            return self.htype
+        elif fieldname == "arp.hlen":
+            return self.hlen
+        elif fieldname == "arp.ptype":
+            return self.ptype
+        elif fieldname == "arp.plen":
+            return self.plen
+        elif fieldname == "arp.opcode":
+            return self.opcode
+        elif fieldname == "arp.sender_mac":
+            return str(self.sender_mac)
+        elif fieldname == "arp.target_mac":
+            return str(self.target_mac)
+        elif fieldname == "arp.target_ip":
+            return str(self.target_ip)
+        elif fieldname == "arp.sender_ip":
+            return str(self.sender_ip)
+        elif fieldname == "arp.target_ip":
+            return str(self.target_ip)

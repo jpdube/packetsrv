@@ -11,7 +11,7 @@ log = logging.getLogger("packetdb")
 FRAME_TYPE_8021Q = 0x8100
 FRAME_TYPE_IPV4 = 0x0800
 FRAME_TYPE_IPV6 = 0x86DD
-FRAME_TYPE_ARP = 0x0801
+FRAME_TYPE_ARP = 0x0806
 
 ETHER_TYPE_LIST = [
     0x0800, 0x0806, 0x0842, 0x22F0, 0x22F3, 0x22EA, 0x6002,
@@ -61,6 +61,8 @@ class PacketDecode:
             return self.search_tcp(field)
         elif proto == "udp":
             return self.search_udp(field)
+        elif proto == "arp":
+            return self.search_arp(field)
         else:
             return False
 
@@ -222,6 +224,35 @@ class PacketDecode:
         else:
             return 0
 
+    def search_arp(self, field: str) -> int:
+
+        if field == "htype":
+            return self.arp_htype
+
+        elif field == "hlen":
+            return self.arp_hlen
+
+        elif field == "ptype":
+            return self.arp_ptype
+
+        elif field == "plen":
+            return self.arp_plen
+
+        elif field == "opcode":
+            return self.arp_opcode
+
+        elif field == "sender_mac":
+            return self.arp_sender_mac
+        elif field == "target_mac":
+            return self.arp_target_mac
+        elif field == "sender_ip":
+            return self.arp_sender_ip
+        elif field == "target_ip":
+            return self.arp_target_ip
+
+        else:
+            return 0
+
     def get_mac(self, mac_bytes) -> int:
         response = (mac_bytes[0] << 40) & 0x00_00_FF_00_00_00_00_00
         response += (mac_bytes[1] << 32) & 0x00_00_00_FF_00_00_00_00
@@ -239,6 +270,10 @@ class PacketDecode:
     @property
     def has_ipv4(self) -> bool:
         return self.ethertype == FRAME_TYPE_IPV4
+
+    @property
+    def has_arp(self) -> bool:
+        return self.ethertype == FRAME_TYPE_ARP
 
     @property
     def has_tcp(self) -> bool:
@@ -518,3 +553,43 @@ class PacketDecode:
     @property
     def udp_checksum(self) -> int:
         return unpack("!H", self.packet[self.ip_offset + 6:self.ip_offset + 8])[0]
+
+    # --- ARP
+    @property
+    def arp_htype(self) -> int:
+        return unpack(
+            "!H", self.packet[self.eth_size + 0:self.eth_size + 2])[0]
+
+    @property
+    def arp_ptype(self) -> int:
+        return unpack(
+            "!H", self.packet[self.eth_size + 2:self.eth_size + 4])[0]
+
+    @property
+    def arp_hlen(self) -> int:
+        return self.packet[self.eth_size + 4]
+
+    @property
+    def arp_plen(self) -> int:
+        return self.packet[self.eth_size + 5]
+
+    @property
+    def arp_opcode(self) -> int:
+        return unpack(
+            "!H", self.packet[self.eth_size + 6:self.eth_size + 8])[0]
+
+    @property
+    def arp_sender_mac(self):
+        return self.packet[self.eth_size + 8:self.eth_size + 14]
+
+    @property
+    def arp_sender_ip(self) -> int:
+        return unpack("!I", self.packet[self.eth_size + 14:self.eth_size + 18])[0]
+
+    @property
+    def arp_target_mac(self) -> int:
+        return self.packet[self.eth_size + 18:self.eth_size + 24]
+
+    @property
+    def arp_target_ip(self) -> int:
+        return unpack("!I", self.packet[self.eth_size + 18:self.eth_size + 24])[0]

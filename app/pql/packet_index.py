@@ -33,6 +33,8 @@ def packet_index(pd: PacketDecode) -> int:
 
     if pd.has_ethernet:
         pindex = pindex + ETHERNET
+    if pd.has_arp:
+        pindex = pindex + ARP
     if pd.has_ipv4:
         pindex = pindex + IPv4
     if pd.has_icmp:
