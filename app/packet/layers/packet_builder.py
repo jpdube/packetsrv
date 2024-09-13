@@ -51,6 +51,22 @@ class PacketBuilder:
         for v in self.layers.values():
             print(f"{v}")
 
+    def get_byte_field(self, proto: str, offset: int, length: int) -> bytes | None:
+        layer = self.get_layer_by_proto(proto)
+        if layer:
+            return layer.get_array(offset, length)
+
+        return None
+
+    def get_layer_by_proto(self, str_proto: str):
+        match str_proto:
+            case "eth": return self.get_layer(LayerID.ETHERNET)
+            case "ip": return self.get_layer(LayerID.IPV4)
+            case "tcp": return self.get_layer(LayerID.TCP)
+
+            case other:
+                return None
+
     def from_bytes(self, raw_packet, header: PktHeader | Frame = None):
         self.layers: Dict[LayerID, Packet] = {}
         self.packet = raw_packet

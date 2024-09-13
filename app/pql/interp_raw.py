@@ -4,6 +4,7 @@ from datetime import datetime, timedelta
 
 from dbase.packet_ptr import PktPtr
 from packet.layers.packet_decode import PacketDecode
+from packet.layers.packet_builder import PacketBuilder
 from packet.layers.packet_hdr import PktHeader
 from pql.model import (Array, BinOp, Boolean, ConstDecl, Date, Grouping,
                        Integer, IPv4, Label, LabelByte, Mac, Now,
@@ -22,16 +23,15 @@ def exec_program(model, pkt_ref: PktPtr):
     pfile.open(f"{pkt_ref.file_id}")
     env = {}
 
-    pd = PacketDecode()
     hdr, pkt = pfile.get(pkt_ref.ptr, 0)
-    pd.decode(hdr, pkt)
+    pd = PacketBuilder()
+    pd.from_bytes(pkt, hdr)
     if interpret(model, env, pd):
         pkt_ref.header = hdr
         pkt_ref.packet = pkt
         return pkt_ref
     else:
         return None
-
 
 def cmp_array(left, right) -> bool:
     if len(left) != len(right):
