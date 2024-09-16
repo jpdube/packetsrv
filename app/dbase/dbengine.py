@@ -1,10 +1,7 @@
-import cProfile
-import io
+# import cProfile
 import logging
 import multiprocessing as mp
-import pstats
 from datetime import datetime
-from pstats import SortKey
 from typing import Any, Generator
 
 from config.config import Config
@@ -80,9 +77,11 @@ class DBEngine:
 
         return query_result.get_result()
 
-    def search_pkt(self, pkt_ptr: PktPtr, where_expr):
+    def search_pkt(self, pkt_ptr: PktPtr, where_expr) -> PacketBuilder | None:
         if pkt_result := exec_program(where_expr, pkt_ptr):
             return pkt_result
+        else:
+            return None
 
     def chunks(self, l: list[Any], n: int) -> Generator[Any, Any, Any]:
         for i in range(0, len(l), n):
