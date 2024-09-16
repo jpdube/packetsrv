@@ -78,29 +78,11 @@ class DBEngine:
         log.info(
             f"---> Index scan time: {ttl_time} Result: {searched}:{self.pkt_found} TOP: {self.model.top_expr} OFFSET: {self.model.offset} TO_FETCH: {self.model.packet_to_fetch} SELECT: {self.model.select_expr}")
 
-        # pr.disable()
-        # s = io.StringIO()
-        # sortby = SortKey.CUMULATIVE
-        # ps = pstats.Stats(pr, stream=s).sort_stats(sortby)
-        # ps.print_stats()
-        # print(s.getvalue())
-
         return query_result.get_result()
 
     def search_pkt(self, pkt_ptr: PktPtr, where_expr):
-        pkt_result = exec_program(where_expr, pkt_ptr)
-        if pkt_result is not None:
-            # spkt = Ether(pkt_result.packet)
-            # spkt.show()
-
-            # if IP in spkt:
-            #     ip_val = spkt[IP]
-            #     print(ip_val)
-            # log.info(spkt[IP].src)
-
-            pb = PacketBuilder()
-            pb.from_bytes(pkt_result.packet, pkt_result.header)
-            return pb
+        if pkt_result := exec_program(where_expr, pkt_ptr):
+            return pkt_result
 
     def chunks(self, l: list[Any], n: int) -> Generator[Any, Any, Any]:
         for i in range(0, len(l), n):

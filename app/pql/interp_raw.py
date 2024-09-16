@@ -24,14 +24,13 @@ def exec_program(model, pkt_ref: PktPtr):
     env = {}
 
     hdr, pkt = pfile.get(pkt_ref.ptr, 0)
-    pd = PacketBuilder()
-    pd.from_bytes(pkt, hdr)
-    if interpret(model, env, pd):
-        pkt_ref.header = hdr
-        pkt_ref.packet = pkt
-        return pkt_ref
+    pb = PacketBuilder()
+    pb.from_bytes(pkt, hdr)
+    if interpret(model, env, pb):
+        return pb
     else:
         return None
+
 
 def cmp_array(left, right) -> bool:
     if len(left) != len(right):
