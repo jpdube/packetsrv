@@ -184,9 +184,13 @@ class PacketBuilder:
                 return tcp.get_field(field)
 
         elif pkt_name == 'udp':
-            udp = self.get_layer(LayerID.UDP)
-            if udp:
-                return udp.get_field(field)
+            dhcp = self.get_layer(LayerID.UDP)
+            if dhcp:
+                return dhcp.get_field(field)
+        elif pkt_name == 'dhcp':
+            dhcp = self.get_layer(LayerID.DHCP)
+            if dhcp:
+                return dhcp.get_field(field)
 
         return None
 

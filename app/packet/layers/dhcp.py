@@ -1,10 +1,10 @@
-from packet.layers.fields import IPv4Address, MacAddress
 from struct import unpack
+from typing import Tuple
+
+from packet.layers.fields import IPv4Address, MacAddress
 from packet.layers.layer_type import LayerID
 from packet.layers.packet import Packet
-from typing import Tuple
 from packet.utils.print_hex import HexDump
-
 
 params_req_list = {
     1: "Subnet mask",
@@ -59,6 +59,9 @@ class DHCPOption:
     def __str__(self) -> str:
         return f"{self.option_no:02}: {self.option_name} -> "
 
+    def export(self) -> dict:
+        return {}
+
 
 # 5303
 class Request(DHCPOption):
@@ -68,8 +71,12 @@ class Request(DHCPOption):
     def __str__(self) -> str:
         return f"{super().__str__()}53{self.opt_len:02}{self.option[0]:02}"
 
+    def export(self) -> dict:
+        return {}
 
 # 5305
+
+
 class Ack(DHCPOption):
     def __init__(self, option_len, option):
         super().__init__(option_len, option, 5, "DHCP Ack")
@@ -77,8 +84,12 @@ class Ack(DHCPOption):
     def __str__(self) -> str:
         return f"{super().__str__()}53{self.opt_len:02}{self.option[0]:02}"
 
+    def export(self) -> dict:
+        return {}
 
 # 54
+
+
 class ServerIP(DHCPOption):
     pass
 
@@ -97,8 +108,14 @@ class Netmask(DHCPOption):
     def __str__(self) -> str:
         return f"{super().__str__()}{self.mask}"
 
+    def export(self) -> dict:
+        return {}
 
+    def export(self) -> dict:
+        return {"dhcp.netmask": str(self.mask)}
 # 3
+
+
 class Router(DHCPOption):
     def __init__(self, opt_len, option):
         super().__init__(opt_len, option, 3, "Router")
@@ -127,6 +144,13 @@ class Router(DHCPOption):
 
     def summary(self, offset: int) -> str:
         result = f'{" " * offset}   {self.__str__()}\n'
+        return result
+
+    def export(self) -> dict:
+        result = {}
+        for i, r in enumerate(self.router_list):
+            result[f"dhcp.router_{i}"] = str(r)
+
         return result
 
 
@@ -159,8 +183,16 @@ class DomainNameServer(DHCPOption):
         result = f'{" " * offset}   {self.__str__()}\n'
         return result
 
+    def export(self) -> dict:
+        result = {}
+        for i, r in enumerate(self.dns_list):
+            result[f"dhcp.domain_name{i}"] = str(r)
+
+        return result
 
 # 12
+
+
 class Hostname(DHCPOption):
     def __init__(self, opt_len, option):
         super().__init__(opt_len, option, 12, "Host Name")
@@ -179,8 +211,12 @@ class Hostname(DHCPOption):
         result = f'{" " * offset}   {self.__str__()}\n'
         return result
 
+    def export(self) -> dict:
+        return {"dhcp.hostname": self.hostname}
 
 # 15
+
+
 class DomainName(DHCPOption):
     def __init__(self, opt_len, option):
         super().__init__(opt_len, option, 15, "Domain name")
@@ -200,8 +236,12 @@ class DomainName(DHCPOption):
         result = f'{" " * offset}   {self.__str__()}\n'
         return result
 
+    def export(self) -> dict:
+        return {"dhcp.domaine_name": self.domain_name}
 
 # 50
+
+
 class RequestedIPAddr(DHCPOption):
     def __init__(self, opt_len, option):
         super().__init__(opt_len, option, 50, "Requested IP address")
@@ -219,8 +259,12 @@ class RequestedIPAddr(DHCPOption):
         result = f'{" " * offset}   {self.__str__()}\n'
         return result
 
+    def export(self) -> dict:
+        return {"dhcp.requested_ip": str(self.ip_address)}
 
 # 51
+
+
 class IPAddrLeaseTime(DHCPOption):
     def __init__(self, opt_len, option):
         super().__init__(opt_len, option, 51, "IP Address lease time")
@@ -238,8 +282,12 @@ class IPAddrLeaseTime(DHCPOption):
         result = f'{" " * offset}   {self.__str__()}\n'
         return result
 
+    def export(self) -> dict:
+        return {"dhcp.lease": str(self.time)}
 
 # 55
+
+
 class ParamReqList(DHCPOption):
     def __init__(self, opt_len, option):
         super().__init__(opt_len, option, 55, "Parameter request list")
@@ -263,8 +311,16 @@ class ParamReqList(DHCPOption):
         result = f'{" " * offset}   {self.__str__()}\n'
         return result
 
+    def export(self) -> dict:
+        result = {}
+        for i, r in enumerate(self.params):
+            result[f"dhcp.param_{i}"] = r
+
+        return result
 
 # 58
+
+
 class RenewalTime(DHCPOption):
     def __init__(self, opt_len, option):
         super().__init__(opt_len, option, 58, "Renewal time")
@@ -282,8 +338,12 @@ class RenewalTime(DHCPOption):
         result = f'{" " * offset}   {self.__str__()}\n'
         return result
 
+    def export(self) -> dict:
+        return {"dhcp.renewal_time": str(self.time)}
 
 # 59
+
+
 class RebindingTime(DHCPOption):
     def __init__(self, opt_len, option):
         super().__init__(opt_len, option, 59, "Rebinding time value")
@@ -301,8 +361,12 @@ class RebindingTime(DHCPOption):
         result = f'{" " * offset}   {self.__str__()}\n'
         return result
 
+    def export(self) -> dict:
+        return {"dhcp.rebinding_time": str(self.time)}
 
 # 60
+
+
 class VendorClassId(DHCPOption):
     def __init__(self, opt_len, option):
         super().__init__(opt_len, option, 60, "Vendor class identifier")
@@ -311,8 +375,10 @@ class VendorClassId(DHCPOption):
         self.decode()
 
     def decode(self):
-        self.vci = unpack(f"!{self.opt_len - 1}s",
-                          self.option[:-1])[0].decode("utf-8")
+        self.vci = unpack(f"!{self.opt_len}s",
+                          self.option[0:])[0].decode("utf-8")
+        # self.vci = unpack(f"!{self.opt_len - 1}s",
+        #                   self.option[:-1])[0].decode("utf-8")
 
     def __str__(self) -> str:
         return f"{super().__str__()}{self.vci}"
@@ -320,6 +386,9 @@ class VendorClassId(DHCPOption):
     def summary(self, offset: int) -> str:
         result = f'{" " * offset}   {self.__str__()}\n'
         return result
+
+    def export(self) -> dict:
+        return {"dhcp.vcid": self.vci}
 
 
 # 61
@@ -342,8 +411,12 @@ class ClientIdentifier(DHCPOption):
         result = f'{" " * offset}   {self.__str__()}\n'
         return result
 
+    def export(self) -> dict:
+        return {}
 
 # 81
+
+
 class ClientFQDN(DHCPOption):
     def __init__(self, opt_len, option):
         super().__init__(opt_len, option, 81, "Client fully qualified domain name")
@@ -368,8 +441,12 @@ class ClientFQDN(DHCPOption):
         result = f'{" " * offset}   {self.__str__()}\n'
         return result
 
+    def export(self) -> dict:
+        return {"dhcp.fqdn": self.fqdn}
 
 # 125
+
+
 class VendorSpecInfo(DHCPOption):
     def __init__(self, opt_len, option):
         super().__init__(opt_len, option, 125, "V-I Vendor specific info")
@@ -387,8 +464,12 @@ class VendorSpecInfo(DHCPOption):
         result = f'{" " * offset}   {self.__str__()}\n'
         return result
 
+    def export(self) -> dict:
+        return {}
 
 # 255
+
+
 class End(DHCPOption):
     pass
 
@@ -498,7 +579,7 @@ class Dhcp(Packet):
                 self.option_list.append(response)
 
     @property
-    def msg_type(self) -> int:
+    def opcode(self) -> int:
         return unpack("!B", self.packet[0:1])[0]
 
     @property
@@ -564,18 +645,72 @@ class Dhcp(Packet):
 
     def summary(self, offset: int) -> str:
         result = f'{" " * offset}DHCP ->\n'
-        result += f'{" " * offset}   Opcode.....: {self.msg_type}\n'
+        result += f'{" " * offset}   Opcode.....: {self.opcode}\n'
 
         for opt in self.option_list:
             result += opt.summary(offset)
 
         return result
 
+    def export(self):
+        result = {
+            "dhcp.opcode": self.opcode,
+            "dhcp.htype": self.htype,
+            "dhcp.hlen": self.hlen,
+            "dhcp.hops": self.hops,
+            "dhcp.xid": self.xid,
+            "dhcp.secs": self.sec,
+            "dhcp.flags": self.flags,
+            "dhcp.ciaddr": str(self.ciaddr),
+            "dhcp.yiaddr": str(self.yiaddr),
+            "dhcp.siaddr": str(self.siaddr),
+            "dhcp.giaddr": str(self.giaddr),
+            "dhcp.chaddr": str(self.chaddr),
+            # "dhcp.sname": self.sname,
+            # "dhcp.filename": self.filename,
+
+        }
+        for opt in self.option_list:
+            result.update(opt.export())
+
+        return result
+
     def get_field(self, fieldname: str):
-        ...
+        match fieldname:
+            case "dhcp.opcode":
+                return self.opcode
+            case "dhcp.htype":
+                return self.htype
+            case "dhcp.hlen":
+                return self.hlen
+            case "dhcp.hops":
+                return self.hops
+            case "dhcp.xid":
+                return self.xid
+            case "dhcp.secs":
+                return self.sec
+            case "dhcp.flags":
+                return self.flags
+            case "dhcp.ciaddr":
+                return str(self.ciaddr)
+            case "dhcp.yiaddr":
+                return str(self.yiaddr)
+            case "dhcp.siaddr":
+                return str(self.siaddr)
+            case "dhcp.giaddr":
+                return str(self.giaddr)
+            case "dhcp.chaddr":
+                return str(self.chaddr)
+            case "dhcp.sname":
+                return self.sname
+            case "dhcp.filename":
+                return self.filename
+            case _:
+                return None
 
     def __str__(self):
-        result = f"DHCP -> Opcode: {self.msg_type}, Xid: {self.xid:x}, Lease sec: {self.sec}\n{HexDump.format_hex(self.packet)}\n********\n"
+        result = f"DHCP -> Opcode: {self.opcode}, Xid: {self.xid:x}, Lease sec: {
+            self.sec}\n{HexDump.format_hex(self.packet)}\n********\n"
         for opt in self.option_list:
             result += f" {opt}\n"
         return result

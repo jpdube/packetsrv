@@ -297,7 +297,7 @@ class PacketDecode:
     @property
     def has_dhcp(self) -> bool:
         if self.has_udp:
-            return self.udp_dport in (67, 68) or self.udp_sport in (67, 68)
+            return self.udp_dport in [67, 68] or self.udp_sport in [67, 68]
         else:
             return False
 
