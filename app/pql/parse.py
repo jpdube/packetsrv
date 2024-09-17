@@ -213,7 +213,7 @@ def parse_select(tokens):
     if tokens.peek(Tokens.TOK_DISTINCT):
         distinct = True
         tokens.expect(Tokens.TOK_DISTINCT)
-        
+
     if tokens.peek(Tokens.TOK_WILDCARD):
         field = tokens.expect(Tokens.TOK_WILDCARD)
         fields.append(Label("*"))
@@ -522,6 +522,8 @@ def parse_unary(tokens):
 def parse_source(text):
     global index_field
     index_field = set()
+    global ip_search
+    ip_search = {'ip.src': [], 'ip.dst': []}
     tokens = tokenize(text)
     model = parse_select(Tokenizer(tokens))
     return model
