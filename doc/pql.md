@@ -203,3 +203,14 @@ from source.format  #--- where source is the source of the data and
 
 This is a good example were we can parse the file and obtain the fields and the data from the same file
 
+# Packet capture with tcpdump
+
+With tcpdump running on Ubuntu you need to disable the apparmor profile 
+in roder for the move script to work. Here are some examples:
+
+```bash
+sudo apparmor_parser -R /etc/apparmor.d/usr.bin.tcpdump
+sudo aa-status
+```
+
+The aa-status command will allow you to confirmed if the disabled command was successfull
