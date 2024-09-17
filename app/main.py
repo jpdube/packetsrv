@@ -11,12 +11,12 @@ from api.server import start
 from config.config import Config
 from config.config_db import ConfigDB
 from dbase.dbengine import DBEngine
-# from rich.logging import RichHandler
+from rich.logging import RichHandler
 from server.file_monitor import start_db_watcher
 
 log_format = '%(threadName)s %(message)s'
-logging.basicConfig(format=log_format)
-# logging.basicConfig(format=log_format, handlers=[RichHandler()])
+# logging.basicConfig(format=log_format)
+logging.basicConfig(format=log_format, handlers=[RichHandler()])
 log = logging.getLogger('packetdb')
 log.setLevel(logging.DEBUG)
 
