@@ -91,17 +91,14 @@ class IndexManager:
               select pkt_ptr
               from pkt_index
               where (pindex & ?) = ?
-
               """
         if len(ip_list["ip.src"]) > 0:
-            sql += " and ip_src between ? and ? "
             net, brdcast = self.net_broadcast(
                 ip_list["ip.src"][0][0], ip_list["ip.src"][0][1])
             params.append(net)
             params.append(brdcast)
 
         if len(ip_list["ip.dst"]) > 0:
-            sql += " and ip_dst between ? and ? "
             net, brdcast = self.net_broadcast(
                 ip_list["ip.dst"][0][0], ip_list["ip.dst"][0][1])
             params.append(net)
@@ -177,38 +174,6 @@ class IndexManager:
     def chunks(self, l: list[Any], n: int) -> Generator[Any, Any, Any]:
         for i in range(0, len(l), n):
             yield l[i:i + n]
-
-    def match_ip(self, ip_src: int, ip_dst: int, ip_list: dict[str, list[Tuple[int, int]]]) -> bool:
-        if len(ip_list['ip.dst']) > 0 and len(ip_list['ip.src']) > 0:
-            return self.match_ip_and(ip_src, ip_dst, ip_list)
-        else:
-            return self.match_ip_or(ip_src, ip_dst, ip_list)
-
-    def match_ip_and(self, ip_src: int, ip_dst: int, ip_list: dict[str, list[Tuple[int, int]]]) -> bool:
-        src_found = False
-        dst_found = False
-
-        if self.is_in_network(ip_src, ip_list['ip.src']):
-            src_found = True
-
-        if self.is_in_network(ip_dst, ip_list['ip.dst']):
-            dst_found = True
-
-        return src_found and dst_found
-
-    def match_ip_or(self, ip_src: int, ip_dst: int, ip_list: dict[str, list[Tuple[int, int]]]) -> bool:
-        src_found = False
-        dst_found = False
-
-        if len(ip_list['ip.src']) > 0:
-            if self.is_in_network(ip_src, ip_list['ip.src']):
-                src_found = True
-
-        if len(ip_list['ip.dst']) > 0:
-            if self.is_in_network(ip_dst, ip_list['ip.dst']):
-                dst_found = True
-
-        return src_found or dst_found
 
     def is_in_network(self, address: int, address_list: list[Tuple[int, int]]) -> bool:
         for ip, mask in address_list:
