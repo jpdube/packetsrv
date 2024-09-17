@@ -1,6 +1,8 @@
-from packet.layers.packet import Packet
-from packet.layers.fields import IPv4Address
 from struct import unpack
+
+from packet.layers.fields import IPv4Address
+from packet.layers.layer_type import LayerID
+from packet.layers.packet import Packet
 
 type_values = {
     1: "1: Type(A)",
@@ -70,6 +72,19 @@ class DnsHeader:
     def __str__(self) -> str:
         return f"ID: {self.id:x}, Flags: {self.flags:04x}, QR: {self.qr_flag}, OpCode: {self.opcode:x}, Recur: {self.recursion}, Questions: {self.questions}"
 
+    def export(self) -> dict[str, int | str]:
+        return {
+            "dns.id": self.id,
+            "dns.flags": self.flags,
+            "dns.qr_flag": self.qr_flag,
+            "dns.opcode": self.opcode,
+            "dns.recursion": self.recursion,
+            "dns.response": self.response,
+            "dns.questions": self.questions,
+            "dns.answer_rr": self.answer_rr,
+            "dns.add_rr": self.add_rr,
+        }
+
 
 class DnsQuery:
     def __init__(self, query):
@@ -105,11 +120,23 @@ class DnsQuery:
 
     def summary(self, offset: int) -> str:
         result = f'{" " * offset}  Query ->\n'
-        result += f'{" " * offset}   Type.....: {type_values.get(self.qtype, "Undefined")}\n'
+        result += f'{" " *
+                     offset}   Type.....: {type_values.get(self.qtype, "Undefined")}\n'
         result += f'{" " * offset}   Class....: {self.qclass}\n'
 
         for l in self.label_list:
             result += f'{" " * offset}   Label....: {l}\n'
+
+        return result
+
+    def export(self) -> dict[str, int | str]:
+        result = {
+            "dns.type": type_values.get(self.qtype, "Undefined"),
+            "dns.class": self.qclass,
+        }
+
+        for index, label in enumerate(self.label_list):
+            result[f"label_{index}"] = label
 
         return result
 
@@ -123,11 +150,12 @@ class DnsAnswer:
         self.result = result
 
     def __str__(self) -> str:
-        return f'Answer -> Type: {type_values.get(self.qtype,"Unknow")}, Class: {self.qclass}, Ttl: {self.ttl}, Len: {self.data_len}, Data: {self.result}'
+        return f'Answer -> Type: {type_values.get(self.qtype, "Unknow")}, Class: {self.qclass}, Ttl: {self.ttl}, Len: {self.data_len}, Data: {self.result}'
 
     def summary(self, offset: int) -> str:
         result = f'{" " * offset}  Answer ->\n'
-        result += f'{" " * offset}   Type.....: {type_values.get(self.qtype, "Undefined")}\n'
+        result += f'{" " *
+                     offset}   Type.....: {type_values.get(self.qtype, "Undefined")}\n'
         result += f'{" " * offset}   Class....: {self.qclass}\n'
         result += f'{" " * offset}   TTL......: {self.ttl}\n'
         result += f'{" " * offset}   Length...: {self.data_len}\n'
@@ -135,9 +163,22 @@ class DnsAnswer:
 
         return result
 
+    def export(self) -> dict[str, int | str]:
+        result = {
+            "dns.qtype": type_values.get(self.qtype, "Undefined"),
+            "dns.qclass": self.qclass,
+            "dns.ttl": self.ttl,
+            "dns.length": self.data_len,
+            "dns.result": str(self.result)
+        }
+
+        return result
+
 
 class Dns(Packet):
-    name = 53
+    name = LayerID.DNS
+
+    __slots__ = ["packet"]
 
     def __init__(self, packet):
         self.packet = packet
@@ -221,16 +262,6 @@ class Dns(Packet):
 
         return result
 
-    def export(self) -> dict[str, int | str]:
-        return {
-            "dns.id": self.header.id,
-            "dns.flags": self.header.flags,
-            "dns.qr_flag": self.header.qr_flag,
-            "dns.opcode": self.header.opcode,
-            "dns.recursion": self.header.recursion,
-            "dns.questions": self.header.questions,
-        }
-
     def __str__(self) -> str:
         result = (
             f"DNS ->{self.header} Option: {self.queries}\n"
@@ -241,5 +272,33 @@ class Dns(Packet):
 
         return result
 
-    def get_field(self, fieldname: str):
-        ...
+    def export(self) -> dict[str, int | str]:
+        result = {
+            "dns.id": self.header.id,
+            "dns.flags": self.header.flags,
+            "dns.qr_flag": self.header.qr_flag,
+            "dns.opcode": self.header.opcode,
+            "dns.recursion": self.header.recursion,
+            "dns.questions": self.header.questions,
+        }
+
+        result.update(self.queries.export())
+
+        if self.answer_list is not None:
+            for answer in self.answer_list:
+                result.update(answer.export())
+
+        return result
+
+    def get_field(self, fieldname: str) -> int | None:
+        match fieldname:
+            case "dns.opcode":
+                return self.header.opcode
+            case "dns.flags":
+                return self.header.flags
+            case "dns.recursion":
+                return self.header.recursion
+            case "dns.questions":
+                return self.header.questions
+            case _:
+                return None

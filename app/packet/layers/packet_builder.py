@@ -191,6 +191,10 @@ class PacketBuilder:
             dhcp = self.get_layer(LayerID.DHCP)
             if dhcp:
                 return dhcp.get_field(field)
+        elif pkt_name == 'dns':
+            dns = self.get_layer(LayerID.DNS)
+            if dns:
+                return dns.get_field(field)
 
         return None
 

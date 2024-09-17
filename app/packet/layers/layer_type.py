@@ -13,6 +13,7 @@ class LayerID(Enum):
     FRAME = auto()
     UNDEFINED = auto()
     DHCP = auto()
+    DNS = auto()
 
     def __str__(self) -> str:
         return str(self.name)
