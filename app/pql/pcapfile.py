@@ -156,8 +156,10 @@ class PcapFile:
                       sport integer
                       );
                   """)
-        c.execute('''PRAGMA synchronous = EXTRA''')
-        c.execute('''PRAGMA journal_mode = WAL''')
+        c.execute('''PRAGMA synchronous = OFF''')
+        c.execute('''PRAGMA journal_mode = MEMORY''')
+        # c.execute('''PRAGMA synchronous = EXTRA''')
+        # c.execute('''PRAGMA journal_mode = WAL''')
         c.executemany(
             "INSERT INTO pkt_index (timestamp, pkt_ptr, pindex, ip_dst, ip_src, header_len, dport, sport) VALUES (?,?,?,?,?,?,?,?)", index_list)
         conn.commit()
@@ -193,8 +195,9 @@ class PcapFile:
                         file_id integer not null
                         );
                     """)
-        c.execute('''PRAGMA synchronous = EXTRA''')
-        c.execute('''PRAGMA journal_mode = WAL''')
+        c.execute('''PRAGMA synchronous = OFF''')
+        c.execute('''PRAGMA journal_mode = MEMORY''')
+
         c.executemany(
             "INSERT INTO master_index (start_ts, end_ts, file_id) VALUES (?,?,?)", master_index)
         conn.commit()
