@@ -142,6 +142,8 @@ class PcapFile:
 
         conn = sqlite3.connect(db_name)
         c = conn.cursor()
+        c.execute('''PRAGMA synchronous = OFF''')
+        c.execute('''PRAGMA journal_mode = MEMORY''')
         c.execute("drop table if exists pkt_index;")
         c.execute("""
                   create table if not exists pkt_index (
@@ -156,13 +158,11 @@ class PcapFile:
                       sport integer
                       );
                   """)
-        c.execute('''PRAGMA synchronous = OFF''')
-        c.execute('''PRAGMA journal_mode = MEMORY''')
         # c.execute('''PRAGMA synchronous = EXTRA''')
         # c.execute('''PRAGMA journal_mode = WAL''')
+        c.execute("BEGIN;")
         c.executemany(
             "INSERT INTO pkt_index (timestamp, pkt_ptr, pindex, ip_dst, ip_src, header_len, dport, sport) VALUES (?,?,?,?,?,?,?,?)", index_list)
-        conn.commit()
 
         c.execute("""
                   create index idx_ip_src
@@ -177,6 +177,7 @@ class PcapFile:
                   on pkt_index (pindex);
                   """)
 
+        c.execute("COMMIT;")
         conn.close()
 
     def build_master_index(self, master_index, clean=False):
