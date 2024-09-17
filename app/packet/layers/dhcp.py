@@ -10,6 +10,7 @@ params_req_list = {
     1: "Subnet mask",
     2: "Time offset",
     3: "Router",
+    4: "Tine servers",
     6: "Domain name server",
     7: "Log server",
     15: "Domain name",
@@ -87,6 +88,21 @@ class Ack(DHCPOption):
     def export(self) -> dict:
         return {}
 
+
+class DefaultTTL(DHCPOption):
+    def __init__(self, option_len, option):
+        super().__init__(option_len, option, 37, "Default TTL")
+        self.ttl = 0
+        self.decode()
+
+    def decode(self):
+        self.ttl = self.option[0]
+
+    def __str__(self) -> str:
+        return f"{super().__str__()}53{self.opt_len:02}{self.option[0]:02}"
+
+    def export(self) -> dict:
+        return {"dhcp.default_ttl": self.ttl}
 # 54
 
 
@@ -113,6 +129,7 @@ class Netmask(DHCPOption):
 
     def export(self) -> dict:
         return {"dhcp.netmask": str(self.mask)}
+
 # 3
 
 
@@ -153,6 +170,46 @@ class Router(DHCPOption):
 
         return result
 
+# 4
+
+
+class TimeServer(DHCPOption):
+    def __init__(self, opt_len, option):
+        super().__init__(opt_len, option, 3, "Router")
+        self.ntp_list = []
+
+        self.decode()
+
+    def decode(self):
+        nbr_router = int(self.opt_len / 4)
+        offset = 0
+
+        for _ in range(nbr_router):
+            # if offset + 4 < len(self.option):
+            ip = IPv4Address(self.option[offset: offset + 4])
+            self.ntp_list.append(ip)
+            offset += 4
+
+    def __str__(self) -> str:
+        result = f"{super().__str__()}"
+        for i, r in enumerate(self.ntp_list):
+            result += f"{i}: {r}"
+            if i < len(self.ntp_list) - 1:
+                result += ', '
+
+        return result
+
+    def summary(self, offset: int) -> str:
+        result = f'{" " * offset}   {self.__str__()}\n'
+        return result
+
+    def export(self) -> dict:
+        result = {}
+        for i, r in enumerate(self.ntp_list):
+            result[f"dhcp.ntpsrv_{i}"] = str(r)
+
+        return result
+
 
 # 6
 class DomainNameServer(DHCPOption):
@@ -186,7 +243,7 @@ class DomainNameServer(DHCPOption):
     def export(self) -> dict:
         result = {}
         for i, r in enumerate(self.dns_list):
-            result[f"dhcp.domain_name{i}"] = str(r)
+            result[f"dhcp.dns_{i}"] = str(r)
 
         return result
 
@@ -526,12 +583,16 @@ class Dhcp(Packet):
                 response = Router(option_len, option_data)
                 self.option_list.append(response)
 
+            elif option_id == 0x04:
+                response = TimeServer(option_len, option_data)
+                self.option_list.append(response)
+
             elif option_id == 0x0C:
                 response = Hostname(option_len, option_data)
                 self.option_list.append(response)
 
             elif option_id == 0x37:
-                response = ParamReqList(option_len, option_data)
+                response = DefaultTTL(option_len, option_data)
                 self.option_list.append(response)
 
             elif option_id == 0x3A:
