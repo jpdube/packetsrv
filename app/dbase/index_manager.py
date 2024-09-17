@@ -93,12 +93,14 @@ class IndexManager:
               where (pindex & ?) = ?
               """
         if len(ip_list["ip.src"]) > 0:
+            sql = " ".join([sql, "and ip_src between ? and ? "])
             net, brdcast = self.net_broadcast(
                 ip_list["ip.src"][0][0], ip_list["ip.src"][0][1])
             params.append(net)
             params.append(brdcast)
 
         if len(ip_list["ip.dst"]) > 0:
+            sql = " ".join([sql,  "and ip_dst between ? and ? "])
             net, brdcast = self.net_broadcast(
                 ip_list["ip.dst"][0][0], ip_list["ip.dst"][0][1])
             params.append(net)
