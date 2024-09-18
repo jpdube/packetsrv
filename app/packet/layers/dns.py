@@ -133,10 +133,11 @@ class DnsQuery:
         result = {
             "dns.type": type_values.get(self.qtype, "Undefined"),
             "dns.class": self.qclass,
+            "dns.answer": ".".join(self.label_list)
         }
 
-        for index, label in enumerate(self.label_list):
-            result[f"label_{index}"] = label
+        # for index, label in enumerate(self.label_list):
+        # result[f"dns.label_{index}"] = label
 
         return result
 
