@@ -3,7 +3,8 @@ BIN=$(BASE)/bin
 DIST=$(BASE)/dist
 CONFIGDIR=$(BASE)/config-jpd
 PYFILES=$(wildcard *.py)
-APPNAME=pcapdbapi
+APPNAME=packetdb
+APPMAIN=./app/main.py
 MAIN=$(BASE)/app/main.py
 PYTHON=python3
 TEST_DIR=$(BASE)/test
@@ -28,7 +29,7 @@ test_verbose:
 .PHONY: build
 build:
 	#pip freeze > requirements.txt
-	pyinstaller --onefile --name $(APPNAME)-linux-amd64 $(MAIN)
+	pyinstaller --onefile --name $(APPNAME)-linux-arm64 $(APPMAIN)
 
 clean:
 	rm -rf ./dist
