@@ -5,7 +5,7 @@ CONFIGDIR=$(BASE)/config-jpd
 PYFILES=$(wildcard *.py)
 APPNAME=packetdb
 APPMAIN=./app/main.py
-MAIN=$(BASE)/app/main.py
+MAIN=$(BASE)main.py
 PYTHON=python3
 TEST_DIR=$(BASE)/test
 
