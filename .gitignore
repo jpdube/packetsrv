@@ -18,6 +18,7 @@ ENV/
 dist/
 bin/
 build/
+*.spec
 config-jpd/
 db/
 .env
