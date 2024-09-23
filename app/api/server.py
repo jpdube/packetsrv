@@ -43,4 +43,5 @@ def node():
 
 
 def start():
-    app.run(host="0.0.0.0", port=8081, debug=False)
+    app.run(host="0.0.0.0", port=8443, debug=False, ssl_context=(
+        "./dev_certs/cert.pem", "./dev_certs/key.pem"))
