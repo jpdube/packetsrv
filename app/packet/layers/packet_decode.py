@@ -277,7 +277,10 @@ class PacketDecode:
 
     @property
     def has_tcp(self) -> bool:
-        return self.ip_proto == 0x06
+        if self.has_ipv4:
+            return self.ip_proto == 0x06
+        else:
+            return False
 
     @property
     def has_udp(self) -> bool:
@@ -303,7 +306,10 @@ class PacketDecode:
 
     @property
     def has_https(self) -> bool:
-        return self.tcp_dport == 443 or self.tcp_sport == 443
+        if self.has_ipv4 and self.has_tcp:
+            return self.tcp_dport == 443 or self.tcp_sport == 443
+        else:
+            return False
 
     @property
     def has_ssh(self) -> bool:
