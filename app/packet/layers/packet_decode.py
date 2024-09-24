@@ -284,7 +284,10 @@ class PacketDecode:
 
     @property
     def has_udp(self) -> bool:
-        return self.ip_proto == 0x11
+        if self.has_ipv4:
+            return self.ip_proto == 0x11
+        else:
+            return False
 
     @property
     def has_icmp(self) -> bool:
@@ -313,72 +316,123 @@ class PacketDecode:
 
     @property
     def has_ssh(self) -> bool:
-        return self.tcp_dport == 22 or self.tcp_sport == 22
+        if self.has_ipv4 and self.has_tcp:
+            return self.tcp_dport == 22 or self.tcp_sport == 22
+        else:
+            return False
 
     @property
     def has_telnet(self) -> bool:
-        return self.tcp_dport == 23 or self.tcp_sport == 23
+        if self.has_ipv4 and self.has_tcp:
+            return self.tcp_dport == 23 or self.tcp_sport == 23
+        else:
+            return False
 
     @property
     def has_rdp(self) -> bool:
-        return self.tcp_dport == 3389 or self.tcp_sport == 3389
+        if self.has_ipv4 and self.has_tcp:
+            return self.tcp_dport == 3389 or self.tcp_sport == 3389
+        else:
+            return False
 
     @property
     def has_smtp(self) -> bool:
-        return self.tcp_dport == 25 or self.tcp_sport == 25
+        if self.has_ipv4 and self.has_tcp:
+            return self.tcp_dport == 25 or self.tcp_sport == 25
+        else:
+            return False
 
     @property
     def has_imap(self) -> bool:
-        return self.tcp_dport == 143 or self.tcp_sport == 143
+        if self.has_ipv4 and self.has_tcp:
+            return self.tcp_dport == 143 or self.tcp_sport == 143
+        else:
+            return False
 
     @property
     def has_imaps(self) -> bool:
-        return self.tcp_dport == 993 or self.tcp_sport == 993
+        if self.has_ipv4 and self.has_tcp:
+            return self.tcp_dport == 993 or self.tcp_sport == 993
+        else:
+            return False
 
     @property
     def has_pop3(self) -> bool:
-        return self.tcp_dport == 110 or self.tcp_sport == 110
+        if self.has_ipv4 and self.has_tcp:
+            return self.tcp_dport == 110 or self.tcp_sport == 110
+        else:
+            return False
 
     @property
     def has_pop3s(self) -> bool:
-        return self.tcp_dport == 995 or self.tcp_sport == 995
+        if self.has_ipv4 and self.has_tcp:
+            return self.tcp_dport == 995 or self.tcp_sport == 995
+        else:
+            return False
 
     @property
     def has_ftp(self) -> bool:
-        return self.tcp_dport == 21 or self.tcp_sport == 21
+        if self.has_ipv4 and self.has_tcp:
+            return self.tcp_dport == 21 or self.tcp_sport == 21
+        else:
+            return False
 
     @property
     def has_http(self) -> bool:
-        return self.tcp_dport in [80, 8080] or self.tcp_sport in [80, 8080]
+        if self.has_ipv4 and self.has_tcp:
+            return self.tcp_dport in [80, 8080] or self.tcp_sport in [80, 8080]
+        else:
+            return False
 
     @property
     def has_ntp(self) -> bool:
-        return self.tcp_dport == 123 or self.tcp_sport == 123
+        if self.has_ipv4 and self.has_tcp:
+            return self.tcp_dport == 123 or self.tcp_sport == 123
+        else:
+            return False
 
     @property
     def has_rtp(self) -> bool:
-        return self.udp_dport == 5004 or self.udp_sport == 5004
+        if self.has_ipv4 and self.has_udp:
+            return self.udp_dport == 5004 or self.udp_sport == 5004
+        else:
+            return False
 
     @property
     def has_rtcp(self) -> bool:
-        return self.udp_dport == 5005 or self.udp_sport == 5005
+        if self.has_ipv4 and self.has_udp:
+            return self.udp_dport == 5005 or self.udp_sport == 5005
+        else:
+            return False
 
     @property
     def has_sip(self) -> bool:
-        return self.udp_dport == 5060 or self.udp_sport == 5060
+        if self.has_ipv4 and self.has_udp:
+            return self.udp_dport == 5060 or self.udp_sport == 5060
+        else:
+            return False
 
     @property
     def has_siptls(self) -> bool:
-        return self.udp_dport == 5061 or self.udp_sport == 5061
+        if self.has_ipv4 and self.has_udp:
+            return self.udp_dport == 5061 or self.udp_sport == 5061
+        else:
+            return False
 
     @property
     def has_bgp(self) -> bool:
-        return self.tcp_dport == 179 or self.tcp_sport == 179
+        if self.has_ipv4 and self.has_tcp:
+            return self.tcp_dport == 179 or self.tcp_sport == 179
+        else:
+            return False
 
     @property
     def has_snmp(self) -> bool:
-        snmp_port = (161, 162)
-        return self.tcp_dport in snmp_port or self.tcp_sport in snmp_port or self.udp_dport in snmp_port or self.udp_sport in snmp_port
+        if self.has_ipv4 and self.has_tcp:
+            snmp_port = (161, 162)
+            return self.tcp_dport in snmp_port or self.tcp_sport in snmp_port or self.udp_dport in snmp_port or self.udp_sport in snmp_port
+        else:
+            return False
 
     @property
     def timestamp(self) -> int:
