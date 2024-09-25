@@ -104,9 +104,12 @@ class IcmpEcho(Packet):
         result = f'{" " * offset}ICMP-Echo ->\n'
         result += f'{" " * offset}   Type...: {self.type}\n'
         result += f'{" " * offset}   Code...: {self.code}\n'
-        result += f'{" " * offset}   Seq no.....: {self.sequence_no},0x{self.sequence_no:04x} \n'
-        result += f'{" " * offset}   Identifier.: {self.identifier},0x{self.identifier:04x} \n'
-        result += f'{" " * offset}   Checksum...: {self.checksum},0x{self.checksum:04x}\n'
+        result += f'{" " * offset}   Seq no.....: {
+            self.sequence_no},0x{self.sequence_no:04x} \n'
+        result += f'{" " * offset}   Identifier.: {
+            self.identifier},0x{self.identifier:04x} \n'
+        result += f'{" " *
+                     offset}   Checksum...: {self.checksum},0x{self.checksum:04x}\n'
 
         return result
 
@@ -115,3 +118,9 @@ class IcmpEcho(Packet):
 
     def get_field(self, fieldname: str):
         ...
+
+    def get_array(self, offset: int, length: int) -> bytes | None:
+        if offset < len(self.payload) and (offset + length) < len(self.payload):
+            return self.payload[offset: offset + length]
+        else:
+            return None

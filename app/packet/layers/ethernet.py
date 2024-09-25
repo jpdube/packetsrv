@@ -59,7 +59,8 @@ class Ethernet(Packet):
         result = f'{" " * offset}Ethernet ->\n'
         result += f'{" " * offset}   Dst Mac..: {self.dst_mac}\n'
         result += f'{" " * offset}   Src Mac..: {self.src_mac}\n'
-        result += f'{" " * offset}   Ethertype: {self.ethertype},0x{self.ethertype:04x} \n'
+        result += f'{" " *
+                     offset}   Ethertype: {self.ethertype},0x{self.ethertype:04x} \n'
         result += f'{" " * offset}   Vlan ID..: {self.vlan_id}\n'
         return result
 
@@ -70,8 +71,6 @@ class Ethernet(Packet):
             "eth.ethertype": self.ethertype,
             "eth.vlan": self.vlan_id
         }
-
-
 
     def __str__(self):
         return f"Ethernet -> dst_mac: {self.dst_mac}, src_mac: {self.src_mac}, protocol: {self.ethertype}/{self.ethertype:04x}, vlan_id: {self.vlan_id}/{self.vlan_id:x}"
@@ -93,3 +92,9 @@ class Ethernet(Packet):
                 return 0
         else:
             return 0
+
+    def get_array(self, offset: int, length: int) -> bytes | None:
+        if offset < len(self.payload) and (offset + length) < len(self.payload):
+            return self.payload[offset: offset + length]
+        else:
+            return None

@@ -66,3 +66,11 @@ class Frame(Packet):
                 return self.orig_len
             elif field == 'inclen':
                 return self.incl_len
+
+    def get_array(self, offset: int, length: int) -> bytes | None:
+        print(f"Byte search: O:{offset}, L:{length}, PL:{len(self.packet)}")
+        if offset < len(self.packet) and (offset + length) < len(self.packet):
+            result = self.packet[offset: offset + length]
+            return result
+        else:
+            return None

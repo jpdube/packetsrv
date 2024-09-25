@@ -36,7 +36,8 @@ class UDP(Packet):
         result += f'{" " * offset}   Src port...: {self.src_port}\n'
         result += f'{" " * offset}   Dst port...: {self.dst_port}\n'
         result += f'{" " * offset}   Lenght.....: {self.length}\n'
-        result += f'{" " * offset}   Checksum...: {self.checksum},0x{self.checksum:04x}\n'
+        result += f'{" " *
+                     offset}   Checksum...: {self.checksum},0x{self.checksum:04x}\n'
 
         return result
 
@@ -66,3 +67,9 @@ class UDP(Packet):
                 return 0
         else:
             return 0
+
+    def get_array(self, offset: int, length: int) -> bytes | None:
+        if offset < len(self.payload) and (offset + length) < len(self.payload):
+            return self.payload[offset: offset + length]
+        else:
+            return None
