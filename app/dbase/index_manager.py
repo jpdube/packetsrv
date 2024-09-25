@@ -28,7 +28,7 @@ class IndexManager:
         for i in files_list:
             flist.append(i.stem)
         result = pool.map(pcapfile.create_index, flist)
-        result.sort(key=lambda a: a[0])
+        # result.sort(key=lambda a: a[0])
         pcapfile.build_master_index(result, clean=True)
         ttl_time = datetime.now() - start_time
         log.info(f"---> Total Index Time: {ttl_time}")
