@@ -26,6 +26,7 @@ RTCP =     0b0000_0000_0000_0000_0000_0000_0000_0000_000_0000_0100_0000_0000_000
 SIP =      0b0000_0000_0000_0000_0000_0000_0000_0000_000_0000_1000_0000_0000_0000_0000_0000
 SIP_TLS =  0b0000_0000_0000_0000_0000_0000_0000_0000_000_0001_0000_0000_0000_0000_0000_0000
 BGP =      0b0000_0000_0000_0000_0000_0000_0000_0000_000_0010_0000_0000_0000_0000_0000_0000
+SMB =      0b0000_0000_0000_0000_0000_0000_0000_0000_000_0100_0000_0000_0000_0000_0000_0000
 
 
 def packet_index(pd: PacketDecode) -> int:
@@ -41,12 +42,22 @@ def packet_index(pd: PacketDecode) -> int:
         pindex = pindex + ICMP
     if pd.has_udp:
         pindex = pindex + UDP
-    if pd.has_tcp:
-        pindex = pindex + TCP
+
     if pd.has_dns:
         pindex = pindex + DNS
     if pd.has_dhcp:
         pindex = pindex + DHCP
+    if pd.has_ntp:
+        pindex = pindex + NTP
+    if pd.has_rtp:
+        pindex = pindex + RTP
+    if pd.has_rtcp:
+        pindex = pindex + RTCP
+
+
+    if pd.has_tcp:
+        pindex = pindex + TCP
+
     if pd.has_https:
         pindex = pindex + HTTPS
     if pd.has_ssh:
@@ -71,18 +82,15 @@ def packet_index(pd: PacketDecode) -> int:
         pindex = pindex + FTP
     if pd.has_http:
         pindex = pindex + HTTP
-    if pd.has_ntp:
-        pindex = pindex + NTP
-    if pd.has_rtp:
-        pindex = pindex + RTP
-    if pd.has_rtcp:
-        pindex = pindex + RTCP
+    if pd.has_bgp:
+        pindex = pindex + BGP
+
     if pd.has_sip:
         pindex = pindex + SIP
     if pd.has_siptls:
         pindex = pindex + SIP_TLS
-    if pd.has_bgp:
-        pindex = pindex + BGP
+    if pd.has_smb:
+        pindex = pindex + SMB
 
     return pindex
 
@@ -141,6 +149,8 @@ def build_search_index(index_set: set[int]) -> int:
         pindex = pindex + SIP_TLS
     if 'BGP' in index_set:
         pindex = pindex + BGP
+    if 'SMB' in index_set:
+        pindex = pindex + SMB
 
     print(f"Search index: {pindex:x} in {index_set}")
     return pindex
