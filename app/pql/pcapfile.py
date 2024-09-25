@@ -1,8 +1,9 @@
 import logging
 import os
 import sqlite3
+import time
 from struct import unpack
-from typing import Tuple
+from typing import Any, Generator, Tuple
 
 import pql.packet_index as pkt_index
 from config.config import Config
@@ -92,6 +93,9 @@ class PcapFile:
         index_list = []
         first_ts = None
         last_ts = None
+
+        start_ts = time.time()
+
         with open(f"{Config.pcap_path()}/{file_id}.pcap", "rb") as fd:
             glob_header = fd.read(PCAP_GLOBAL_HEADER_SIZE)
             if unpack("!I", glob_header[0:4])[0] == MAGIC_BE:
@@ -131,12 +135,17 @@ class PcapFile:
                 offset += incl_len + 16
 
         db_name = f"{Config.pcap_index()}/{file_id}.db"
+        end_time = time.time() - start_ts
+
         self.create_db_index(db_name, index_list)
-        log.info(f"{db_name} completed...")
+        log.info(f"{db_name} completed, {len(index_list)
+                                         } packets indexed, time: {end_time:.3} {(end_time / len(index_list)) * 1_000_000:.2f}us/packet")
 
         return (first_ts, last_ts, int(file_id))
 
     def create_db_index(self, db_name: str, index_list):
+        start_ts = time.time()
+
         if os.path.exists(db_name):
             os.remove(db_name)
 
@@ -158,12 +167,6 @@ class PcapFile:
                       sport integer
                       );
                   """)
-        # c.execute('''PRAGMA synchronous = EXTRA''')
-        # c.execute('''PRAGMA journal_mode = WAL''')
-        c.execute("BEGIN;")
-        c.executemany(
-            "INSERT INTO pkt_index (timestamp, pkt_ptr, pindex, ip_dst, ip_src, header_len, dport, sport) VALUES (?,?,?,?,?,?,?,?)", index_list)
-
         c.execute("""
                   create index idx_ip_src
                   on pkt_index (ip_src);
@@ -176,8 +179,13 @@ class PcapFile:
                   create index idx_pindex
                   on pkt_index (pindex);
                   """)
+        c.execute("BEGIN;")
+
+        c.executemany(
+            "INSERT INTO pkt_index (timestamp, pkt_ptr, pindex, ip_dst, ip_src, header_len, dport, sport) VALUES (?,?,?,?,?,?,?,?)", index_list)
 
         c.execute("COMMIT;")
+        log.info(f"DB index time: {time.time() - start_ts:6.3}")
         conn.close()
 
     def build_master_index(self, master_index, clean=False):
@@ -209,3 +217,7 @@ class PcapFile:
                     """)
 
         conn.close()
+
+    def chunks(self, l: list[Any], n: int) -> Generator[Any, Any, Any]:
+        for i in range(0, len(l), n):
+            yield l[i:i + n]
