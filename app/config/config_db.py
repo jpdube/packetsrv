@@ -8,6 +8,34 @@ from config.config import Config
 log = logging.getLogger("packetdb")
 
 
+class User:
+    def __init__(self):
+        self.conn = sqlite3.connect(Config.config_dbase())
+        self.cursor = self.conn.cursor()
+        self.username = ""
+        self.password = ""
+        self.active = False
+        self.id = 0
+
+    def create(self, username: str, password: str, description: str):
+        sql = f"""
+            insert into User (username, password, created_by, description, active) values ({username}, {password}, 1, {description}, True);
+        """
+        self.cursor.execute(sql)
+
+    def get(self, username: str):
+        sql = f"select username, password, active, id from user where username = '{
+            username}'"
+        row = self.cursor.execute(sql).fetchone()
+        self.username = row[0]
+        self.password = row[1]
+        self.active = row[2]
+        self.id = row[3]
+
+    def check_user(self, username: str, password: str) -> bool:
+        return True
+
+
 @dataclass
 class CaptureProfile:
     id: int
