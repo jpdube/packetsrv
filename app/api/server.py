@@ -15,7 +15,7 @@ from flask_jwt_extended import (JWTManager, create_access_token,
 log = logging.getLogger("packetdb")
 
 app = Flask(__name__)
-app.config["SECRET_KEY"] = "01234567890abcdefgh"
+app.config["SECRET_KEY"] = "wkxzvr%fTzd*y+QxtMDQEQr9E_b9odVnkE"
 # app.secret_key = "aaabbbcccddd"
 app.config["JWT_SECRET_KEY"] = "Jq@QA^9xA&yo%YG@J&DW38$GoWiw+z*&"
 app.config['JWT_ACCESS_TOKEN_EXPIRES'] = datetime.timedelta(minutes=480)
