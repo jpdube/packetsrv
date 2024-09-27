@@ -78,6 +78,8 @@ class PcapFile:
                 return None
 
             pkt_header = decode_header(header, byte_order)
+            pkt_header.file_ptr = int(self.filename)
+            pkt_header.pkt_ptr = ptr
 
             if hdr_size == 0:
                 incl_len = pkt_header.incl_len

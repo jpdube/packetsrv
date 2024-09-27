@@ -94,6 +94,8 @@ class QueryResult:
 
                 record[f] = field_value
 
+            record["id"] = pb.get_field("frame.id")
+
         if bool(record) and (not self.model.has_distinct or tmp_hash not in self.distinct):
             self.result["result"].append(record)
             self.distinct.append(tmp_hash)

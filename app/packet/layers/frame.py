@@ -66,6 +66,8 @@ class Frame(Packet):
                 return self.orig_len
             elif field == 'inclen':
                 return self.incl_len
+            elif field == 'id':
+                return (f"{self.header.file_ptr}:{self.header.pkt_ptr}")
 
     def get_array(self, offset: int, length: int) -> bytes | None:
         print(f"Byte search: O:{offset}, L:{length}, PL:{len(self.packet)}")

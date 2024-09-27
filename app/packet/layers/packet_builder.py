@@ -23,7 +23,8 @@ log = logging.getLogger("packetdb")
 
 
 class PacketBuilder:
-    __slots__ = ["packet", "layers", "fields_list", "color_range"]
+    __slots__ = ["packet", "layers", "fields_list",
+                 "color_range"]
 
     def __init__(self) -> None:
         self.layers: Dict[LayerID, Packet] = {}
