@@ -303,3 +303,9 @@ class Dns(Packet):
                 return self.header.questions
             case _:
                 return None
+
+    def get_array(self, offset: int, length: int) -> bytes | None:
+        if offset < len(self.packet) and (offset + length) < len(self.packet):
+            return self.packet[offset: offset + length]
+        else:
+            return None
