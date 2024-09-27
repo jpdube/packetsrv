@@ -23,17 +23,24 @@ class User:
         """
         self.cursor.execute(sql)
 
-    def get(self, username: str):
-        sql = f"select username, password, active, id from user where username = '{
-            username}'"
-        row = self.cursor.execute(sql).fetchone()
-        self.username = row[0]
-        self.password = row[1]
-        self.active = row[2]
-        self.id = row[3]
+    def get(self, username: str) -> bool:
+        sql = f"select username, password, active, id from user where username = ?"
+        row = self.cursor.execute(sql, (username, )).fetchone()
+        if row:
+            self.username = row[0]
+            self.password = row[1]
+            self.active = row[2]
+            self.id = row[3]
+
+            return True
+        else:
+            return False
 
     def check_user(self, username: str, password: str) -> bool:
         return True
+
+    def __str__(self) -> str:
+        return f"User: {self.username}, Active: {self.active}"
 
 
 @dataclass

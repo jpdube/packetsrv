@@ -38,11 +38,9 @@ def login():
 
     username = request.json.get("username", "")
     password = request.json.get("password", "")
-    user = User()
-    user.get(username)
-    print(user)
 
-    if username == "jpdube" and bcrypt.checkpw(password.encode("utf-8"), user.password.encode('utf-8')):
+    user = User()
+    if user.get(username) and bcrypt.checkpw(password.encode("utf-8"), user.password.encode('utf-8')):
         token = create_access_token(identity=username)
         return jsonify({"token": token})
     else:
