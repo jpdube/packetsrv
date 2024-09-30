@@ -1,0 +1,256 @@
+from dataclasses import dataclass
+from datetime import datetime
+from pathlib import Path
+from struct import unpack
+from typing import Optional, List
+from multiprocessing import Pool
+
+from config.config import Config
+# from pql.pcapfile import PcapFile
+from pql.model import SelectStatement
+
+from packet.layers.packet_decode import PacketDecode
+from dataclasses import dataclass
+from struct import pack
+
+PCAP_GLOBAL_HEADER_SIZE = 24
+PCAP_PACKET_HEADER_SIZE = 16
+INDEX_HEADER_SIZE = 8
+INDEX_DEF_SIZE = 8
+
+
+@dataclass
+class PacketInfo:
+    ts: int
+    ptr: int
+    index: int
+    ip_dst: int
+    ip_src: int
+
+    def __str__(self) -> str:
+        return f"TS: {self.ts}, Ptr: {self.ptr:x}, Index: {self.index:x}, IP Dst: {self.ip_dst:x}, IP Src: {self.ip_src:x}"
+
+
+@dataclass
+class PktPtr:
+    timestamp: int
+    file_id: int
+    ptr: int
+    ip_dst: int
+    ip_src: int
+    header: Optional[bytes] = None
+    packet: Optional[bytes] = None
+
+    def __str__(self) -> str:
+        return f"FileID: {self.file_id}, Ptr: {self.ptr}, IP dst: {self.ip_dst:x}, IP Src: {self.ip_src:x}"
+
+
+class IndexManager:
+    def __init__(self):
+        self.index_dict = {}
+
+    # --------------------------------
+    #
+    # Index format
+    #
+    # 4 bytes - Magic number 0xa1b2c3d4
+    # 2 bytes - File version
+    # 1 byte  - Number of index entries
+    # 1 byte  - Padding
+    # For each index entry:
+    #   4 bytes - Index
+    #   4 bytes - Position
+    #
+    # ...
+    #
+    # For each entry:
+    #
+    #   4 bytes - Timestamp
+    #   4 bytes - Packet pointer
+    #   4 bytes - Index
+    #   4 bytes - Dest IP
+    #   4 bytes - Src IP
+    #
+    #
+    def build_index(self, file_id):
+        offset = 0
+        pd = PacketDecode()
+        first_ts = None
+        last_ts = None
+        with open(f"{Config.pcap_path()}/{file_id}.pcap", "rb") as fd:
+            _ = fd.read(PCAP_GLOBAL_HEADER_SIZE)
+            offset += 24
+
+            while True:
+                header = fd.read(PCAP_PACKET_HEADER_SIZE)
+                if len(header) == 0:
+                    break
+
+                incl_len = unpack("!I", header[12:16])[0]
+                packet = fd.read(incl_len)
+
+                pd.decode(header, packet)
+                ts = pd.get_field('pkt.timestamp')
+                last_ts = ts
+                if first_ts is None:
+                    first_ts = ts
+
+                packet = PacketInfo(
+                    ts, offset, self.packet_index(pd), pd.ip_dst, pd.ip_src)
+                if self.index_dict.get(packet.index, None) is None:
+                    self.index_dict[packet.index] = []
+
+                self.index_dict[packet.index].append(
+                    packet)
+
+                offset += incl_len + 16
+
+        # for key in sorted(self.index_dict.keys()):
+        #     print(f"{key:x}: count: {len(self.index_dict[key])}")
+
+        with open(f"{Config.pcap_index()}/{file_id}.pidx", "wb") as f:
+            f.write(pack("!I", 0xa1b2c3d4))
+            f.write(pack("!H", 0x0100))
+            f.write(pack("!B", len(self.index_dict.keys())))
+            f.write(pack("!B", 0xff))
+
+            position = (len(self.index_dict.keys()) * 8) + 8
+            for key in sorted(self.index_dict.keys()):
+                f.write(pack("!II", key, position))
+                # print(f"Key: {key:x}, Ptr: {position:x}")
+                position += len(self.index_dict[key]) * 20
+
+            for key in sorted(self.index_dict.keys()):
+                for p in self.index_dict[key]:
+                    f.write(pack("!IIIII", p.ts, p.ptr,
+                            p.index, p.ip_dst, p.ip_src))
+
+        return (first_ts, last_ts, int(file_id))
+
+    def index_count(self) -> int:
+        count = 0
+        for k in self.index_dict.keys():
+            count += len(self.index_dict[k])
+
+        return count
+
+    def packet_index(self, pd: PacketDecode) -> int:
+        pindex = 0
+
+        if pd.has_ethernet:
+            pindex = pindex + 0x01
+        if pd.has_ipv4:
+            pindex = pindex + 0x04
+        if pd.has_icmp:
+            pindex = pindex + 0x08
+        if pd.has_udp:
+            pindex = pindex + 0x10
+        if pd.has_tcp:
+            pindex = pindex + 0x20
+        if pd.has_dns:
+            pindex = pindex + 0x40
+        if pd.has_dhcp:
+            pindex = pindex + 0x80
+        if pd.has_https:
+            pindex = pindex + 0x100
+
+        # print(f"Bit index: {pindex:x}")
+        return pindex
+
+    def build_master_index(self, master_index):
+        with open(f"{Config.pcap_master_index()}/master.pidx", "wb") as f:
+            for idx in master_index:
+                # print(idx)
+                f.write(pack('!III', *idx))
+
+    def create_index(self):
+        path = Path(Config.pcap_path())
+        files_list = list(path.glob("*.pcap"))
+        # pcapfile = PcapFile()
+        pool = Pool()
+        start_time = datetime.now()
+        flist = []
+        for i in files_list:
+            flist.append(i.stem)
+        result = pool.map(self.build_index, flist)
+        result.sort(key=lambda a: a[0])
+        # print(result)
+        self.build_master_index(result)
+        ttl_time = datetime.now() - start_time
+        print(f"---> Total Index Time: {ttl_time}")
+
+    def search(self, model: SelectStatement):
+        search_index = self.build_search_value(model.index_field)
+        path = Path(Config.pcap_index())
+        files_list = list(path.glob("*.pidx"))
+        files_list.sort(key=lambda a: int(a.stem))
+
+        for file_id in files_list:
+            with open(f"{Config.pcap_index()}{file_id.stem}.pidx", "rb") as f:
+                buffer = []
+                header = f.read(INDEX_HEADER_SIZE)
+                if unpack("!I", header[0:4])[0] == 0xa1b2c3d4:
+                    print("Valid index file")
+                nbr_index, = unpack("!I", header[6:10])
+                print(f"Nbr index in file: {nbr_index}")
+
+                for _ in range(nbr_index):
+                    index, ptr = unpack("!II", f.read(8))
+                    if (index & search_index) == search_index:
+                        # print(f"{search_index:x}, {index:x}, {ptr:x}")
+                        f.seek(ptr)
+                        break
+                # f.read(unpack("!H", 0x0100))
+                # f.read(unpack("!B", len(self.index_dict.keys())))
+                # f.read(unpack("!B", 0xff))
+                while True:
+                    buffer = f.read(20)
+
+                    if not buffer:
+                        break
+
+                    ts, offset, index, ip_dst, ip_src = unpack(
+                        ">IIIII", buffer)
+                    if (search_index & index) == search_index and self.search_ip(model.ip_list, ip_dst, ip_src):
+                        pkt = PktPtr(timestamp=ts, file_id=int(file_id.stem),
+                                     ptr=offset, ip_dst=ip_dst, ip_src=ip_src)
+                        print(pkt)
+                        yield(pkt)
+
+    def search_ip(self, ip_list, ip_dst, ip_src) -> bool:
+        found = False
+        # print(f"dst: {ip_dst:x}, scr: {ip_src:x}, list: {ip_list}")
+        for ip in ip_list['ip.src']:
+            if ip.is_in_network(ip_src):
+                found = True
+
+        for ip in ip_list['ip.dst']:
+            if ip.is_in_network(ip_dst):
+                found = True
+
+        return found
+
+    def build_search_value(self, index_set):
+        pindex = 0
+
+        if 'ETH' in index_set:
+            pindex = pindex + 0x01
+        if 'ARP' in index_set:
+            pindex = pindex + 0x02
+        if 'IP' in index_set:
+            pindex = pindex + 0x04
+        if 'ICMP' in index_set:
+            pindex = pindex + 0x08
+        if 'UDP' in index_set:
+            pindex = pindex + 0x10
+        if 'TCP' in index_set:
+            pindex = pindex + 0x20
+        if 'DNS' in index_set:
+            pindex = pindex + 0x40
+        if 'DHCP' in index_set:
+            pindex = pindex + 0x80
+        if 'HTTPS' in index_set:
+            pindex = pindex + 0x100
+
+        print(f"Bit index: {pindex:x}")
+        return pindex

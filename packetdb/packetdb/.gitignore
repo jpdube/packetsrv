@@ -1,0 +1,30 @@
+# Byte-compiled / optimized / DLL files
+.DS*
+
+__pycache__/
+*.py[cod]
+*$py.class
+
+# virtualenv
+.venv/
+venv/
+.venv2/
+venv2/
+pvenv/
+ENV/
+*.log
+.idea*
+.vscode/
+dist/
+bin/
+build/
+*.spec
+config-jpd/
+db/
+.env
+logs/
+
+# Rust
+target/
+
+dev_certs/
