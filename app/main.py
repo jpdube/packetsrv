@@ -67,7 +67,7 @@ def server():
     log.info(f"PCAP DB starting on plateform {platform.system()}")
     init()
 
-    start_db_watcher(Config.pcap_path(), 1)
+    # start_db_watcher(Config.pcap_path(), 1)
 
     api_thread = Thread(target=start, daemon=True)
     api_thread.start()

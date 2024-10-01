@@ -1,7 +1,0 @@
-flask
-mypy
-autopep8
-pydantic
-pytest
-rich
-
