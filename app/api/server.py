@@ -7,6 +7,7 @@ import jwt
 from config.config import Config
 from config.config_db import ConfigDB, User
 from dbase.dbengine import DBEngine
+from flask_cors import CORS
 from flask import Flask, jsonify, request, session
 from flask_bcrypt import bcrypt
 from flask_jwt_extended import (JWTManager, create_access_token,
@@ -20,6 +21,7 @@ app.config["SECRET_KEY"] = "wkxzvr%fTzd*y+QxtMDQEQr9E_b9odVnkE"
 app.config["JWT_SECRET_KEY"] = "Jq@QA^9xA&yo%YG@J&DW38$GoWiw+z*&"
 app.config['JWT_ACCESS_TOKEN_EXPIRES'] = datetime.timedelta(minutes=480)
 
+cors = CORS(app)
 jwt = JWTManager(app)
 
 
@@ -73,5 +75,6 @@ def node():
 
 
 def start():
-    app.run(host="0.0.0.0", port=8443, debug=False, ssl_context=(
-        "./dev_certs/cert.pem", "./dev_certs/key.pem"))
+    app.run(host="0.0.0.0", port=8443, debug=False)
+    # , ssl_context=(
+    #     "./dev_certs/cert.pem", "./dev_certs/key.pem"))
