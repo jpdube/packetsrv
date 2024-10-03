@@ -111,6 +111,7 @@ class IndexManager:
         for r in c.fetchall():
             pkt = PktPtr(file_id=int(file_id.stem),
                          ptr=r[0], ip_dst=0, ip_src=0, pkt_hdr_size=0)
+            # log.debug(f"PTR index: {pkt.file_id}:{pkt.ptr}")
             result.append(pkt)
 
         return result
@@ -131,9 +132,37 @@ class IndexManager:
 
         search_index = pkt_index.build_search_index(model.index_field)
         # log.error(f"CHUNK SIZE: {self.chunk_size(search_index)}")
-        log.debug(f"Computed index: {search_index:x}")
+        # log.debug(f"Computed index: {search_index:x}")
+        # pool = mp.Pool()
+
+        log.info(f"Using {Config.nbr_threads()} threads for index search")
+        result = []
+        for index_file in files_list:
+            result = self.search_pkt(index_file, search_index, model.ip_list)
+
+            for r in result:
+                yield(r)
+
+    def search_parallel(self, model: SelectStatement) -> Generator[Any, Any, Any]:
+
+        log.debug(f"Search index started: {model.index_field}")
+
+        # --- Check for interval
+        interval_result = self.search_interval(model)
+        if interval_result:
+            log.info(f"{len(interval_result)} found in master index")
+            files_list = interval_result
+        else:
+            path = Path(Config.pcap_index())
+            files_list = list(path.glob("*.db"))
+            files_list.sort(key=lambda a: int(a.stem))
+
+        search_index = pkt_index.build_search_index(model.index_field)
         pool = mp.Pool()
 
+        log.info(f"Using {Config.nbr_threads()} threads for index search")
+
+        log.info(f"Using {Config.nbr_threads()} threads for index search")
         for index_chunk in self.chunks(files_list, Config.nbr_threads()):
             params = []
             for idx in index_chunk:
