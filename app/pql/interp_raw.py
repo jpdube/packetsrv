@@ -1,11 +1,10 @@
 # interp.py
 
+import logging
 from datetime import datetime, timedelta
 
 from dbase.packet_ptr import PktPtr
-from packet.layers.packet_decode import PacketDecode
 from packet.layers.packet_builder import PacketBuilder
-from packet.layers.packet_hdr import PktHeader
 from pql.model import (Array, BinOp, Boolean, ConstDecl, Date, Grouping,
                        Integer, IPv4, Label, LabelByte, Mac, Now,
                        SelectStatement, Unary)
@@ -16,6 +15,8 @@ from pql.tokens_list import Tokens
 # Process a pcap file to filter
 # The pcapfile should be iterator based
 # ---------------------------------------------
+
+log = logging.getLogger("packetdb")
 
 
 def exec_program(model, pkt_ref: PktPtr):
@@ -42,7 +43,7 @@ def cmp_array(left, right) -> bool:
     return True
 
 
-def interpret(node, env, packet: PacketDecode):
+def interpret(node, env, packet: PacketBuilder):
     if isinstance(node, Integer):
         return node.value
 
