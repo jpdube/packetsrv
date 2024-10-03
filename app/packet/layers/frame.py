@@ -32,7 +32,7 @@ class Frame(Packet):
         return self.header.incl_len
 
     def __str__(self) -> str:
-        return f"Packet info -> Time date/sec: {self.ts_format}/{self.ts_sec}, Offset: {self.ts_usec}usec, Orig len: {self.orig_len}, Incl len: {self.incl_len}"
+        return f"Packet info -> ID: {self.header.packet_id()}, Time date/sec: {self.ts_format}/{self.ts_sec}, Offset: {self.ts_usec}usec, Orig len: {self.orig_len}, Incl len: {self.incl_len}"
 
     def summary(self, offset: int) -> str:
         result = f'{" " * offset}Frame ->\n'
@@ -67,7 +67,7 @@ class Frame(Packet):
             elif field == 'inclen':
                 return self.incl_len
             elif field == 'id':
-                return (f"{self.header.file_ptr}:{self.header.pkt_ptr}")
+                return self.header.packet_id()
 
     def get_array(self, offset: int, length: int) -> bytes | None:
         print(f"Byte search: O:{offset}, L:{length}, PL:{len(self.packet)}")
