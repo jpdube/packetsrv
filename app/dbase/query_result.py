@@ -17,7 +17,6 @@ class QueryResult:
         self.ts_start = sys.maxsize
         self.ts_end = 0
         self.model = model
-        self.packet_list = []
         self.distinct = []
         self.result = {
             "errors": ["No errors"],
@@ -40,7 +39,6 @@ class QueryResult:
             return len(self.result['result']) >= self.model.top_expr
 
     def add_packet(self, packet: PacketBuilder):
-        self.packet_list.append(packet)
         ts = packet.get_field("frame.ts_sec")
 
         self.found += 1
