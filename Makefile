@@ -14,9 +14,12 @@ check:
 	mypy app/pql app/dbase app/packet app/api
 	# mypy main.py pql/ dbase/ packet/ api/
 
+compile:
+	$(PYTHON) setup.py build_ext --inplace
+
 run:
 	# $(PYTHON) setup.py build_ext --inplace
-	$(PYTHON) $(MAIN)
+	$(PYTHON) $(APPMAIN)
 
 .PHONY: test
 test:
