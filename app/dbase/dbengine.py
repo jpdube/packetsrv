@@ -34,6 +34,7 @@ class DBEngine:
         offset_ptr = 0
 
         self.model = parse_source(pql)
+        log.debug(self.model)
         log.debug(self.model.index_field)
         query_result = QueryResult(self.model)
         index_result = index_mgr.search(self.model)

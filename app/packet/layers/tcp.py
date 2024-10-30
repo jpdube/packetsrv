@@ -132,13 +132,11 @@ class TCP(Packet):
         result = f'{" " * offset}TCP ->\n'
         result += f'{" " * offset}   Src port...: {self.src_port}\n'
         result += f'{" " * offset}   Dst port...: {self.dst_port}\n'
-        result += f'{" " *
-                     offset}   Seq no.....: {self.seq_no},0x{self.seq_no:04x} \n'
+        result += f'{" " * offset}   Seq no.....: {self.seq_no},0x{self.seq_no:04x} \n'
         result += f'{" " * offset}   Ack no.....: {self.ack_no}\n'
         result += f'{" " * offset}   Header len.: {self.header_len}\n'
         result += f'{" " * offset}   Flags......: {self.flags}\n'
-        result += f'{" " *
-                     offset}   Checksum...: {self.checksum},0x{self.checksum:04x}\n'
+        result += f'{" " * offset}   Checksum...: {self.checksum},0x{self.checksum:04x}\n'
 
         return result
 

@@ -140,7 +140,6 @@ class GroupBy:
 
     def print(self):
         for key, value in self.grp_result.items():
-            log.debug(f"Group ADD: {
-                key}->{len(value)}\n-----------------------------------")
-
+            log.debug(
+                f"Group ADD: {key}->{len(value)}\n-----------------------------------")
         log.debug(f"Group by total: {len(self.grp_result)}")

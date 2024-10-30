@@ -38,10 +38,8 @@ class Frame(Packet):
         result = f'{" " * offset}Frame ->\n'
         result += f'{" " * offset}   Time......: {self.ts_format}\n'
         result += f'{" " * offset}   Offset ms.: {self.ts_usec}\n'
-        result += f'{" " *
-                     offset}   Orig len..: {self.orig_len},0x{self.orig_len:04x} \n'
-        result += f'{" " *
-                     offset}   Incl len..: {self.incl_len},0x{self.incl_len:04x} \n'
+        result += f'{" " * offset}   Orig len..: {self.orig_len},0x{self.orig_len:04x} \n'
+        result += f'{" " * offset}   Incl len..: {self.incl_len},0x{self.incl_len:04x} \n'
 
         return result
 

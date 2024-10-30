@@ -44,8 +44,8 @@ def init():
     configdb = ConfigDB()
     configdb.check_tables()
 
-    log.info(f"Node: {configdb.node_info} is online at {
-             configdb.node_location}")
+    log.info(
+        f"Node: {configdb.node_info} is online at {configdb.node_location}")
 
 
 @click.group()

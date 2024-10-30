@@ -36,8 +36,7 @@ class UDP(Packet):
         result += f'{" " * offset}   Src port...: {self.src_port}\n'
         result += f'{" " * offset}   Dst port...: {self.dst_port}\n'
         result += f'{" " * offset}   Lenght.....: {self.length}\n'
-        result += f'{" " *
-                     offset}   Checksum...: {self.checksum},0x{self.checksum:04x}\n'
+        result += f'{" " * offset}   Checksum...: {self.checksum},0x{self.checksum:04x}\n'
 
         return result
 

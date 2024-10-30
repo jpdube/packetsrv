@@ -9,6 +9,7 @@ import pql.packet_index as pkt_index
 from config.config import Config
 from packet.layers.packet_decode import PacketDecode
 from packet.layers.packet_hdr import PktHeader
+from struct import pack
 
 log = logging.getLogger("packetdb")
 
@@ -118,6 +119,8 @@ class PcapFile:
 
                 pd.decode(pkt_header, packet)
                 ts = pd.get_field('pkt.timestamp')
+                end_ts_decode = time.time()
+
                 last_ts = ts
                 if first_ts is None:
                     first_ts = ts
@@ -136,59 +139,64 @@ class PcapFile:
 
                 offset += incl_len + 16
 
-        db_name = f"{Config.pcap_index()}/{file_id}.db"
+        db_name = f"{Config.pcap_index()}/{file_id}.pidx"
         end_time = time.time() - start_ts
 
         self.create_db_index(db_name, index_list)
-        log.info(f"{db_name} completed, {len(index_list)
-                                         } packets indexed, time: {end_time:.3} {(end_time / len(index_list)) * 1_000_000:.2f}us/packet")
+        log.info(f"{db_name} completed, {len(index_list)} packets indexed, time: {end_time:.3} {(end_time / len(index_list)) * 1_000_000:.2f}us/packet")
 
         return (first_ts, last_ts, int(file_id))
 
     def create_db_index(self, db_name: str, index_list):
-        start_ts = time.time()
+        with open(db_name, "wb") as f:
+            for ix in index_list:
+                index_line = pack(">IIIIIHHH", *ix)
+                f.write(index_line)
 
-        if os.path.exists(db_name):
-            os.remove(db_name)
+    # def create_db_index(self, db_name: str, index_list):
+    #     start_ts = time.time()
 
-        conn = sqlite3.connect(db_name)
-        c = conn.cursor()
-        c.execute('''PRAGMA synchronous = OFF''')
-        c.execute('''PRAGMA journal_mode = MEMORY''')
-        c.execute("drop table if exists pkt_index;")
-        c.execute("""
-                  create table if not exists pkt_index (
-                      id integer primary key autoincrement,
-                      timestamp integer not null,
-                      pkt_ptr integer not null,
-                      pindex integer not null,
-                      ip_dst integer,
-                      ip_src integer,
-                      header_len integer not null,
-                      dport integer,
-                      sport integer
-                      );
-                  """)
-        c.execute("""
-                  create index idx_ip_src
-                  on pkt_index (ip_src);
-                  """)
-        c.execute("""
-                  create index idx_ip_dst
-                  on pkt_index (ip_dst);
-                  """)
-        c.execute("""
-                  create index idx_pindex
-                  on pkt_index (pindex);
-                  """)
-        c.execute("BEGIN;")
+    #     if os.path.exists(db_name):
+    #         os.remove(db_name)
 
-        c.executemany(
-            "INSERT INTO pkt_index (timestamp, pkt_ptr, pindex, ip_dst, ip_src, header_len, dport, sport) VALUES (?,?,?,?,?,?,?,?)", index_list)
+    #     conn = sqlite3.connect(db_name)
+    #     c = conn.cursor()
+    #     c.execute('''PRAGMA synchronous = OFF''')
+    #     c.execute('''PRAGMA journal_mode = MEMORY''')
+    #     c.execute("drop table if exists pkt_index;")
+    #     c.execute("""
+    #               create table if not exists pkt_index (
+    #                   id integer primary key autoincrement,
+    #                   timestamp integer not null,
+    #                   pkt_ptr integer not null,
+    #                   pindex integer not null,
+    #                   ip_dst integer,
+    #                   ip_src integer,
+    #                   header_len integer not null,
+    #                   dport integer,
+    #                   sport integer
+    #                   );
+    #               """)
+    #     c.execute("""
+    #               create index idx_ip_src
+    #               on pkt_index (ip_src);
+    #               """)
+    #     c.execute("""
+    #               create index idx_ip_dst
+    #               on pkt_index (ip_dst);
+    #               """)
+    #     c.execute("""
+    #               create index idx_pindex
+    #               on pkt_index (pindex);
+    #               """)
+    #     c.execute("BEGIN;")
 
-        c.execute("COMMIT;")
-        log.info(f"DB index time: {time.time() - start_ts:6.3}")
-        conn.close()
+    #     c.executemany(
+    #         "INSERT INTO pkt_index (timestamp, pkt_ptr, pindex, ip_dst, ip_src, header_len, dport, sport) VALUES (?,?,?,?,?,?,?,?)", index_list)
+
+    #     c.execute("COMMIT;")
+    #     conn.close()
+    #     log.info(f"DB index time: {time.time() - start_ts:6.3}")
 
     def build_master_index(self, master_index, clean=False):
         db_name = f"{Config.pcap_master_index()}"

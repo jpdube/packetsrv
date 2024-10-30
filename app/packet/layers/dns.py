@@ -120,8 +120,7 @@ class DnsQuery:
 
     def summary(self, offset: int) -> str:
         result = f'{" " * offset}  Query ->\n'
-        result += f'{" " *
-                     offset}   Type.....: {type_values.get(self.qtype, "Undefined")}\n'
+        result += f'{" " * offset}   Type.....: {type_values.get(self.qtype, "Undefined")}\n'
         result += f'{" " * offset}   Class....: {self.qclass}\n'
 
         for l in self.label_list:
@@ -155,8 +154,7 @@ class DnsAnswer:
 
     def summary(self, offset: int) -> str:
         result = f'{" " * offset}  Answer ->\n'
-        result += f'{" " *
-                     offset}   Type.....: {type_values.get(self.qtype, "Undefined")}\n'
+        result += f'{" " * offset}   Type.....: {type_values.get(self.qtype, "Undefined")}\n'
         result += f'{" " * offset}   Class....: {self.qclass}\n'
         result += f'{" " * offset}   TTL......: {self.ttl}\n'
         result += f'{" " * offset}   Length...: {self.data_len}\n'

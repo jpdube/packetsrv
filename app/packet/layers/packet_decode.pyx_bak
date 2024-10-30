@@ -5,6 +5,7 @@ from typing import List
 from packet.layers.fields import IPv4Address
 from packet.layers.packet_hdr import PktHeader
 from packet.utils.print_hex import HexDump
+import cython
 
 log = logging.getLogger("packetdb")
 
@@ -24,7 +25,7 @@ ETHER_TYPE_LIST = [
     0x8915, 0x891D, 0x893a, 0x892F, 0x9000, 0xF1C1
 ]
 
-
+@cython.cclass
 class PacketDecode:
 
     __slots__ = ["packet", "header", "offset"]
@@ -34,10 +35,10 @@ class PacketDecode:
         self.header = None
         self.offset = 0
 
+    @cython.ccall
     def decode(self, header: PktHeader, packet):
         self.header = header
-        self.packet = packet
-        # self.packet = memoryview(packet)
+        self.packet = memoryview(packet)
         self.offset = 18 if self.has_vlan else 14
 
     def get_byte_field(self, field_name: str, offset: int, length: int) -> bytes | None:

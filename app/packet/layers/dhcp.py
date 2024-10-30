@@ -770,8 +770,7 @@ class Dhcp(Packet):
                 return None
 
     def __str__(self):
-        result = f"DHCP -> Opcode: {self.opcode}, Xid: {self.xid:x}, Lease sec: {
-            self.sec}\n{HexDump.format_hex(self.packet)}\n********\n"
+        result = f"DHCP -> Opcode: {self.opcode}, Xid: {self.xid:x}, Lease sec: {self.sec}\n{HexDump.format_hex(self.packet)}\n********\n"
         for opt in self.option_list:
             result += f" {opt}\n"
         return result
