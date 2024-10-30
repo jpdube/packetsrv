@@ -10,6 +10,8 @@ from config.config import Config
 from dbase.packet_ptr import PktPtr
 from pql.model import SelectStatement
 from pql.pcapfile import PcapFile
+import time
+from struct import unpack
 
 log = logging.getLogger("packetdb")
 
@@ -17,6 +19,24 @@ log = logging.getLogger("packetdb")
 class IndexManager:
     def __init__(self):
         pass
+
+    def create_index_seq(self):
+        path = Path(Config.pcap_path())
+        files_list = list(path.glob("*.pcap"))
+        pcapfile = PcapFile()
+        start_time = datetime.now()
+        # flist = []
+        result = []
+        for i in files_list:
+            start_ts = time.time()
+            r = pcapfile.create_index(i.stem)
+            log.info(f"   ====> Index manager: {time.time() - start_ts:.3}")
+            result.append(r)
+
+        # result.sort(key=lambda a: a[0])
+        pcapfile.build_master_index(result, clean=True)
+        ttl_time = datetime.now() - start_time
+        log.info(f"---> Total Index Time: {ttl_time}")
 
     def create_index(self):
         path = Path(Config.pcap_path())
@@ -81,6 +101,46 @@ class IndexManager:
 
     def search_pkt(self, file_id: Path, search_index: int, ip_list: dict[str, list[Tuple[int, int]]]):
         result = []
+
+        with open(str(file_id), "rb") as f:
+            while True:
+                buffer = f.read(26)
+
+                if len(buffer) != 26:
+                    break
+
+                (ts, ptr, index, dst_ip, src_ip, hdr_len,
+                 dport, sport) = unpack(">IIIIIHHH", buffer)
+                # log.debug(f"TS: {ts:x}, ptr: {ptr:x}, Index:{index:x} ")
+                found = False
+                if (index & search_index) == search_index:
+                    # log.debug(f"Search index: {search_index:x}:{index:x}")
+                    found = True
+                    if len(ip_list["ip.dst"]) > 0:
+                        net, brdcast = self.net_broadcast(
+                            ip_list["ip.dst"][0][0], ip_list["ip.dst"][0][1])
+                        if dst_ip >= net and dst_ip <= brdcast:
+                            found = True
+                        else:
+                            found = False
+
+                    if len(ip_list["ip.src"]) > 0:
+                        net, brdcast = self.net_broadcast(
+                            ip_list["ip.src"][0][0], ip_list["ip.src"][0][1])
+                        if src_ip >= net and src_ip <= brdcast:
+                            found = True
+                        else:
+                            found = False
+                if found:
+                    pkt = PktPtr(file_id=int(file_id.stem),
+                                 ptr=ptr, ip_dst=0, ip_src=0, pkt_hdr_size=0)
+                    # log.debug(f"PTR index: {pkt.file_id}:{pkt.ptr}")
+                    result.append(pkt)
+
+        return result
+
+    def search_pkt_db(self, file_id: Path, search_index: int, ip_list: dict[str, list[Tuple[int, int]]]):
+        result = []
         conn = sqlite3.connect(str(file_id))
         c = conn.cursor()
         params = []
@@ -127,7 +187,8 @@ class IndexManager:
             files_list = interval_result
         else:
             path = Path(Config.pcap_index())
-            files_list = list(path.glob("*.db"))
+            files_list = list(path.glob("*.pidx"))
+            # files_list = list(path.glob("*.db"))
             files_list.sort(key=lambda a: int(a.stem))
 
         search_index = pkt_index.build_search_index(model.index_field)
@@ -141,7 +202,7 @@ class IndexManager:
             result = self.search_pkt(index_file, search_index, model.ip_list)
 
             for r in result:
-                yield(r)
+                yield (r)
 
     def search_parallel(self, model: SelectStatement) -> Generator[Any, Any, Any]:
 
@@ -177,8 +238,8 @@ class IndexManager:
         if not model.has_interval:
             return None
 
-        log.debug(f"Interval s: {model.start_interval}, e: {
-                  model.end_interval}")
+        log.debug(
+            f"Interval s: {model.start_interval}, e: {model.end_interval}")
 
         conn = sqlite3.connect(Config.pcap_master_index())
         c = conn.cursor()
