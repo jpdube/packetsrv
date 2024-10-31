@@ -774,3 +774,9 @@ class Dhcp(Packet):
         for opt in self.option_list:
             result += f" {opt}\n"
         return result
+
+    def get_array(self, offset: int, length: int) -> bytes | None:
+        if offset < len(self.payload) and (offset + length) < len(self.payload):
+            return self.payload[offset: offset + length]
+        else:
+            return None
