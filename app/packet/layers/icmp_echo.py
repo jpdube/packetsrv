@@ -121,3 +121,12 @@ class IcmpEcho(Packet):
             return self.payload[offset: offset + length]
         else:
             return None
+
+    def export(self) -> dict[str, str | int]:
+        return {
+            "icmp_echo.type": {self.type},
+            "icmp_echo.code": {self.code},
+            "icmp_echo.seq_no": {self.sequence_no},
+            "icmp_echo.identifier": {self.identifier},
+            "icmp_echo.checksum": {self.checksum},
+        }
