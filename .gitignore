@@ -10,6 +10,7 @@ __pycache__/
 venv/
 .venv2/
 venv2/
+venv3/
 pvenv/
 ENV/
 *.log
