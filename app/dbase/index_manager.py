@@ -61,8 +61,8 @@ class IndexManager:
         c = conn.cursor()
 
         sql = """
-            select cast (avg(count) as int) 
-            from proto_stats 
+            select cast (avg(count) as int)
+            from proto_stats
             where (proto & ?) = ?;
 
         """
@@ -118,33 +118,19 @@ class IndexManager:
                     found = True
 
                     if len(ip_list["ip.dst"]) > 0:
-                        net, brdcast = self.net_broadcast(
-                            ip_list["ip.dst"][0][0], ip_list["ip.dst"][0][1])
-                        if dst_ip >= net and dst_ip <= brdcast:
-                            found = True
-                        else:
-                            found = False
+                        ip_search = Ipv4Search(ip_list["ip.dst"])
+                        found = dst_ip in ip_search
 
                     if len(ip_list["ip.src"]) > 0:
-                        net, brdcast = self.net_broadcast(
-                            ip_list["ip.src"][0][0], ip_list["ip.src"][0][1])
-                        if src_ip >= net and src_ip <= brdcast:
-                            found = True
-                        else:
-                            found = False
+                        ip_search = Ipv4Search(ip_list["ip.src"])
+                        found = src_ip in ip_search
 
                     if len(ip_list['dport']) > 0:
-                        if dport in ip_list['dport']:
-                            found = True
-                        else:
-                            found = False
+                        found = dport in ip_list['dport']
 
                     if len(ip_list['sport']) > 0:
                         log.error(f"Found sport: {ip_list['sport'][0]}")
-                        if sport in ip_list['sport']:
-                            found = True
-                        else:
-                            found = False
+                        found = sport in ip_list['sport']
 
                 if found:
                     pkt = PktPtr(file_id=int(file_id.stem),
@@ -263,8 +249,8 @@ class IndexManager:
                   model.start_interval, model.end_interval)
 
         sql = """
-                select * from master_index where start_ts >= ? and end_ts <= ? 
-                union all 
+                select * from master_index where start_ts >= ? and end_ts <= ?
+                union all
                 select * from master_index where ? >= start_ts and ? <= end_ts;
 
               """
@@ -282,11 +268,22 @@ class IndexManager:
         for i in range(0, len(l), n):
             yield l[i:i + n]
 
-    def is_in_network(self, address: int, address_list: list[Tuple[int, int]]) -> bool:
-        for ip, mask in address_list:
-            net, broadcast = self.net_broadcast(ip, mask)
-            if address >= net and address <= broadcast:
+
+class Ipv4Search:
+    def __init__(self, address_list: list[Tuple[int, int]]):
+        self.ip_list = address_list
+
+    def __contains__(self, search_ip: int) -> bool:
+        for addr in self.ip_list:
+            if self.is_in_network(search_ip, addr[0], addr[1]):
                 return True
+
+        return False
+
+    def is_in_network(self, address: int, searched_ip: int, mask: int) -> bool:
+        net, broadcast = self.net_broadcast(searched_ip, mask)
+        if address >= net and address <= broadcast:
+            return True
 
         return False
 
