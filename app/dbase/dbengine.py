@@ -46,9 +46,9 @@ class DBEngine:
                 if offset_ptr > self.model.offset:
                     query_result.add_packet(r)
                     self.pkt_found += 1
-                else:
-                    log.debug(
-                        f"Skipping for offset: {self.model.offset}:{offset_ptr}")
+                # else:
+                #     log.debug(
+                #         f"Skipping for offset: {self.model.offset}:{offset_ptr}")
                 offset_ptr += 1
 
             if query_result.count_reach:
