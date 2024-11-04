@@ -2,6 +2,7 @@
 # import pql.tokens_list as tl
 import datetime
 import time
+import logging
 
 from pql.aggregate import Aggregate, Average, Bandwidth, Count, Max, Min, Sum
 from pql.lexer import tokenize
@@ -13,6 +14,9 @@ index_field = set()
 # prev_label = []
 prev_ip = 0
 ip_search = {'ip.src': [], 'ip.dst': []}
+port_search = {'sport': [], 'dport': []}
+
+log = logging.getLogger("packetdb")
 
 
 class Tokenizer:
@@ -20,7 +24,6 @@ class Tokenizer:
         self.tokens = tokens
         self.lookahead = None
         self.prev_token = None
-
         self.prev_label = None
 
     def peek(self, *token_type):
@@ -58,7 +61,8 @@ class Tokenizer:
             self.prev_token = self.lookahead
             self.lookahead = None
 
-            if token.value in ['ip.dst', 'ip.src']:
+            if token.value in ['ip.dst', 'ip.src', 'tcp.dport', 'tcp.sport', 'upd.sport', 'udp.dport']:
+                # if token.value in ['ip.dst', 'ip.src']:
                 self.prev_label = token.value
             return token
 
@@ -291,12 +295,16 @@ def parse_string(tokens):
 
 def parse_integer(tokens):
     token = tokens.expect(Tokens.TOK_INTEGER)
+    log.debug(f"Prev token: {tokens}, token:{token}")
+
+    # --- Check if value is assigned to an index field
+    if tokens.prev_label is not None:
+        log.debug(f"Label: {tokens.prev_label}, {token.value}")
+        ip_search[tokens.prev_label.split(".")[1]].append(int(token.value))
+
     return Integer(token.value)
 
 
-# Values:
-# [0]
-# [1,2]
 def parse_array(tokens):
     values = []
     tokens.expect(Tokens.TOK_INDEX_START)
@@ -523,7 +531,7 @@ def parse_source(text):
     global index_field
     index_field = set()
     global ip_search
-    ip_search = {'ip.src': [], 'ip.dst': []}
+    ip_search = {'ip.src': [], 'ip.dst': [], 'sport': [], 'dport': []}
     tokens = tokenize(text)
     model = parse_select(Tokenizer(tokens))
     return model

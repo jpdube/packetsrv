@@ -116,6 +116,7 @@ class IndexManager:
                 if (index & search_index) == search_index:
                     # log.debug(f"Search index: {search_index:x}:{index:x}")
                     found = True
+
                     if len(ip_list["ip.dst"]) > 0:
                         net, brdcast = self.net_broadcast(
                             ip_list["ip.dst"][0][0], ip_list["ip.dst"][0][1])
@@ -131,6 +132,20 @@ class IndexManager:
                             found = True
                         else:
                             found = False
+
+                    if len(ip_list['dport']) > 0:
+                        if dport in ip_list['dport']:
+                            found = True
+                        else:
+                            found = False
+
+                    if len(ip_list['sport']) > 0:
+                        log.error(f"Found sport: {ip_list['sport'][0]}")
+                        if sport in ip_list['sport']:
+                            found = True
+                        else:
+                            found = False
+
                 if found:
                     pkt = PktPtr(file_id=int(file_id.stem),
                                  ptr=ptr, ip_dst=0, ip_src=0, pkt_hdr_size=0)
