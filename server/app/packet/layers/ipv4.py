@@ -1,10 +1,8 @@
-from packet.layers.fields import IPv4Address
-from packet.layers.packet import Packet
-from typing import Dict
-from packet.layers.layer_type import LayerID
-
-
 from struct import unpack
+
+from packet.layers.fields import IPv4Address
+from packet.layers.layer_type import LayerID
+from packet.layers.packet import Packet
 
 IHL_SHORT = 5
 IHL_LONG = 6
