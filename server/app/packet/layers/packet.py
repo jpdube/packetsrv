@@ -15,7 +15,7 @@ class Packet(ABC):
         return None
 
     @abstractmethod
-    def export(self) -> dict[str, str | int]:
+    def export(self) -> dict[str, str | int] | None:
         return None
 
     @abstractmethod
