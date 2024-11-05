@@ -13,13 +13,15 @@ from flask_bcrypt import bcrypt
 from flask_jwt_extended import (JWTManager, create_access_token,
                                 get_jwt_identity, jwt_required)
 
+
+Config.load()
 log = logging.getLogger("packetdb")
 
 app = Flask(__name__)
-app.config["SECRET_KEY"] = "wkxzvr%fTzd*y+QxtMDQEQr9E_b9odVnkE"
-# app.secret_key = "aaabbbcccddd"
-app.config["JWT_SECRET_KEY"] = "Jq@QA^9xA&yo%YG@J&DW38$GoWiw+z*&"
-app.config['JWT_ACCESS_TOKEN_EXPIRES'] = datetime.timedelta(minutes=480)
+app.config["SECRET_KEY"] = Config.api_secret_key()
+app.config["JWT_SECRET_KEY"] = Config.api_jwt_secrete_key()
+app.config['JWT_ACCESS_TOKEN_EXPIRES'] = datetime.timedelta(
+    minutes=Config.api_jwt_token_expires())
 
 cors = CORS(app)
 jwt = JWTManager(app)

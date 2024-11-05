@@ -39,12 +39,25 @@ class Config:
         return os.getenv('PCAP_MASTER_INDEX', '')
 
     @classmethod
+    def api_secret_key(cls):
+        return os.getenv("API_SECRET_KEY", "")
+
+    @classmethod
+    def api_jwt_secrete_key(cls):
+        return os.getenv("API_JWT_SECRET_KEY", "")
+
+    @classmethod
+    def api_jwt_token_expires(cls):
+        return int(os.getenv("API_JWT_ACCESS_TOKEN_EXPIRES", 15))
+
+    @classmethod
     def nbr_threads(cls) -> int:
         nbr_threads = os.getenv('NBR_THREADS', mp.cpu_count())
         try:
             cpu_threads = int(nbr_threads)
         except ValueError:
-            log.error(f"Invalid value for NBR_THREADS: {nbr_threads} using default core count")
+            log.error(
+                f"Invalid value for NBR_THREADS: {nbr_threads} using default core count")
             cpu_threads = mp.cpu_count()
 
         if cpu_threads > mp.cpu_count():
