@@ -7,12 +7,11 @@ import jwt
 from config.config import Config
 from config.config_db import ConfigDB, User
 from dbase.dbengine import DBEngine
-from flask_cors import CORS
 from flask import Flask, jsonify, request, session
 from flask_bcrypt import bcrypt
+from flask_cors import CORS
 from flask_jwt_extended import (JWTManager, create_access_token,
                                 get_jwt_identity, jwt_required)
-
 
 Config.load()
 log = logging.getLogger("packetdb")
@@ -51,7 +50,7 @@ def login():
         return jsonify({"error": "Bad username or password"})
 
 
-@app.route('/pql', methods=['POST'])
+@app.route('/query', methods=['POST'])
 @jwt_required()
 def query():
     pql = request.get_json()
