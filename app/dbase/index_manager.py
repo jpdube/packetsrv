@@ -1,8 +1,10 @@
 import logging
 import multiprocessing as mp
 import sqlite3
+import time
 from datetime import datetime
 from pathlib import Path
+from struct import unpack
 from typing import Any, Generator, Tuple
 
 import pql.packet_index as pkt_index
@@ -10,8 +12,6 @@ from config.config import Config
 from dbase.packet_ptr import PktPtr
 from pql.model import SelectStatement
 from pql.pcapfile import PcapFile
-import time
-from struct import unpack
 
 log = logging.getLogger("packetdb")
 
@@ -137,43 +137,6 @@ class IndexManager:
                                  ptr=ptr, ip_dst=0, ip_src=0, pkt_hdr_size=0)
                     # log.debug(f"PTR index: {pkt.file_id}:{pkt.ptr}")
                     result.append(pkt)
-
-        return result
-
-    def search_pkt_db(self, file_id: Path, search_index: int, ip_list: dict[str, list[Tuple[int, int]]]):
-        result = []
-        conn = sqlite3.connect(str(file_id))
-        c = conn.cursor()
-        params = []
-        params.append(search_index)
-        params.append(search_index)
-
-        sql = """
-              select pkt_ptr
-              from pkt_index
-              where (pindex & ?) = ?
-              """
-        if len(ip_list["ip.src"]) > 0:
-            sql = " ".join([sql, "and ip_src between ? and ? "])
-            net, brdcast = self.net_broadcast(
-                ip_list["ip.src"][0][0], ip_list["ip.src"][0][1])
-            params.append(net)
-            params.append(brdcast)
-
-        if len(ip_list["ip.dst"]) > 0:
-            sql = " ".join([sql,  "and ip_dst between ? and ? "])
-            net, brdcast = self.net_broadcast(
-                ip_list["ip.dst"][0][0], ip_list["ip.dst"][0][1])
-            params.append(net)
-            params.append(brdcast)
-
-        c.execute(sql, params)
-
-        for r in c.fetchall():
-            pkt = PktPtr(file_id=int(file_id.stem),
-                         ptr=r[0], ip_dst=0, ip_src=0, pkt_hdr_size=0)
-            # log.debug(f"PTR index: {pkt.file_id}:{pkt.ptr}")
-            result.append(pkt)
 
         return result
 
