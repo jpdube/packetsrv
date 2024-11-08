@@ -48,8 +48,9 @@ class DBEngine:
                     self.pkt_found += 1
                 offset_ptr += 1
 
-            if query_result.count_reach:
-                break
+            if self.model.has_top:
+                if query_result.count_reach:
+                    break
 
             searched += 1
 
