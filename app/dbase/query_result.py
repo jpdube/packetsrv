@@ -173,7 +173,10 @@ class GroupBy:
                 record[self.model.groupby_fields[index]] = field_value
 
             for aggr in self.model.aggregate:
-                record[aggr.as_of] = aggr.execute(pkt_list)
+                value_list = []
+                for p in pkt_list:
+                    value_list.append(p.get_field(aggr.fieldname))
+                record[aggr.as_of] = aggr.execute(value_list)
 
             result.append(record)
 
