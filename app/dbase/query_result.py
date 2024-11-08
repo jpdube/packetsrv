@@ -5,6 +5,7 @@ from collections import defaultdict
 from packet.layers.field_type import get_type
 from packet.layers.fields import IPv4Address
 from packet.layers.packet_builder import PacketBuilder
+from pql.aggregate import Count
 from pql.model import SelectStatement
 
 log = logging.getLogger("packetdb")
@@ -26,6 +27,7 @@ class QueryResult:
 
         log.debug(self.model)
         self.groupby = GroupBy(self.model)
+        self.aggby = AggregateBy(self.model)
 
     @property
     def is_empty(self) -> bool:
@@ -35,6 +37,8 @@ class QueryResult:
     def count_reach(self) -> bool:
         if self.model.has_groupby:
             return self.groupby.count >= self.model.top_expr
+        elif not self.model.has_groupby and self.model.has_aggregate:
+            return self.aggby.count >= self.model.top_expr
         else:
             return len(self.result['result']) >= self.model.top_expr
 
@@ -54,6 +58,8 @@ class QueryResult:
 
         if self.model.has_groupby:
             self.groupby.add(packet)
+        elif not self.model.has_groupby and self.model.has_aggregate:
+            self.aggby.add(packet)
         else:
             self.process_pkt(packet)
 
@@ -67,6 +73,8 @@ class QueryResult:
         if self.model.has_groupby:
             # self.groupby.print()
             self.result['result'] = self.groupby.get_result()
+        elif not self.model.has_groupby and self.model.has_aggregate:
+            self.result['result'] = self.aggby.get_result()
         return self.result
 
     def process_pkt(self, pb: PacketBuilder):
@@ -97,6 +105,39 @@ class QueryResult:
         if bool(record) and (not self.model.has_distinct or tmp_hash not in self.distinct):
             self.result["result"].append(record)
             self.distinct.append(tmp_hash)
+
+
+class AggregateBy:
+    def __init__(self, model: SelectStatement):
+        self.model = model
+        self.aggr_result = defaultdict(list)
+        self.packet_count = 0
+
+    def add(self, packet: PacketBuilder):
+        self.packet_count += 1
+        for aggr in self.model.aggregate:
+            if isinstance(aggr, Count):
+                self.aggr_result[aggr.fieldname].append(1)
+            else:
+                value = packet.get_field(aggr.fieldname)
+                self.aggr_result[aggr.fieldname].append(value)
+
+    @property
+    def count(self) -> int:
+        return self.packet_count
+
+    def get_result(self) -> list:
+        result = []
+        for key, pkt_list in self.aggr_result.items():
+            log.debug(f"{key}:{len(pkt_list)}")
+
+            record = {}
+            for aggr in self.model.aggregate:
+                record[aggr.as_of] = aggr.execute(pkt_list)
+
+            result.append(record)
+
+        return result
 
 
 class GroupBy:

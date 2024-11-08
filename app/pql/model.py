@@ -174,6 +174,14 @@ class SelectStatement(Statement):
         #     self.limit = limit_expr[1]
 
     @property
+    def has_top(self) -> bool:
+        return self.top_expr != 0
+
+    @property
+    def has_aggregate(self) -> bool:
+        return len(self.aggregate) > 0
+
+    @property
     def packet_to_fetch(self) -> int:
         return self.offset + self.top_expr
 
@@ -210,10 +218,10 @@ class SelectStatement(Statement):
                    Include: {self.include},
                    Where: {repr(self.where_expr)},
                    Group By: {self.groupby_fields},
-                   Top: {self.top_expr},
+                   Top: {self.has_top} value:{self.top_expr},
                    Offset: {self.offset},
                    Interval: {self.interval[0]} to {self.interval[1]},
-                   Aggregate: {self.aggregate}
+                   Aggregate: {self.has_aggregate} aggr list:{self.aggregate}
                    Distinct: {self.has_distinct}
 
                    """
