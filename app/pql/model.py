@@ -149,7 +149,8 @@ class SelectStatement(Statement):
         index_field,
         ip_list,
         where_expr,
-        groupby_fields,
+        groupby_fields=None,
+        orderby_fields=None,
         top_expr=0,
         offset_expr=0,
         # limit_expr=0,
@@ -164,6 +165,7 @@ class SelectStatement(Statement):
         self.ip_list = ip_list
         self.where_expr = where_expr
         self.groupby_fields = groupby_fields
+        self.orderby_fields = orderby_fields
         self.top_expr = int(top_expr)
         self.offset = int(offset_expr)
         # self.limit = None
@@ -198,6 +200,10 @@ class SelectStatement(Statement):
         return self.interval[0] != 0 and self.interval[1] != 0
 
     @property
+    def has_orderby(self) -> bool:
+        return self.orderby_fields is not None
+
+    @property
     def start_interval(self) -> int:
         if self.has_interval:
             return self.interval[0]
@@ -217,11 +223,12 @@ class SelectStatement(Statement):
                    Index: {self.index_field}, IP: {self.ip_list},
                    Include: {self.include},
                    Where: {repr(self.where_expr)},
-                   Group By: {self.groupby_fields},
+                   Group By: {self.has_groupby}: {self.groupby_fields},
+                   Order By: {self.has_orderby}: {self.orderby_fields},
                    Top: {self.has_top} value:{self.top_expr},
                    Offset: {self.offset},
                    Interval: {self.interval[0]} to {self.interval[1]},
-                   Aggregate: {self.has_aggregate} aggr list:{self.aggregate}
+                   Aggregate: {self.has_aggregate}: aggr list:{self.aggregate}
                    Distinct: {self.has_distinct}
 
                    """
