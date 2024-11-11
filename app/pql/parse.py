@@ -1,8 +1,8 @@
 # from packet.layers.ipv4 import IPV4
 # import pql.tokens_list as tl
 import datetime
-import time
 import logging
+import time
 
 from pql.aggregate import Aggregate, Average, Bandwidth, Count, Max, Min, Sum
 from pql.lexer import tokenize
@@ -177,6 +177,22 @@ def parse_groupby(tokens):
     return groupby_value
 
 
+def parse_orderby(tokens):
+    orderby_value = None
+    if tokens.peek(Tokens.TOK_ORDER_BY):
+        tokens.expect(Tokens.TOK_ORDER_BY)
+        orderby_value = []
+        while True:
+            field = tokens.expect(Tokens.TOK_NAME)
+            # print(f'SELECT fields: {field}')
+            if field:
+                orderby_value.append(field.value)
+
+            if tokens.accept(Tokens.TOK_DELIMITER) is None:
+                break
+    return orderby_value
+
+
 def parse_top(tokens):
     top_value = 0
     if tokens.peek(Tokens.TOK_TOP):
@@ -241,6 +257,7 @@ def parse_select(tokens):
     where_value = parse_where(tokens)
     groupby_value = parse_groupby(tokens)
     interval_start, interval_end = parse_interval(tokens)
+    orderby_value = parse_orderby(tokens)
     top_value = parse_top(tokens)
     offset_value = parse_offset(tokens)
     # limit_fields = parse_limit(tokens)
@@ -254,6 +271,7 @@ def parse_select(tokens):
                            ip_search,
                            where_value,
                            groupby_value,
+                           orderby_value,
                            top_value,
                            offset_value,
                            #    limit_fields,
