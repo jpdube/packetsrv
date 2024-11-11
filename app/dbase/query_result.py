@@ -1,6 +1,7 @@
 import logging
 import sys
 from collections import defaultdict
+from dataclasses import dataclass
 
 from packet.layers.field_type import get_type
 from packet.layers.fields import IPv4Address
@@ -43,7 +44,7 @@ class QueryResult:
             return len(self.result['result']) >= self.model.top_expr
 
     def add_packet(self, packet: PacketBuilder):
-        ts = packet.get_field("frame.ts_sec")
+        ts = int(packet.get_field("frame.ts_sec"))
 
         self.found += 1
 
@@ -75,7 +76,19 @@ class QueryResult:
             self.result['result'] = self.groupby.get_result()
         elif not self.model.has_groupby and self.model.has_aggregate:
             self.result['result'] = self.aggby.get_result()
+
+        if self.model.has_orderby:
+            self.result['result'] = sorted(
+                self.result['result'], key=lambda x: self.sort_columns(x))
+
         return self.result
+
+    def sort_columns(self, x):
+        columns = []
+        for sort_col in self.model.orderby_fields:
+            columns.append(x[sort_col])
+
+        return columns
 
     def process_pkt(self, pb: PacketBuilder):
         if len(self.model.select_expr) == 0:
