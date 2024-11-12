@@ -33,6 +33,11 @@ def make_session_permanent():
     session.modified = True
 
 
+@app.route("/health", methods=["GET"])
+def health():
+    return jsonify({"msg": "Online"})
+
+
 @app.route("/login", methods=["POST"])
 def login():
     if request.json is None:
