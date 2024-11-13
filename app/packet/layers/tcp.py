@@ -136,6 +136,7 @@ class TCP(Packet):
         result += f'{" " * offset}   Ack no.....: {self.ack_no}\n'
         result += f'{" " * offset}   Header len.: {self.header_len}\n'
         result += f'{" " * offset}   Flags......: {self.flags}\n'
+        result += f'{" " * offset}   Window.....: {self.window}\n'
         result += f'{" " * offset}   Checksum...: {self.checksum},0x{self.checksum:04x}\n'
 
         return result
@@ -149,6 +150,7 @@ class TCP(Packet):
             "tcp.hdr_len": self.header_len,
             "tcp.flags": self.flags,
             "tcp.checksum": self.checksum,
+            "tcp.window": self.window,
         }
 
     def __str__(self) -> str:
