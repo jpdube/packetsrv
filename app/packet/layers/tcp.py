@@ -149,8 +149,16 @@ class TCP(Packet):
             "tcp.ack_no": self.ack_no,
             "tcp.hdr_len": self.header_len,
             "tcp.flags": self.flags,
+            "tcp.flag_rst": self.flag_rst,
+            "tcp.flag_syn": self.flag_syn,
+            "tcp.flag_fin": self.flag_fin,
+            "tcp.flag_ack": self.flag_ack,
+            "tcp.flag_urg": self.flag_urg,
+            "tcp.flag_ns": self.flag_ns,
+            "tcp.flag_ece": self.flag_ece,
             "tcp.checksum": self.checksum,
             "tcp.window": self.window,
+            "tcp.urgent_ptr": self.urgent_ptr,
         }
 
     def __str__(self) -> str:
@@ -158,33 +166,43 @@ class TCP(Packet):
 
     def get_field(self, fieldname: str) -> None | int:
         field = fieldname.split('.')[1]
-        if field:
-            if field == 'seq_no':
+        match field:
+            case 'seq_no':
                 return self.seq_no
-            elif field == 'ack_no':
+            case 'seq_no':
+                return self.seq_no
+            case'ack_no':
                 return self.ack_no
-            elif field == 'length':
+            case 'length':
                 return self.header_len
-            elif field == 'window':
+            case 'window':
                 return self.window
-            elif field == 'checksum':
+            case 'checksum':
                 return self.checksum
-            elif field == 'urgent_ptr':
+            case 'urgent_ptr':
                 return self.urgent_ptr
-            elif field == 'flag_syn':
+            case 'flag_syn':
                 return self.flag_syn
-            elif field == 'flag_ack':
+            case 'flag_ack':
                 return self.flag_ack
-            elif field == 'checksum':
+            case 'flag_rst':
+                return self.flag_rst
+            case 'flag_fin':
+                return self.flag_fin
+            case 'flag_urg':
+                return self.flag_urg
+            case 'flag_ns':
+                return self.flag_ns
+            case 'flag_ece':
+                return self.flag_ece
+            case 'checksum':
                 return self.checksum
-            elif field == 'sport':
+            case 'sport':
                 return self.src_port
-            elif field == 'dport':
+            case 'dport':
                 return self.dst_port
-            else:
-                return 0
-        else:
-            return None
+            case _:
+                return None
 
     def get_array(self, offset: int, length: int) -> bytes | None:
         if offset < len(self.payload) and (offset + length) < len(self.payload):
