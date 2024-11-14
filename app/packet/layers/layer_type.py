@@ -14,6 +14,7 @@ class LayerID(Enum):
     UNDEFINED = auto()
     DHCP = auto()
     DNS = auto()
+    HTTPS = auto()
 
     def __str__(self) -> str:
         return str(self.name)

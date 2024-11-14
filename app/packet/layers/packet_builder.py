@@ -2,6 +2,7 @@ import base64
 import logging
 from typing import Dict, List, Tuple
 
+from packet.layers.https import Https
 from packet.layers.arp import ARP
 from packet.layers.dhcp import Dhcp
 from packet.layers.dns import Dns
@@ -96,6 +97,12 @@ class PacketBuilder:
             if ip.protocol == IP_PROTO_TCP:
                 tcp = TCP(raw_packet[offset + 34:])
                 self.add(tcp)
+
+                if tcp.dst_port == 443 and not tcp.flag_syn and not tcp.flag_fin and len(tcp.payload) > 0:
+                    https = Https(tcp.payload)
+                    if https.is_valid:
+                        self.add(https)
+
             elif ip.protocol == IP_PROTO_UDP:
                 udp = UDP(raw_packet[offset + 34:])
                 self.add(udp)
@@ -196,6 +203,10 @@ class PacketBuilder:
             dns = self.get_layer(LayerID.DNS)
             if dns:
                 return dns.get_field(field)
+        elif pkt_name == 'https':
+            https = self.get_layer(LayerID.HTTPS)
+            if https:
+                return https.get_field(field)
 
         return None
 
