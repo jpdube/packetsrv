@@ -5,6 +5,7 @@ from datetime import datetime, timedelta
 
 from dbase.packet_ptr import PktPtr
 from packet.layers.packet_builder import PacketBuilder
+from packet.layers.layer_type import LayerID
 from pql.model import (Array, BinOp, Boolean, ConstDecl, Date, Grouping,
                        Integer, IPv4, Label, LabelByte, Mac, Now,
                        SelectStatement, Unary)
@@ -70,7 +71,7 @@ def interpret(node, env, packet: PacketBuilder):
         return node
 
     elif isinstance(node, ConstDecl):
-        return node.value
+        return node
 
     elif isinstance(node, Now):
         time_result = datetime.fromtimestamp(node.value)
@@ -142,6 +143,8 @@ def interpret(node, env, packet: PacketBuilder):
                 return leftval == rightval.to_int
             elif isinstance(rightval, Array):
                 return leftval == rightval.value
+            elif isinstance(rightval, ConstDecl):
+                return packet.has_layer(rightval.value)
             else:
                 return leftval == rightval
         elif node.op == Tokens.TOK_LAND:

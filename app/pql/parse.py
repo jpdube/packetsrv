@@ -8,6 +8,7 @@ from pql.aggregate import Aggregate, Average, Bandwidth, Count, Max, Min, Sum
 from pql.lexer import tokenize
 from pql.model import *
 from pql.tokens_list import Tokens
+from packet.layers.layer_type import LayerID, from_string
 
 index_field = set()
 # ip_list = set()
@@ -367,7 +368,10 @@ def parse_mac(tokens):
 def parse_const(tokens):
     name = tokens.expect(Tokens.TOK_CONST)
     index_field.add(name.value)
-    return ConstDecl(name.value, "int", name.value)
+    const_decl = from_string(name.value)
+    log.debug(f"CONSTANT: {const_decl}")
+    return ConstDecl(name.value, "int", const_decl)
+    # return ConstDecl(name.value, "int", name.value)
 
 
 def parse_var(tokens):

@@ -1,5 +1,6 @@
-import pql.pql_constant as const
 from pql.tokens_list import Tokens
+from packet.layers.layer_type import has_value
+from pql.pql_constant import has_value
 
 _keywords = {
     "select": Tokens.TOK_SELECT,
@@ -222,8 +223,11 @@ class Lexer:
         value = self.text[tok_start: self.pos]
         if value in _keywords:
             token = Token(_keywords[value], value, self.line, self.col)
-        elif value in const.const_list:
-            token = Token(Tokens.TOK_CONST, value, self.line, self.col)
+        elif const_value := has_value(value):
+            # elif value in const.const_list:
+            if const_value is not None:
+                token = Token(Tokens.TOK_CONST, const_value.name,
+                              self.line, self.col)
         else:
             token = Token(Tokens.TOK_NAME, value, self.line, self.col)
 

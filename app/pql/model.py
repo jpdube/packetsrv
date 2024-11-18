@@ -3,8 +3,10 @@ from functools import lru_cache
 from typing import List
 
 from packet.layers.fields import IPv4Address, MacAddress
+from packet.layers.layer_type import LayerID
 from pql.aggregate import Aggregate
-from pql.pql_constant import const_value
+# from pql.pql_constant import const_value
+# from pql.pql_constant import Constants
 
 
 class Node:
@@ -53,7 +55,7 @@ class ConstDecl(Expression):
     def __init__(self, name, type, value):
         self.name = name
         self.type = type
-        self.value = const_value(value)
+        self.value = value
 
     def __repr__(self):
         return f"ConstDecl {self.name}, {self.type}, {self.value}"
