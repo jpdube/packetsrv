@@ -13,8 +13,8 @@ class Https(Packet):
 
     @property
     def is_valid(self):
-        valid = self.content_type in (0x15, 0x16, 0x17)
-        print(f"HTTPS VALID: {valid}")
+        valid = self.content_type in (0x15, 0x16, 0x17) and self.tls_version in (
+            "tls 1.0", "tls 1.1", "tls 1.2")
         return valid
 
     @property
@@ -29,10 +29,14 @@ class Https(Packet):
         if len(self.packet) > 0:
             version = int(unpack("!H", self.packet[1:3])[0])
             match version:
+                case 0x0301:
+                    return "tls 1.0"
+                case 0x0302:
+                    return "tls 1.1"
                 case 0x0303:
                     return "tls 1.2"
                 case _:
-                    return "unknown version"
+                    return f"unknown {version:x}"
 
         else:
             return "unknown version"
