@@ -11,7 +11,7 @@ class Packet(ABC):
         pass
 
     @abstractmethod
-    def get_field(self, fieldname: str) -> None | int:
+    def get_field(self, fieldname: str) -> None | int | str:
         return None
 
     @abstractmethod
