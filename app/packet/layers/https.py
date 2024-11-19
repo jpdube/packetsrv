@@ -1,12 +1,20 @@
+from enum import Enum
 from struct import unpack
 
 from packet.layers.layer_type import LayerID
 from packet.layers.packet import Packet
 
-TLS_V1_0 = 0x0301
-TLS_V1_1 = 0x0303
-TLS_V1_2 = 0x0303
-TLS_VERSIONS = [TLS_V1_0, TLS_V1_1, TLS_V1_2]
+
+class TlsVersion(Enum):
+    V1_0 = 0x0301
+    V1_1 = 0x0302
+    V1_2 = 0x0303
+    V_UNKNOWN = 0
+
+    # @classmethod
+    # def is_valid_version(cls, version_code) -> bool:
+    #     return version_code.value in [cls.V1_0.value, cls.V1_1.value, cls.V1_2.value]
+
 
 CONTENT_TYPE = [0x15, 0x16, 0x17]
 
@@ -21,7 +29,8 @@ class Https(Packet):
 
     @property
     def is_valid(self):
-        valid = self.content_type in CONTENT_TYPE and self.tls_version in TLS_VERSIONS
+        valid = self.content_type in CONTENT_TYPE and self.tls_version in (
+            TlsVersion.V1_0.value, TlsVersion.V1_1.value, TlsVersion.V1_2.value)
         return valid
 
     @property
@@ -44,11 +53,11 @@ class Https(Packet):
         if len(self.packet) > 0:
             version = int(unpack("!H", self.packet[1:3])[0])
             match version:
-                case int(TLS_V1_0):
+                case TlsVersion.V1_0.value:
                     return "tls 1.0"
-                case int(TLS_V1_1):
+                case TlsVersion.V1_1.value:
                     return "tls 1.1"
-                case int(TLS_V1_2):
+                case TlsVersion.V1_2.value:
                     return "tls 1.2"
                 case _:
                     return f"unknown {version:x}"

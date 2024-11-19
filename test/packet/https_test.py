@@ -9,7 +9,7 @@ def test_https_packet():
     https = Https(bytes(packet))
 
     assert (https.content_type == 0x17)
-    assert (https.tls_version == 0x0303)
+    assert (https.tls_version == TlsVersion.V1_2.value)
     assert (https.length == 0x3bfb)
     assert (https.payload == bytes([0x01, 0x02, 0x03]))
 
@@ -51,4 +51,4 @@ def test_https_version():
 
     https = Https(bytes(packet))
 
-    assert (https.tls_version ==)
+    assert (https.tls_version == TlsVersion.V1_2.value)
