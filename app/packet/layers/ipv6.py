@@ -96,3 +96,14 @@ class IPV6(Packet):
 
     def get_field(self, fieldname: str):
         ...
+
+    def export(self):
+        return {
+            "ipv6": 0
+        }
+
+    def get_array(self, offset: int, length: int) -> bytes | None:
+        if offset < len(self.payload) and (offset + length) < len(self.payload):
+            return self.payload[offset: offset + length]
+        else:
+            return None
