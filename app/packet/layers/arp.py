@@ -101,3 +101,9 @@ class ARP(Packet):
             return str(self.sender_ip)
         elif fieldname == "arp.target_ip":
             return str(self.target_ip)
+
+    def get_array(self, offset: int, length: int) -> bytes | None:
+        if offset < len(self.packet) and (offset + length) < len(self.packet):
+            return self.packet[offset: offset + length]
+        else:
+            return None
