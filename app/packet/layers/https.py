@@ -11,10 +11,6 @@ class TlsVersion(Enum):
     V1_2 = 0x0303
     V_UNKNOWN = 0
 
-    # @classmethod
-    # def is_valid_version(cls, version_code) -> bool:
-    #     return version_code.value in [cls.V1_0.value, cls.V1_1.value, cls.V1_2.value]
-
 
 CONTENT_TYPE = [0x15, 0x16, 0x17]
 
