@@ -2,14 +2,15 @@ import base64
 import logging
 from typing import Dict, List, Tuple
 
-from packet.layers.https import Https
 from packet.layers.arp import ARP
 from packet.layers.dhcp import Dhcp
 from packet.layers.dns import Dns
 from packet.layers.ethernet import (ETHER_TYPE_ARP, ETHER_TYPE_IPV4,
                                     ETHER_TYPE_IPV6, Ethernet)
 from packet.layers.frame import Frame
+from packet.layers.https import Https
 from packet.layers.icmp_builder import icmp_builder
+from packet.layers.icmp_dest_unreach import IcmpDestUnreach
 from packet.layers.icmp_echo import IcmpEcho
 from packet.layers.ipv4 import IP_PROTO_ICMP, IP_PROTO_TCP, IP_PROTO_UDP, IPV4
 from packet.layers.ipv6 import IPV6
@@ -114,7 +115,8 @@ class PacketBuilder:
                     self.add(dns)
             elif ip.protocol == IP_PROTO_ICMP:
                 icmp = icmp_builder(raw_packet[offset + 34:])
-                self.add(icmp)
+                if icmp:
+                    self.add(icmp)
 
         if e.ethertype == ETHER_TYPE_IPV6:
             ip = IPV6(raw_packet[offset + 14:])
@@ -207,6 +209,14 @@ class PacketBuilder:
             https = self.get_layer(LayerID.HTTPS)
             if https:
                 return https.get_field(field)
+        elif pkt_name == 'icmp_echo':
+            icmp_echo = self.get_layer(LayerID.ICMP_ECHO)
+            if icmp_echo:
+                return icmp_echo.get_field(field)
+        elif pkt_name == 'icmp_destunreach':
+            icmp_destunreach = self.get_layer(LayerID.ICMP_DESTUNREACH)
+            if icmp_destunreach:
+                return icmp_destunreach.get_field(field)
 
         return None
 
