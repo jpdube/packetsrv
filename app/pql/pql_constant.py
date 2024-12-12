@@ -1,6 +1,5 @@
-from enum import Enum
-
 import logging
+from enum import Enum
 
 log = logging.getLogger("packetdb")
 
@@ -33,6 +32,8 @@ class Constants(Enum):
     BGP = "BGP"
     DHCP = "DHCP"
     SMB = "SMB"
+    ICMP_ECHO = "ICMP_ECHO"
+    ICMP_DESTUNREACH = "ICMP_DESTUNREACH"
 
 
 def has_value(value: str) -> Constants | None:
