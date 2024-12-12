@@ -1,6 +1,6 @@
-from pql.tokens_list import Tokens
-from packet.layers.layer_type import has_value
+# from packet.layers.layer_type import has_value
 from pql.pql_constant import has_value
+from pql.tokens_list import Tokens
 
 _keywords = {
     "select": Tokens.TOK_SELECT,
