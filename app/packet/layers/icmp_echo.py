@@ -1,5 +1,6 @@
 from struct import unpack
 from packet.layers.packet import Packet
+from packet.layers.layer_type import LayerID
 from typing import Dict
 
 """
@@ -71,7 +72,7 @@ IP Fields:
 
 
 class IcmpEcho(Packet):
-    name = 6
+    name = LayerID.ICMP_ECHO
 
     def __init__(self, packet: bytes):
         self.packet = packet
@@ -113,8 +114,22 @@ class IcmpEcho(Packet):
     def __str__(self):
         return f"ICMP Echo -> type: {self.type}, code: {self.code}, checksum: {self.checksum:x}, identifier: {self.identifier}, sequence: {self.sequence_no}"
 
-    def get_field(self, fieldname: str):
-        ...
+    def get_field(self, fieldname: str) -> int | bytes | None:
+        match fieldname:
+            case "icmp_echo.type":
+                return self.type
+            case "icmp_echo.code":
+                return self.code
+            case "icmp_echo.seq_no":
+                return self.sequence_no
+            case "icmp_echo.identifier":
+                return self.identifier
+            case "icmp_echo.checksum":
+                return self.checksum
+            case "icmp_echo.payload":
+                return self.payload
+            case _:
+                return None
 
     def get_array(self, offset: int, length: int) -> bytes | None:
         if offset < len(self.payload) and (offset + length) < len(self.payload):

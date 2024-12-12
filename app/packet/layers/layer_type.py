@@ -1,5 +1,4 @@
-from enum import Enum
-from enum import auto
+from enum import Enum, auto
 
 
 class LayerID(Enum):
@@ -9,7 +8,9 @@ class LayerID(Enum):
     TCP = auto()
     UDP = auto()
     ARP = auto()
-    ICMP = auto()
+    # ICMP = auto()
+    ICMP_ECHO = auto()
+    ICMP_DESTUNREACH = auto()
     FRAME = auto()
     UNDEFINED = auto()
     DHCP = auto()
@@ -48,8 +49,10 @@ def from_string(str_value: str) -> LayerID:
             return LayerID.UDP
         case"ARP":
             return LayerID.ARP
-        case"ICMP":
-            return LayerID.ICMP
+        # case"ICMP":
+        #     return LayerID.ICMP
+        case"ICMP_DESTUNREACH":
+            return LayerID.ICMP_DESTUNREACH
         case"FRAME":
             return LayerID.FRAME
         case"DHCP":
@@ -70,3 +73,5 @@ def from_string(str_value: str) -> LayerID:
             return LayerID.FTP
         case"SMB":
             return LayerID.SMB
+        case"ICMP_ECHO":
+            return LayerID.ICMP_ECHO

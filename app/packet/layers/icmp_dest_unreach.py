@@ -79,20 +79,24 @@ Destination Unreachable Message
 
 """
 from struct import unpack
+
 from packet.layers.ipv4 import IPV4
+from packet.layers.datagram import Datagram
+from packet.layers.frame import Frame
+from packet.layers.layer_type import LayerID
 # from packet.utils.print_hex import format_hex
 from packet.layers.packet import Packet
-from packet.layers.layer_type import LayerID
 
 
 class IcmpDestUnreach(Packet):
-    name = LayerID.ICMP
+    name = LayerID.ICMP_DESTUNREACH
+    __slots__ = ["packet"]
 
     def __init__(self, packet):
         self.packet = packet
 
     @property
-    def type(self) -> int:
+    def icmp_type(self) -> int:
         return unpack("!B", self.packet[0:1])[0]
 
     @property
@@ -104,20 +108,52 @@ class IcmpDestUnreach(Packet):
         return unpack("!H", self.packet[2:4])[0]
 
     @property
-    def datagram(self) -> IPV4:
-        return IPV4(self.packet[8:])
+    def datagram(self) -> Datagram:
+        ipv4 = IPV4(self.packet[8:])
+        self.datagram_def = Datagram(ipv4)
+
+        return self.datagram_def
 
     def __str__(self):
-        return f"ICMP Dest unreachable -> type: {self.type}, code: {self.code}, checksum: {self.checksum:x}, src_ip: {self.datagram.src_ip}, dst_ip: {self.datagram.dst_ip}"
+        return f"ICMP Dest unreachable -> type: {self.icmp_type}, code: {self.code}, checksum: {self.checksum:x}, src_ip: {self.datagram.src_ip}, dst_ip: {self.datagram.dst_ip}"
 
     def summary(self, offset: int) -> str:
         result = f'{" " * offset}ICMP-Destination unreachable ->\n'
-        result += f'{" " * offset}   Type.......: {self.type}\n'
+        result += f'{" " * offset}   Type.......: {self.icmp_type}\n'
         result += f'{" " * offset}   Code.......: {self.code}\n'
         result += f'{" " * offset}   Checksum...: {self.checksum},0x{self.checksum:04x}\n'
         result += f'{" " * offset}   Datagram...: {self.datagram}\n'
 
         return result
 
-    def get_field(self, fieldname: str):
-        ...
+    def get_field(self, fieldname: str) -> int | IPV4 | None:
+        match fieldname:
+            case "icmp_destunreach.type":
+                return self.icmp_type
+            case "icmp_destunreach.code":
+                return self.code
+            case "icmp_destunreach.checksum":
+                return self.checksum
+            case "icmp_destunreach.datagram":
+                return self.datagram.export()
+            case _:
+                return None
+
+    def export(self) -> dict[str, str | int] | None:
+        return {
+            "icmp_destunreach.type": self.icmp_type,
+            "icmp_destunreach.code": self.code,
+            "icmp_destunreach.checksum": self.checksum,
+            "icmp_destunreach.datagram": self.datagram.export(),
+        }
+
+    def get_array(self, offset: int, length: int) -> bytes | None:
+        if offset < len(self.packet) and (offset + length) < len(self.packet):
+            return self.packet[offset: offset + length]
+        else:
+            return None
+
+    @property
+    def is_valid(self) -> bool:
+        print(f"ICMP VALID: {self.summary(0)}")
+        return self.icmp_type == 3 and (self.code == 1 or self.code == 3)

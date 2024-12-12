@@ -291,6 +291,10 @@ class PacketDecode:
             return False
 
     @property
+    def has_icmp_unreachable(self) -> bool:
+        return self.ip_proto == 0x01 and self.ip_payload[0] == 3 and (self.ip_payload[1] == 1 or self.ip_payload[1] == 3)
+
+    @property
     def has_icmp(self) -> bool:
         return self.ip_proto == 0x01
 
@@ -484,6 +488,10 @@ class PacketDecode:
             return unpack("!H", self.packet[14:16])[0] & 0xFFF
         else:
             return 1
+
+    @property
+    def ip_payload(self) -> bytes:
+        return self.packet[20 + self.offset:]
 
     @property
     def ip_version(self) -> int:
