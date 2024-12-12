@@ -21,3 +21,8 @@ class Packet(ABC):
     @abstractmethod
     def get_array(self, offset: int, length: int) -> bytes | None:
         return None
+
+    # @property
+    # @abstractmethod
+    # def is_valid(self) -> bool:
+    #     return False
