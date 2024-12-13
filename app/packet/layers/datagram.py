@@ -23,3 +23,13 @@ class Datagram:
             result.update(l.export())
 
         return result
+
+    def get_field(self, fieldname: str) -> int | str | None:
+        field_parts = fieldname.split(".")
+        if len(field_parts) == 3:
+            search_field = f"{field_parts[2]}.{field_parts[3]}"
+            layer = self.layers.get(field_parts[2], None)
+            if layer:
+                return layer.get_field(search_field)
+
+        return None
