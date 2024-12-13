@@ -520,12 +520,14 @@ class Preparser:
         label: str = ""
         column = 0
         line = 0
+        field_count = 0
 
         if self.peek_at(0, Tokens.TOK_NAME) \
                 and self.peek_at(1, Tokens.TOK_PERIOD)  \
                 and self.peek_at(2, Tokens.TOK_NAME):
+            field_count = 3
 
-            for i in range(0, 3):
+            for i in range(0, field_count):
                 tok = self.advance()
                 if tok:
                     if i == 0:
