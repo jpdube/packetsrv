@@ -80,9 +80,9 @@ Destination Unreachable Message
 """
 from struct import unpack
 
-from packet.layers.ipv4 import IPV4
 from packet.layers.datagram import Datagram
 from packet.layers.frame import Frame
+from packet.layers.ipv4 import IPV4
 from packet.layers.layer_type import LayerID
 # from packet.utils.print_hex import format_hex
 from packet.layers.packet import Packet
@@ -136,6 +136,8 @@ class IcmpDestUnreach(Packet):
                 return self.checksum
             case "icmp_destunreach.datagram":
                 return self.datagram.export()
+            case "icmp_destunreach.datagram.*":
+                return "datagram field"
             case _:
                 return None
 
@@ -155,5 +157,4 @@ class IcmpDestUnreach(Packet):
 
     @property
     def is_valid(self) -> bool:
-        print(f"ICMP VALID: {self.summary(0)}")
         return self.icmp_type == 3 and (self.code == 1 or self.code == 3)

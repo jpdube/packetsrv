@@ -4,11 +4,11 @@ import datetime
 import logging
 import time
 
+from packet.layers.layer_type import LayerID, from_string
 from pql.aggregate import Aggregate, Average, Bandwidth, Count, Max, Min, Sum
 from pql.lexer import tokenize
 from pql.model import *
 from pql.tokens_list import Tokens
-from packet.layers.layer_type import LayerID, from_string
 
 index_field = set()
 # ip_list = set()
@@ -240,7 +240,6 @@ def parse_select(tokens):
         fields.append(Label("*"))
     else:
         while True:
-
             aggr = parse_aggregate(tokens)
             if aggr:
                 aggregates.append(aggr)
