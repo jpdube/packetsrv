@@ -26,7 +26,6 @@ class QueryResult:
             "result": [],
         }
 
-        log.debug(self.model)
         self.groupby = GroupBy(self.model)
         self.aggby = AggregateBy(self.model)
 
