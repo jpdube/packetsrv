@@ -1,9 +1,9 @@
 import datetime
+import functools
 import logging
 from datetime import timedelta
-from functools import wraps
 
-import jwt
+# import jwt
 from config.config import Config
 from config.config_db import ConfigDB, User
 from dbase.dbengine import DBEngine
@@ -12,6 +12,9 @@ from flask_bcrypt import bcrypt
 from flask_cors import CORS
 from flask_jwt_extended import (JWTManager, create_access_token,
                                 get_jwt_identity, jwt_required)
+
+# from functools import wraps
+
 
 Config.load()
 log = logging.getLogger("packetdb")
@@ -24,6 +27,24 @@ app.config['JWT_ACCESS_TOKEN_EXPIRES'] = datetime.timedelta(
 
 cors = CORS(app)
 jwt = JWTManager(app)
+
+
+def is_valid(api_key: str) -> bool:
+    print(f"API key is: {api_key}")
+    return api_key == "X-RjqgnPkdM%xQjxLi-Yk8%u"
+
+
+def api_required(func):
+    @functools.wraps(func)
+    def decorator(*args, **kwargs):
+        api_key = request.headers.get("ApiKey")
+        if api_key is None:
+            return {"massage": "Please provide an API key"}
+        if is_valid(api_key):
+            return func(*args, **kwargs)
+        else:
+            return {"message": "The provided API key is not valid"}, 403
+    return decorator
 
 
 @app.before_request
@@ -56,7 +77,8 @@ def login():
 
 
 @app.route('/query', methods=['POST'])
-@jwt_required()
+@api_required
+# @jwt_required()
 def query():
     pql = request.get_json()
     if pql is not None:
