@@ -60,8 +60,8 @@ class TCP(Packet):
 
     @property
     def flags(self) -> int:
-        fl = (unpack("!B", self.packet[12:13])[0] & 0x0F) << 8
-        fl += unpack("!B", self.packet[13:14])[0]
+        fl = (self.packet[12] & 0x0F) << 8
+        fl += self.packet[13] & 0x00ff
         return fl
 
     @property
@@ -99,6 +99,10 @@ class TCP(Packet):
     @property
     def flag_cwr(self) -> bool:
         return self.flags & 0x80 == 0x80
+
+    @property
+    def flag_accurate_ecn(self) -> bool:
+        return self.flags & 0x100 == 0x100
 
     @property
     def flag_ece(self) -> bool:
@@ -179,21 +183,29 @@ class TCP(Packet):
                 return self.window
             case 'checksum':
                 return self.checksum
+            case 'flags':
+                return self.flags
             case 'urgent_ptr':
                 return self.urgent_ptr
             case 'flag_syn':
                 return self.flag_syn
             case 'flag_ack':
                 return self.flag_ack
-            case 'flag_rst':
+            case 'flag_reset':
                 return self.flag_rst
+            case 'flag_push':
+                return self.flag_push
             case 'flag_fin':
                 return self.flag_fin
-            case 'flag_urg':
+            case 'flag_urgent':
                 return self.flag_urg
+            case 'flag_cwr':
+                return self.flag_cwr
+            case 'flag_accurate-ecn':
+                return self.flag_accurate_ecn
             case 'flag_ns':
                 return self.flag_ns
-            case 'flag_ece':
+            case 'flag_ecn-echo':
                 return self.flag_ece
             case 'checksum':
                 return self.checksum
