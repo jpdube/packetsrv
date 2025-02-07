@@ -4,8 +4,8 @@ import logging
 from datetime import datetime, timedelta
 
 from dbase.packet_ptr import PktPtr
-from packet.layers.packet_builder import PacketBuilder
 from packet.layers.layer_type import LayerID
+from packet.layers.packet_builder import PacketBuilder
 from pql.model import (Array, BinOp, Boolean, ConstDecl, Date, Grouping,
                        Integer, IPv4, Label, LabelByte, Mac, Now,
                        SelectStatement, Unary)
@@ -137,6 +137,7 @@ def interpret(node, env, packet: PacketBuilder):
             # print(f"{leftval},{rightval}")
             return leftval >= rightval
         elif node.op == Tokens.TOK_EQ:
+            # print(f"Equality: {leftval}, {rightval}")
             if isinstance(rightval, IPv4):
                 return rightval.is_in_network(leftval)
             elif isinstance(rightval, Mac):
@@ -145,6 +146,9 @@ def interpret(node, env, packet: PacketBuilder):
                 return leftval == rightval.value
             elif isinstance(rightval, ConstDecl):
                 return packet.has_layer(rightval.value)
+            elif isinstance(rightval, bool):
+                # log.debug(f"BOOLEAN EVAL: {leftval},{rightval}")
+                return int(leftval) == int(rightval)
             else:
                 return leftval == rightval
         elif node.op == Tokens.TOK_LAND:
