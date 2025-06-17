@@ -279,6 +279,7 @@ class Dns(Packet):
             "dns.opcode": self.header.opcode,
             "dns.recursion": self.header.recursion,
             "dns.questions": self.header.questions,
+            "dns.question_list": self.queries.export(),
         }
 
         result.update(self.queries.export())
@@ -299,6 +300,10 @@ class Dns(Packet):
                 return self.header.recursion
             case "dns.questions":
                 return self.header.questions
+            case "dns.answers":
+                return self.header.answer_rr
+            case "dns.answer_list":
+                return self.answer_list
             case _:
                 return None
 
