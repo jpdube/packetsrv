@@ -157,7 +157,8 @@ class SelectStatement(Statement):
         offset_expr=0,
         # limit_expr=0,
         interval=(0, 0),
-        aggregate: list[Aggregate] = []
+        aggregate: list[Aggregate] = [],
+        id: list[int] = []
     ):
         self.select_expr = select_fields
         self.distinct = distinct
@@ -173,6 +174,7 @@ class SelectStatement(Statement):
         # self.limit = None
         self.interval = interval
         self.aggregate: list[Aggregate] = aggregate
+        self.id = id
         # if isinstance(limit_expr, List) and len(limit_expr) == 2:
         #     self.offset = limit_expr[0]
         #     self.limit = limit_expr[1]
@@ -206,6 +208,10 @@ class SelectStatement(Statement):
         return self.orderby_fields is not None
 
     @property
+    def has_id(self) -> bool:
+        return len(self.id) > 0
+
+    @property
     def start_interval(self) -> int:
         if self.has_interval:
             return self.interval[0]
@@ -232,7 +238,7 @@ class SelectStatement(Statement):
                    Interval: {self.interval[0]} to {self.interval[1]},
                    Aggregate: {self.has_aggregate}: aggr list:{self.aggregate}
                    Distinct: {self.has_distinct}
-
+                   ID: {self.id}
                    """
 
 

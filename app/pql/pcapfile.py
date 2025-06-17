@@ -1,16 +1,17 @@
 import logging
+import mmap
 import os
 import sqlite3
 import time
-from struct import unpack
-from typing import Any, Generator, Tuple
 from collections import defaultdict
+from struct import pack, unpack
+from typing import Any, Generator, Tuple
 
 import pql.packet_index as pkt_index
 from config.config import Config
 from packet.layers.packet_decode import PacketDecode
 from packet.layers.packet_hdr import PktHeader
-from struct import pack
+from packet.layers.packet_builder import PacketBuilder
 
 log = logging.getLogger("packetdb")
 
@@ -65,6 +66,33 @@ class PcapFile:
         except IOError:
             log.error("IO error")
 
+    def get_packet_by_id(self, ptr: int, hdr_size: int = 0) -> PacketBuilder | None:
+        with open(f"{Config.pcap_path()}/{self.filename}.pcap", "rb") as fd:
+            glob_header = fd.read(PCAP_GLOBAL_HEADER_SIZE)
+            if unpack("!I", glob_header[0:4])[0] == MAGIC_BE:
+                byte_order = "!I"
+            else:
+                byte_order = "<I"
+
+            fd.seek(ptr)
+            header = fd.read(PCAP_PACKET_HEADER_SIZE)
+            if len(header) == 0:
+                return None
+
+            pkt_header = decode_header(header, byte_order)
+            pkt_header.file_ptr = int(self.filename)
+            pkt_header.pkt_ptr = ptr
+
+            if hdr_size == 0:
+                incl_len = pkt_header.incl_len
+                packet = fd.read(incl_len)
+            else:
+                packet = fd.read(hdr_size)
+
+            pb = PacketBuilder()
+            pb.from_bytes(packet, pkt_header)
+            return pb
+
     def get(self, ptr: int, hdr_size: int = 0) -> Tuple[PktHeader, bytes] | None:
         with open(f"{Config.pcap_path()}/{self.filename}.pcap", "rb") as fd:
             glob_header = fd.read(PCAP_GLOBAL_HEADER_SIZE)
@@ -100,7 +128,7 @@ class PcapFile:
 
         start_ts = time.time()
 
-        with open(f"{Config.pcap_path()}/{file_id}.pcap", "rb") as fd:
+        with open(f"{Config.pcap_path()}/{file_id}.pcap", "r+b") as fd:
             glob_header = fd.read(PCAP_GLOBAL_HEADER_SIZE)
             if unpack("!I", glob_header[0:4])[0] == MAGIC_BE:
                 byte_order = "!I"
@@ -120,7 +148,6 @@ class PcapFile:
 
                 pd.decode(pkt_header, packet)
                 ts = pd.get_field('pkt.timestamp')
-                end_ts_decode = time.time()
 
                 last_ts = ts
                 if first_ts is None:

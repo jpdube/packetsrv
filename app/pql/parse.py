@@ -16,6 +16,7 @@ index_field = set()
 prev_ip = 0
 ip_search = {'ip.src': [], 'ip.dst': []}
 port_search = {'sport': [], 'dport': []}
+id = []
 
 log = logging.getLogger("packetdb")
 
@@ -62,7 +63,7 @@ class Tokenizer:
             self.prev_token = self.lookahead
             self.lookahead = None
 
-            if token.value in ['ip.dst', 'ip.src', 'tcp.dport', 'tcp.sport', 'upd.sport', 'udp.dport']:
+            if token.value in ['ip.dst', 'ip.src', 'tcp.dport', 'tcp.sport', 'upd.sport', 'udp.dport', 'frame.id']:
                 # if token.value in ['ip.dst', 'ip.src']:
                 self.prev_label = token.value
             return token
@@ -276,7 +277,8 @@ def parse_select(tokens):
                            offset_value,
                            #    limit_fields,
                            (interval_start, interval_end),
-                           aggregates
+                           aggregates,
+                           id
                            )
 
 
@@ -315,8 +317,11 @@ def parse_integer(tokens):
     token = tokens.expect(Tokens.TOK_INTEGER)
     log.debug(f"Prev token: {tokens}, token:{token}")
 
+    if tokens.prev_label is not None and tokens.prev_label == "frame.id":
+        log.debug(f"FOUND packet ID: {token.value}")
+        id.append(int(token.value))
     # --- Check if value is assigned to an index field
-    if tokens.prev_label is not None:
+    elif tokens.prev_label is not None:
         log.debug(f"Label: {tokens.prev_label}, {token.value}")
         ip_search[tokens.prev_label.split(".")[1]].append(int(token.value))
 
@@ -336,7 +341,12 @@ def parse_array(tokens):
         else:
             tokens.expect(Tokens.TOK_DELIMITER)
 
-    return Array(bytes(values))
+    if tokens.prev_label is not None and tokens.prev_label == "frame.id":
+        global id
+        id += values
+        log.debug(f"ARRAY OF IDs: {id}")
+    else:
+        return Array(bytes(values))
 
 
 def parse_float(tokens):
@@ -553,6 +563,8 @@ def parse_source(text):
     index_field = set()
     global ip_search
     ip_search = {'ip.src': [], 'ip.dst': [], 'sport': [], 'dport': []}
+    global id
+    id = []
     tokens = tokenize(text)
     model = parse_select(Tokenizer(tokens))
     return model

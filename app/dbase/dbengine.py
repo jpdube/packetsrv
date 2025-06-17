@@ -20,24 +20,54 @@ log = logging.getLogger("packetdb")
 class DBEngine:
     def __init__(self):
         self.pkt_found = 0
+        self.index_mgr = IndexManager()
 
     def index_db(self):
         index_mgr = IndexManager()
         index_mgr.create_index()
 
-    def run(self, pql: str):
-        log.debug(pql)
-        self.pql = pql
-        index_mgr = IndexManager()
+    def exec(self, pql: str):
+        self.model = parse_source(pql)
+        log.debug(self.model)
+        log.debug(self.model.index_field)
+        log.debug(f"FOUND ID: {self.model.id}:{self.model.has_id}")
+
+        if not self.model.has_id:
+            return self._run()
+        else:
+            return self._run_id()
+
+    def _run_id(self):
+        query_result = QueryResult(self.model)
+        log.debug("Running with ID")
+        result = []
+
+        start_time = datetime.now()
+        result = self.index_mgr.search_id(self.model.id)
+
+        for pkt in result:
+            query_result.add_packet(pkt)
+
+        log.debug(query_result)
+
+        ttl_time = datetime.now() - start_time
+
+        log.info(
+            f"---> Get by ID time: {ttl_time} for {len(result)} packet")
+        return query_result.get_result()
+
+    def _run(self):
+        # def _run(self, pql: str):
         searched = 0
         self.pkt_found = 0
         offset_ptr = 0
 
-        self.model = parse_source(pql)
+        # self.model = parse_source(pql)
         log.debug(self.model)
         log.debug(self.model.index_field)
+        log.debug(f"FOUND ID: {self.model.id}:{self.model.has_id}")
         query_result = QueryResult(self.model)
-        index_result = index_mgr.search(self.model)
+        index_result = self.index_mgr.search(self.model)
 
         start_time = datetime.now()
         for idx in index_result:

@@ -85,7 +85,7 @@ def query():
         log.debug(f"Got PQL <----- {pql}")
         try:
             db = DBEngine()
-            result = db.run(pql["query"])
+            result = db.exec(pql["query"])
             return jsonify(result)
             # return jsonify({"result": result})
         except (SyntaxError):

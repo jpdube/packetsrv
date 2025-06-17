@@ -13,6 +13,7 @@ from dbase.packet_ptr import PktPtr
 from pql.model import SelectStatement
 from pql.pcapfile import PcapFile
 
+
 log = logging.getLogger("packetdb")
 
 
@@ -70,6 +71,24 @@ class IndexManager:
         c.execute(sql, [proto, proto])
 
         result = c.fetchone()
+
+        return result
+
+    def search_id(self, id_list: list[int]):
+        result = []
+
+        for id in id_list:
+            file_id = id >> 32
+            ptr = id & 0xffff
+            log.debug(f"ID PCAPfile: {file_id}")
+
+            pcapfile = PcapFile()
+            pcapfile.open(file_id)
+
+            pkt = pcapfile.get_packet_by_id(ptr)
+
+            if pkt:
+                result.append(pkt)
 
         return result
 

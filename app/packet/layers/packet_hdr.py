@@ -13,3 +13,10 @@ class PktHeader:
 
     def packet_id(self) -> str:
         return f"{self.file_ptr}:{self.pkt_ptr}"
+
+    def packet_id_int(self) -> int:
+        id = self.file_ptr << 32
+
+        id += self.pkt_ptr & 0xffff
+
+        return id
