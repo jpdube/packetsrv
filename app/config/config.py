@@ -35,6 +35,10 @@ class Config:
         return os.getenv('PCAP_INDEX', '')
 
     @classmethod
+    def pcap_proto_index(cls) -> str:
+        return os.getenv('PCAP_PROTO_INDEX', '')
+
+    @classmethod
     def pcap_master_index(cls) -> str:
         return os.getenv('PCAP_MASTER_INDEX', '')
 

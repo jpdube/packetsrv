@@ -12,7 +12,8 @@ from config.config import Config
 from dbase.packet_ptr import PktPtr
 from pql.model import SelectStatement
 from pql.pcapfile import PcapFile
-
+from dbase.proto_index import ProtoIndex
+from dbase.file_manager import FileManager
 
 log = logging.getLogger("packetdb")
 
@@ -40,6 +41,7 @@ class IndexManager:
         log.info(f"---> Total Index Time: {ttl_time}")
 
     def create_index(self):
+        FileManager.clean_indexes()
         path = Path(Config.pcap_path())
         files_list = list(path.glob("*.pcap"))
         pcapfile = PcapFile()
@@ -92,31 +94,33 @@ class IndexManager:
 
         return result
 
-    #     pub fn get_count_stats(&self, proto: u32) -> usize {
-    #     let conn =
-    #         Connection::open(format!("{}/packetdb.db", &config::CONFIG.master_index_path)).unwrap();
+    def search_proto(self, file_id: int, proto_id: int, ip_list: dict[str, list[Tuple[int, int]]]):
+        result = []
+        proto_index = ProtoIndex(file_id, proto_id)
+        index_list = proto_index.load(file_id, proto_id)
 
-    #     // let mut stmt = conn.prepare("select cast (avg(count) as int) from proto_stats group by proto having (proto & ?) = ?;").unwrap();
-    #     let mut stmt = conn
-    #         .prepare("select cast (avg(count) as int) from proto_stats where (proto & ?) = ?;")
-    #         .unwrap();
+        for idx in index_list:
+            # (ts, ptr, index, dst_ip, src_ip, hdr_len,
+            #  dport, sport) = unpack(">IIIIIHHH", buffer)
+            # log.debug(f"TS: {ts:x}, ptr: {ptr:x}, Index:{index:x} ")
+            # log.debug(f"Search index: {search_index:x}:{index:x}")
+            found = True
 
-    #     let count_iter = stmt
-    #         .query_map([proto, proto], |row| {
-    #             Ok(StatCount {
-    #                 count: row.get(0).unwrap(),
-    #             })
-    #         })
-    #         .unwrap();
+            if len(ip_list["ip.dst"]) > 0:
+                ip_search = Ipv4Search(ip_list["ip.dst"])
+                found = idx.ip_dst in ip_search
 
-    #     let mut value: usize = 0;
+            if len(ip_list["ip.src"]) > 0:
+                ip_search = Ipv4Search(ip_list["ip.src"])
+                found = idx.ip_src in ip_search
 
-    #     for c in count_iter {
-    #         value = c.unwrap().count;
-    #     }
+            if found:
+                pkt = PktPtr(file_id=file_id,
+                             ptr=idx.ptr, ip_dst=0, ip_src=0, pkt_hdr_size=0)
+                # log.debug(f"PTR index: {pkt.file_id}:{pkt.ptr}")
+                result.append(pkt)
 
-    #     value
-    # }
+        return result
 
     def search_pkt(self, file_id: Path, search_index: int, ip_list: dict[str, list[Tuple[int, int]]]):
         result = []
@@ -160,26 +164,55 @@ class IndexManager:
         return result
 
     def search(self, model: SelectStatement) -> Generator[Any, Any, Any]:
+        proto_search = False
 
         log.debug(f"Search index started: {model.index_field}")
 
         # --- Check for interval
         if model.has_interval:
             files_list = self.search_interval(model)
+        elif "DHCP" in model.index_field:
+            log.debug(":::::::::::: DHCP SEARCH :::::::::::")
+            proto_search = True
+            path = Path(Config.pcap_proto_index())
+            files_list = list(path.glob(f"*_100.pidx"))
+            files_list.sort(key=lambda a: int(
+                a.stem.split('_')[0]), reverse=True)
+        elif "RDP" in model.index_field:
+            log.debug(":::::::::::: RDP SEARCH :::::::::::")
+            proto_search = True
+            path = Path(Config.pcap_proto_index())
+            files_list = list(path.glob(f"*_800.pidx"))
+            files_list.sort(key=lambda a: int(
+                a.stem.split('_')[0]), reverse=True)
         else:
             path = Path(Config.pcap_index())
             files_list = list(path.glob("*.pidx"))
             files_list.sort(key=lambda a: int(a.stem), reverse=True)
 
+        # # --- Check for interval
+        # if model.has_interval:
+        #     files_list = self.search_interval(model)
+        # else:
+        #     path = Path(Config.pcap_index())
+        #     files_list = list(path.glob("*.pidx"))
+        #     files_list.sort(key=lambda a: int(a.stem), reverse=True)
+
         search_index = pkt_index.build_search_index(model.index_field)
-        # log.error(f"CHUNK SIZE: {self.chunk_size(search_index)}")
-        # log.debug(f"Computed index: {search_index:x}")
-        # pool = mp.Pool()
 
         log.info(f"Using {Config.nbr_threads()} threads for index search")
         result = []
         for index_file in files_list:
-            result = self.search_pkt(index_file, search_index, model.ip_list)
+            if proto_search:
+                # log.debug(":::::::::::: In proto search :::::::::::")
+                (file_id, proto_id) = index_file.stem.split('_')
+                # log.debug(
+                #     f":::::::::::: {file_id}:{int(proto_id, 16):x}:::::::::::")
+                result = self.search_proto(
+                    int(file_id), int(proto_id, 16), model.ip_list)
+            else:
+                result = self.search_pkt(
+                    index_file, search_index, model.ip_list)
 
             for r in result:
                 yield (r)

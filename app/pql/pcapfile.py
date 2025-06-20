@@ -12,6 +12,7 @@ from config.config import Config
 from packet.layers.packet_decode import PacketDecode
 from packet.layers.packet_hdr import PktHeader
 from packet.layers.packet_builder import PacketBuilder
+from dbase.proto_index import IndexLine, ProtoManager
 
 log = logging.getLogger("packetdb")
 
@@ -126,6 +127,8 @@ class PcapFile:
         last_ts = None
         ip_src_index = defaultdict(list)
 
+        # arp_list = []
+        proto_mgr = ProtoManager(file_id)
         start_ts = time.time()
 
         with open(f"{Config.pcap_path()}/{file_id}.pcap", "r+b") as fd:
@@ -163,20 +166,51 @@ class PcapFile:
                     sport = pd.udp_sport
 
                 ip_src_index[pd.ip_src].append(offset)
-                index_list.append((ts, offset, pkt_index.packet_index(
-                    pd), pd.ip_dst, pd.ip_src, pd.header_len, dport, sport))
+                idx = pkt_index.packet_index(pd)
+                index_list.append(
+                    (ts, offset, idx, pd.ip_dst, pd.ip_src, pd.header_len, dport, sport))
+
+                self.get_protos(proto_mgr, idx, offset, pd.ip_dst, pd.ip_src)
 
                 offset += incl_len + 16
 
+        # proto_idx = ProtoIndex(file_id, pkt_index.ARP)
+        # proto_idx.save(arp_list)
+
         db_name = f"{Config.pcap_index()}/{file_id}.pidx"
-        end_time = time.time() - start_ts
+        proto_mgr.save()
 
         self.create_db_index(db_name, index_list)
+        end_time = time.time() - start_ts
         log.info(f"{db_name} completed, {len(index_list)} packets indexed, time: {end_time:.3} {(end_time / len(index_list)) * 1_000_000:.2f}us/packet")
         # log.info(ip_src_index)
         # self.save_ip_index(file_id, ip_src_index)
 
         return (first_ts, last_ts, int(file_id))
+
+    def get_protos(self, proto_mgr: ProtoManager, idx: int, offset: int, ip_dst: int, ip_src: int):
+        if (idx & pkt_index.ARP) == pkt_index.ARP:
+            proto_mgr.add(pkt_index.ARP, IndexLine(offset, ip_dst, ip_src))
+        elif (idx & pkt_index.DHCP) == pkt_index.DHCP:
+            proto_mgr.add(pkt_index.DHCP, IndexLine(offset, ip_dst, ip_src))
+        elif (idx & pkt_index.DNS) == pkt_index.DNS:
+            proto_mgr.add(pkt_index.DNS, IndexLine(offset, ip_dst, ip_src))
+        elif (idx & pkt_index.HTTP) == pkt_index.HTTP:
+            proto_mgr.add(pkt_index.HTTP, IndexLine(offset, ip_dst, ip_src))
+        elif (idx & pkt_index.SSH) == pkt_index.SSH:
+            proto_mgr.add(pkt_index.SSH, IndexLine(offset, ip_dst, ip_src))
+        elif (idx & pkt_index.TELNET) == pkt_index.TELNET:
+            proto_mgr.add(pkt_index.TELNET, IndexLine(offset, ip_dst, ip_src))
+        elif (idx & pkt_index.RDP) == pkt_index.RDP:
+            proto_mgr.add(pkt_index.RDP, IndexLine(offset, ip_dst, ip_src))
+        elif (idx & pkt_index.NTP) == pkt_index.NTP:
+            proto_mgr.add(pkt_index.NTP, IndexLine(offset, ip_dst, ip_src))
+        elif (idx & pkt_index.SNMP) == pkt_index.SNMP:
+            proto_mgr.add(pkt_index.SNMP, IndexLine(offset, ip_dst, ip_src))
+        elif (idx & pkt_index.FTP) == pkt_index.FTP:
+            proto_mgr.add(pkt_index.FTP, IndexLine(offset, ip_dst, ip_src))
+        elif (idx & pkt_index.SIP) == pkt_index.SIP:
+            proto_mgr.add(pkt_index.SIP, IndexLine(offset, ip_dst, ip_src))
 
     def create_db_index(self, db_name: str, index_list):
         with open(db_name, "wb") as f:
