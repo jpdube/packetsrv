@@ -9,6 +9,7 @@ from packet.layers.ethernet import (ETHER_TYPE_ARP, ETHER_TYPE_IPV4,
                                     ETHER_TYPE_IPV6, Ethernet)
 from packet.layers.frame import Frame
 from packet.layers.https import Https
+from packet.layers.rdp import Rdp
 from packet.layers.icmp_builder import icmp_builder
 from packet.layers.icmp_dest_unreach import IcmpDestUnreach
 from packet.layers.icmp_echo import IcmpEcho
@@ -103,6 +104,10 @@ class PacketBuilder:
                     https = Https(tcp.payload)
                     if https.is_valid:
                         self.add(https)
+
+                elif tcp.dst_port == 3389 and not tcp.flag_syn and not tcp.flag_fin and len(tcp.payload) > 0:
+                    rdp = Rdp(tcp.payload)
+                    self.add(rdp)
 
             elif ip.protocol == IP_PROTO_UDP:
                 udp = UDP(raw_packet[offset + 34:])
@@ -209,6 +214,10 @@ class PacketBuilder:
             https = self.get_layer(LayerID.HTTPS)
             if https:
                 return https.get_field(field)
+        elif pkt_name == 'rdp':
+            rdp = self.get_layer(LayerID.RDP)
+            if rdp:
+                return rdp.get_field(field)
         elif pkt_name == 'icmp_echo':
             icmp_echo = self.get_layer(LayerID.ICMP_ECHO)
             if icmp_echo:

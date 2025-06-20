@@ -22,6 +22,7 @@ class LayerID(Enum):
     SIP = auto()
     FTP = auto()
     SMB = auto()
+    RDP = auto()
 
     def __str__(self) -> str:
         return str(self.name)
@@ -75,3 +76,5 @@ def from_string(str_value: str) -> LayerID:
             return LayerID.SMB
         case"ICMP_ECHO":
             return LayerID.ICMP_ECHO
+        case"RDP":
+            return LayerID.RDP
