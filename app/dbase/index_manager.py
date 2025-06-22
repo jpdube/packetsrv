@@ -163,6 +163,41 @@ class IndexManager:
 
         return result
 
+    def proto_index_files(self, proto: str) -> list[int]:
+        file_pattern = ""
+
+        match proto:
+            case "DHCP":
+                log.debug(":::::::::::: DHCP SEARCH :::::::::::")
+                file_pattern = "*_100.pidx"
+
+            case "RDP":
+                log.debug(":::::::::::: RDP SEARCH :::::::::::")
+                file_pattern = "*_800.pidx"
+
+            case "DNS":
+                log.debug(":::::::::::: DNS SEARCH :::::::::::")
+                file_pattern = "*_80.pidx"
+
+            case "ETH_PROTO_ARP":
+                log.debug(":::::::::::: ARP SEARCH :::::::::::")
+                file_pattern = "*_40.pidx"
+
+        path = Path(Config.pcap_proto_index())
+        files_list = list(path.glob(file_pattern))
+        files_list.sort(key=lambda a: int(a.stem.split('_')[0]), reverse=True)
+
+        return files_list
+
+    def has_proto_index(self, proto_list: list[str]) -> str:
+        proto_def = ["ETH_PROTO_ARP", "DHCP", "RDP", "DNS"]
+
+        for proto in proto_def:
+            if proto in proto_list:
+                return proto
+
+        return None
+
     def search(self, model: SelectStatement) -> Generator[Any, Any, Any]:
         proto_search = False
 
@@ -171,21 +206,11 @@ class IndexManager:
         # --- Check for interval
         if model.has_interval:
             files_list = self.search_interval(model)
-        elif "DHCP" in model.index_field:
-            log.debug(":::::::::::: DHCP SEARCH :::::::::::")
+        elif proto := self.has_proto_index(model.index_field):
             proto_search = True
-            path = Path(Config.pcap_proto_index())
-            files_list = list(path.glob(f"*_100.pidx"))
-            files_list.sort(key=lambda a: int(
-                a.stem.split('_')[0]), reverse=True)
-        elif "RDP" in model.index_field:
-            log.debug(":::::::::::: RDP SEARCH :::::::::::")
-            proto_search = True
-            path = Path(Config.pcap_proto_index())
-            files_list = list(path.glob(f"*_800.pidx"))
-            files_list.sort(key=lambda a: int(
-                a.stem.split('_')[0]), reverse=True)
+            files_list = self.proto_index_files(proto)
         else:
+            log.debug("======== SHOULD NOT BE HERE =========")
             path = Path(Config.pcap_index())
             files_list = list(path.glob("*.pidx"))
             files_list.sort(key=lambda a: int(a.stem), reverse=True)
