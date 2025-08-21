@@ -182,6 +182,8 @@ class PacketBuilder:
 
     def get_field(self, field: str) -> None | int | str | Dict:
         pkt_name = field.split('.')[0]
+        layer_id = LayerID.UNDEFINED
+
         if pkt_name == 'frame':
             frame = self.get_layer(LayerID.FRAME)
             if field == 'frame.packet':
@@ -190,61 +192,38 @@ class PacketBuilder:
                 return self.export()
             elif frame:
                 return frame.get_field(field)
-        elif pkt_name == 'eth':
-            eth = self.get_layer(LayerID.ETHERNET)
-            if eth:
-                return eth.get_field(field)
-        elif pkt_name == 'arp':
-            arp = self.get_layer(LayerID.ARP)
-            if arp:
-                return arp.get_field(field)
-        elif pkt_name == 'ip':
-            arp = self.get_layer(LayerID.IPV4)
-            if arp:
-                return arp.get_field(field)
-        elif pkt_name == 'tcp':
-            tcp = self.get_layer(LayerID.TCP)
-            if tcp:
-                return tcp.get_field(field)
+        else:
+            match pkt_name:
+                case 'eth':
+                    layer_id = LayerID.ETHERNET
+                case 'arp':
+                    layer_id = LayerID.ARP
+                case 'ip':
+                    layer_id = LayerID.IPV4
+                case 'tcp':
+                    layer_id = LayerID.TCP
+                case 'udp':
+                    layer_id = LayerID.UDP
+                case 'dhcp':
+                    layer_id = LayerID.DHCP
+                case 'dns':
+                    layer_id = LayerID.DNS
+                case 'https':
+                    layer_id = LayerID.HTTPS
+                case 'rdp':
+                    layer_id = LayerID.RDP
+                case 'telnet':
+                    layer_id = LayerID.TELNET
+                case 'ssh':
+                    layer_id = LayerID.SSH
+                case 'icmp_echo':
+                    layer_id = LayerID.ICMP_ECHO
+                case 'icmp_destunreach':
+                    layer_id = LayerID.ICMP_DESTUNREACH
 
-        elif pkt_name == 'udp':
-            dhcp = self.get_layer(LayerID.UDP)
-            if dhcp:
-                return dhcp.get_field(field)
-        elif pkt_name == 'dhcp':
-            dhcp = self.get_layer(LayerID.DHCP)
-            if dhcp:
-                return dhcp.get_field(field)
-        elif pkt_name == 'dns':
-            dns = self.get_layer(LayerID.DNS)
-            if dns:
-                return dns.get_field(field)
-        elif pkt_name == 'https':
-            https = self.get_layer(LayerID.HTTPS)
-            if https:
-                return https.get_field(field)
-        elif pkt_name == 'rdp':
-            rdp = self.get_layer(LayerID.RDP)
-            if rdp:
-                return rdp.get_field(field)
-        elif pkt_name == 'telnet':
-            telnet = self.get_layer(LayerID.TELNET)
-            if telnet:
-                return telnet.get_field(field)
-
-        elif pkt_name == 'ssh':
-            ssh = self.get_layer(LayerID.SSH)
-            if ssh:
-                return ssh.get_field(field)
-
-        elif pkt_name == 'icmp_echo':
-            icmp_echo = self.get_layer(LayerID.ICMP_ECHO)
-            if icmp_echo:
-                return icmp_echo.get_field(field)
-        elif pkt_name == 'icmp_destunreach':
-            icmp_destunreach = self.get_layer(LayerID.ICMP_DESTUNREACH)
-            if icmp_destunreach:
-                return icmp_destunreach.get_field(field)
+        layer = self.get_layer(layer_id)
+        if layer:
+            return layer.get_field(field)
 
         return None
 
