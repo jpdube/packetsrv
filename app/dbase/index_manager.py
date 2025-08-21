@@ -179,6 +179,14 @@ class IndexManager:
                 log.debug(":::::::::::: DNS SEARCH :::::::::::")
                 file_pattern = "*_80.pidx"
 
+            case "TELNET":
+                log.debug(":::::::::::: TELNET SEARCH :::::::::::")
+                file_pattern = "*_1000.pidx"
+
+            case "SSH":
+                log.debug(":::::::::::: SSH SEARCH :::::::::::")
+                file_pattern = "*_400.pidx"
+
             case "ETH_PROTO_ARP":
                 log.debug(":::::::::::: ARP SEARCH :::::::::::")
                 file_pattern = "*_40.pidx"
@@ -187,10 +195,11 @@ class IndexManager:
         files_list = list(path.glob(file_pattern))
         files_list.sort(key=lambda a: int(a.stem.split('_')[0]), reverse=True)
 
+        log.debug(f">>> FOUND {len(files_list)} proto")
         return files_list
 
     def has_proto_index(self, proto_list: list[str]) -> str:
-        proto_def = ["ETH_PROTO_ARP", "DHCP", "RDP", "DNS"]
+        proto_def = ["ETH_PROTO_ARP", "DHCP", "RDP", "DNS", "TELNET", "SSH"]
 
         for proto in proto_def:
             if proto in proto_list:
@@ -208,6 +217,7 @@ class IndexManager:
             files_list = self.search_interval(model)
         elif proto := self.has_proto_index(model.index_field):
             proto_search = True
+            log.debug(f"-----> PROTO SEARCH: {proto}")
             files_list = self.proto_index_files(proto)
         else:
             log.debug("======== SHOULD NOT BE HERE =========")

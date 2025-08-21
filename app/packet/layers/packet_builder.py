@@ -10,6 +10,8 @@ from packet.layers.ethernet import (ETHER_TYPE_ARP, ETHER_TYPE_IPV4,
 from packet.layers.frame import Frame
 from packet.layers.https import Https
 from packet.layers.rdp import Rdp
+from packet.layers.telnet import Telnet
+from packet.layers.ssh import Ssh
 from packet.layers.icmp_builder import icmp_builder
 from packet.layers.icmp_dest_unreach import IcmpDestUnreach
 from packet.layers.icmp_echo import IcmpEcho
@@ -109,6 +111,13 @@ class PacketBuilder:
                     rdp = Rdp(tcp.payload)
                     self.add(rdp)
 
+                elif tcp.dst_port == 23 and not tcp.flag_syn and not tcp.flag_fin and len(tcp.payload) > 0:
+                    telnet = Telnet(tcp.payload)
+                    self.add(telnet)
+
+                elif tcp.dst_port == 22 and not tcp.flag_syn and not tcp.flag_fin and len(tcp.payload) > 0:
+                    ssh = Ssh(tcp.payload)
+                    self.add(ssh)
             elif ip.protocol == IP_PROTO_UDP:
                 udp = UDP(raw_packet[offset + 34:])
                 self.add(udp)
@@ -173,11 +182,7 @@ class PacketBuilder:
 
     def get_field(self, field: str) -> None | int | str | Dict:
         pkt_name = field.split('.')[0]
-        if pkt_name == 'eth':
-            eth = self.get_layer(LayerID.ETHERNET)
-            if eth:
-                return eth.get_field(field)
-        elif pkt_name == 'frame':
+        if pkt_name == 'frame':
             frame = self.get_layer(LayerID.FRAME)
             if field == 'frame.packet':
                 return self.to_base64()
@@ -185,6 +190,10 @@ class PacketBuilder:
                 return self.export()
             elif frame:
                 return frame.get_field(field)
+        elif pkt_name == 'eth':
+            eth = self.get_layer(LayerID.ETHERNET)
+            if eth:
+                return eth.get_field(field)
         elif pkt_name == 'arp':
             arp = self.get_layer(LayerID.ARP)
             if arp:
@@ -218,6 +227,16 @@ class PacketBuilder:
             rdp = self.get_layer(LayerID.RDP)
             if rdp:
                 return rdp.get_field(field)
+        elif pkt_name == 'telnet':
+            telnet = self.get_layer(LayerID.TELNET)
+            if telnet:
+                return telnet.get_field(field)
+
+        elif pkt_name == 'ssh':
+            ssh = self.get_layer(LayerID.SSH)
+            if ssh:
+                return ssh.get_field(field)
+
         elif pkt_name == 'icmp_echo':
             icmp_echo = self.get_layer(LayerID.ICMP_ECHO)
             if icmp_echo:
