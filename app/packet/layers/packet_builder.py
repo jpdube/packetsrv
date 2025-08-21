@@ -13,6 +13,7 @@ from packet.layers.rdp import Rdp
 from packet.layers.telnet import Telnet
 from packet.layers.ssh import Ssh
 from packet.layers.http import Http
+from packet.layers.ntp import Ntp
 from packet.layers.icmp_builder import icmp_builder
 from packet.layers.icmp_dest_unreach import IcmpDestUnreach
 from packet.layers.icmp_echo import IcmpEcho
@@ -133,6 +134,10 @@ class PacketBuilder:
                 elif udp.dst_port == 53 or udp.src_port == 53:
                     dns = Dns(udp.payload)
                     self.add(dns)
+                elif udp.dst_port == 123 or udp.src_port == 123:
+                    ntp = Ntp(udp.payload)
+                    self.add(ntp)
+
             elif ip.protocol == IP_PROTO_ICMP:
                 icmp = icmp_builder(raw_packet[offset + 34:])
                 if icmp:
@@ -228,6 +233,8 @@ class PacketBuilder:
                     layer_id = LayerID.ICMP_ECHO
                 case 'icmp_destunreach':
                     layer_id = LayerID.ICMP_DESTUNREACH
+                case 'ntp':
+                    layer_id = LayerID.NTP
 
         layer = self.get_layer(layer_id)
         if layer:

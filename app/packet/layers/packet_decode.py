@@ -403,8 +403,8 @@ class PacketDecode:
 
     @property
     def has_ntp(self) -> bool:
-        if self.has_ipv4 and self.has_tcp:
-            return self.tcp_dport == 123 or self.tcp_sport == 123
+        if self.has_ipv4 and self.has_udp:
+            return self.udp_dport == 123 or self.udp_sport == 123
         else:
             return False
 
