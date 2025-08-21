@@ -12,6 +12,7 @@ from packet.layers.https import Https
 from packet.layers.rdp import Rdp
 from packet.layers.telnet import Telnet
 from packet.layers.ssh import Ssh
+from packet.layers.http import Http
 from packet.layers.icmp_builder import icmp_builder
 from packet.layers.icmp_dest_unreach import IcmpDestUnreach
 from packet.layers.icmp_echo import IcmpEcho
@@ -118,6 +119,11 @@ class PacketBuilder:
                 elif tcp.dst_port == 22 and not tcp.flag_syn and not tcp.flag_fin and len(tcp.payload) > 0:
                     ssh = Ssh(tcp.payload)
                     self.add(ssh)
+
+                elif tcp.dst_port in [80, 8080] and not tcp.flag_syn and not tcp.flag_fin and len(tcp.payload) > 0:
+                    http = Http(tcp.payload)
+                    self.add(http)
+
             elif ip.protocol == IP_PROTO_UDP:
                 udp = UDP(raw_packet[offset + 34:])
                 self.add(udp)
@@ -210,6 +216,8 @@ class PacketBuilder:
                     layer_id = LayerID.DNS
                 case 'https':
                     layer_id = LayerID.HTTPS
+                case 'http':
+                    layer_id = LayerID.HTTP
                 case 'rdp':
                     layer_id = LayerID.RDP
                 case 'telnet':

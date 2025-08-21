@@ -197,6 +197,8 @@ class PcapFile:
             proto_mgr.add(pkt_index.DNS, IndexLine(offset, ip_dst, ip_src))
         elif (idx & pkt_index.HTTP) == pkt_index.HTTP:
             proto_mgr.add(pkt_index.HTTP, IndexLine(offset, ip_dst, ip_src))
+        elif (idx & pkt_index.HTTPS) == pkt_index.HTTPS:
+            proto_mgr.add(pkt_index.HTTPS, IndexLine(offset, ip_dst, ip_src))
         elif (idx & pkt_index.SSH) == pkt_index.SSH:
             proto_mgr.add(pkt_index.SSH, IndexLine(offset, ip_dst, ip_src))
         elif (idx & pkt_index.TELNET) == pkt_index.TELNET:

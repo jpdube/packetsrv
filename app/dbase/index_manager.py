@@ -191,6 +191,14 @@ class IndexManager:
                 log.debug(":::::::::::: ARP SEARCH :::::::::::")
                 file_pattern = "*_40.pidx"
 
+            case "HTTP":
+                log.debug(":::::::::::: HTTP SEARCH :::::::::::")
+                file_pattern = "*_100000.pidx"
+
+            case "HTTPS":
+                log.debug(":::::::::::: HTTPS SEARCH :::::::::::")
+                file_pattern = "*_200.pidx"
+
         path = Path(Config.pcap_proto_index())
         files_list = list(path.glob(file_pattern))
         files_list.sort(key=lambda a: int(a.stem.split('_')[0]), reverse=True)
@@ -199,7 +207,8 @@ class IndexManager:
         return files_list
 
     def has_proto_index(self, proto_list: list[str]) -> str:
-        proto_def = ["ETH_PROTO_ARP", "DHCP", "RDP", "DNS", "TELNET", "SSH"]
+        proto_def = ["ETH_PROTO_ARP", "DHCP",
+                     "RDP", "DNS", "TELNET", "SSH", "HTTP", "HTTPS"]
 
         for proto in proto_def:
             if proto in proto_list:
