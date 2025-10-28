@@ -3,6 +3,7 @@ import logging.config
 import logging.handlers
 import os
 import platform
+import sys
 from signal import SIGINT, signal
 from threading import Thread
 
@@ -77,4 +78,5 @@ def server():
 group.add_command(indexdb)
 group.add_command(server)
 if __name__ == "__main__":
+    log.info(sys.version)
     group()
