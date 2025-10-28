@@ -308,9 +308,9 @@ class PacketDecode:
     @property
     def has_smb(self) -> bool:
         if self.has_ipv4:
-            if self.has_udp and (self.udp_dport == 139 or self.udp_sport == 139):
-                return True
-            elif self.has_tcp and (self.tcp_dport == 445 or self.tcp_sport == 445):
+            # if self.has_udp and (self.udp_dport == 139 or self.udp_sport == 139):
+            #     return True
+            if self.has_tcp and (self.tcp_dport == 445 or self.tcp_sport == 445):
                 return True
             else:
                 return False

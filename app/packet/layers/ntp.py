@@ -14,6 +14,72 @@ class Ntp(Packet):
     def __init__(self, packet) -> None:
         self.packet = packet
 
+    # LI
+    @property
+    def leap_indicator(self) -> int:
+        return (self.packet[0] & 0b11000000) >> 6
+
+    # VN
+    @property
+    def version_no(self) -> int:
+        return (self.packet[0] & 0b00111000) >> 3
+
+    @property
+    def mode(self) -> int:
+        return (self.packet[0] & 0b00000111)
+
+    @property
+    def stratum(self) -> int:
+        return self.packet[1]
+
+    @property
+    def poll(self) -> int:
+        return self.packet[2]
+
+    @property
+    def precision(self) -> int:
+        return self.packet[3]
+
+    @property
+    def root_delay(self) -> int:
+        return unpack("!I", self.packet[4:8])[0]
+
+    @property
+    def root_dispersion(self) -> int:
+        return unpack("!I", self.packet[8:12])[0]
+
+    @property
+    def ref_id(self) -> int:
+        return unpack("!I", self.packet[12:16])[0]
+
+    @property
+    def ref_timestamp(self) -> int:
+        return unpack("!Q", self.packet[16:24])[0]
+
+    @property
+    def origin_timestamp(self) -> int:
+        return unpack("!Q", self.packet[24:32])[0]
+
+    @property
+    def recv_timestamp(self) -> int:
+        return unpack("!Q", self.packet[32:40])[0]
+
+    @property
+    def transmit_timestamp(self) -> int:
+        return unpack("!Q", self.packet[40:48])[0]
+
+    @property
+    def optional_ext(self) -> int:
+        return unpack("!I", self.packet[48:52])[0]
+
+    @property
+    def key_id(self) -> int:
+        return unpack("!I", self.packet[52:56])[0]
+
+    @property
+    def msg_digest(self) -> bytes:
+        return self.packet[52:]
+
     @property
     def payload(self) -> bytes:
         return self.packet[5:]
