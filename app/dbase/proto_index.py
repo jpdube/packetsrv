@@ -41,7 +41,7 @@ class ProtoIndex:
                 f.write(pack(">I", ix.ptr))
                 f.write(pack(">I", ix.ip_dst))
                 f.write(pack(">I", ix.ip_src))
-        log.info(f"Proto index creation time: {time.time() - start_time}")
+        # log.info(f"Proto index creation time: {time.time() - start_time}")
 
     def load(self, file_id: int, proto_id: int) -> list[IndexLine]:
         filename = f"{Config.pcap_proto_index()}/{file_id}_{proto_id:x}.pidx"
