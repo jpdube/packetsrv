@@ -145,6 +145,7 @@ class DBEngine:
         return query_result.get_result()
 
     def search_pkt(self, pkt_ptr: PktPtr, where_expr) -> PacketBuilder | None:
+        # log.debug(pkt_ptr)
         if pkt_result := exec_program(where_expr, pkt_ptr):
             return pkt_result
         else:

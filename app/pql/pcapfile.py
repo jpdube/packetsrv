@@ -213,6 +213,8 @@ class PcapFile:
             proto_mgr.add(pkt_index.FTP, IndexLine(offset, ip_dst, ip_src))
         elif (idx & pkt_index.SIP) == pkt_index.SIP:
             proto_mgr.add(pkt_index.SIP, IndexLine(offset, ip_dst, ip_src))
+        elif (idx & pkt_index.SMB) == pkt_index.SMB:
+            proto_mgr.add(pkt_index.SMB, IndexLine(offset, ip_dst, ip_src))
 
     def create_db_index(self, db_name: str, index_list):
         with open(db_name, "wb") as f:

@@ -28,6 +28,7 @@ def exec_program(model, pkt_ref: PktPtr):
     hdr, pkt = pfile.get(pkt_ref.ptr, 0)
     pb = PacketBuilder()
     pb.from_bytes(pkt, hdr)
+    # log.debug(pb)
     if interpret(model, env, pb):
         return pb
     else:

@@ -14,6 +14,7 @@ from packet.layers.telnet import Telnet
 from packet.layers.ssh import Ssh
 from packet.layers.http import Http
 from packet.layers.ntp import Ntp
+from packet.layers.smb import Smb
 from packet.layers.icmp_builder import icmp_builder
 from packet.layers.icmp_dest_unreach import IcmpDestUnreach
 from packet.layers.icmp_echo import IcmpEcho
@@ -125,6 +126,10 @@ class PacketBuilder:
                     http = Http(tcp.payload)
                     self.add(http)
 
+                elif tcp.dst_port in [445, 139] and not tcp.flag_syn and not tcp.flag_fin and len(tcp.payload) > 0:
+                    smb = Smb(tcp.payload)
+                    self.add(smb)
+
             elif ip.protocol == IP_PROTO_UDP:
                 udp = UDP(raw_packet[offset + 34:])
                 self.add(udp)
@@ -235,6 +240,8 @@ class PacketBuilder:
                     layer_id = LayerID.ICMP_DESTUNREACH
                 case 'ntp':
                     layer_id = LayerID.NTP
+                case 'smb':
+                    layer_id = LayerID.SMB
 
         layer = self.get_layer(layer_id)
         if layer:
