@@ -17,3 +17,18 @@ dependencies = [
     "rich>=15.0.0",
     "watchdog>=6.0.0",
 ]
+
+[build-system]
+requires = ["maturin>=1.15,<2.0"]
+build-backend = "maturin"
+
+# [tool.maturin]
+# features = ["pyo3/extension-module"]
+# module-name = "crates/processor"
+
+[tool.uv]
+cache-keys = [
+    { file = "pyproject.toml" },
+    { file = "crates/processor/Cargo.toml" },
+    { file = "**/*.rs" },
+]

@@ -24,12 +24,16 @@ MAGIC_LE = 0xd4c3b2a1
 
 
 def decode_header(header: bytes, byte_order: str) -> PktHeader:
-    timestamp = unpack(byte_order, header[0:4])[0]
-    ts_offset = unpack(byte_order, header[4:8])[0]
-    orig_len = unpack(byte_order, header[8:12])[0]
-    inc_len = unpack(byte_order, header[12:16])[0]
+    if len(header) == 16:
+        timestamp = unpack(byte_order, header[0:4])[0]
+        ts_offset = unpack(byte_order, header[4:8])[0]
+        orig_len = unpack(byte_order, header[8:12])[0]
+        inc_len = unpack(byte_order, header[12:16])[0]
 
-    return PktHeader(timestamp=timestamp, ts_offset=ts_offset, orig_len=orig_len, incl_len=inc_len)
+        return PktHeader(timestamp=timestamp, ts_offset=ts_offset, orig_len=orig_len, incl_len=inc_len)
+    else:
+        log.error(f"Error reading header-> {header}, {len(header)}")
+        return None
 
 
 class PcapFile:
@@ -42,6 +46,177 @@ class PcapFile:
         self.filename = filename
 
     def next(self):
+        try:
+            fname = f"{Config.pcap_path()}/{self.filename}.pcap"
+            log.debug(f"Next filename: {fname}")
+            # with open(fname, "rb") as fd:
+            fd = os.open(fname, os.O_RDONLY)
+            # os.lseek(fd, 0, 0)
+            # content = os.read(fd, 100)
+            # print ("File contains the following string:", content)
+            mf = mmap.mmap(fd, 0, prot=mmap.PROT_READ)
+            log.debug(f"========= AFTER MMAP OPEN {mf.size()}===========")
+            if unpack("!I", mf[0:4])[0] == MAGIC_BE:
+                byte_order = "!I"
+            else:
+                byte_order = "<I"
+
+            self.offset += 24
+            # log.debug(f"Byte ORDER: {byte_order}")
+            while True:
+                if (self.offset + 16) >= mf.size():
+                    break
+                
+                pkt_header = decode_header(mf[self.offset: self.offset + PCAP_PACKET_HEADER_SIZE], byte_order)
+
+                incl_len = pkt_header.incl_len
+                self.offset += 16
+                yield (pkt_header, mf[self.offset:self.offset + incl_len], self.offset)
+                self.offset += incl_len
+        except IOError as ex:
+            log.error(f"IO error: {ex}")
+        finally:
+            os.close(fd)
+            mf.close()
+
+    def create_index(self, file_id):
+        offset = 0
+        pd = PacketDecode()
+        index_list = []
+        first_ts = None
+        last_ts = None
+        ip_src_index = defaultdict(list)
+
+        # arp_list = []
+        proto_mgr = ProtoManager(file_id)
+        start_ts = time.time()
+
+        with open(f"{Config.pcap_path()}/{file_id}.pcap", "r+b") as fd:
+            mf = mmap.mmap(fd.fileno(), 0, prot=mmap.PROT_READ)
+            # glob_header = fd.read(PCAP_GLOBAL_HEADER_SIZE)
+            if unpack("!I", mf[0:4])[0] == MAGIC_BE:
+                byte_order = "!I"
+            else:
+                byte_order = "<I"
+
+            offset += 24
+
+            while True:
+                if offset + 16 >= mf.size():
+                    break
+
+                pkt_header = decode_header(mf[offset: offset + 16], byte_order)
+                incl_len = pkt_header.incl_len
+
+
+                pd.decode(pkt_header, mf[offset + 16: offset + 16 + incl_len])
+                ts = pd.get_field('pkt.timestamp')
+
+                last_ts = ts
+                if first_ts is None:
+                    first_ts = ts
+
+                dport = 0
+                sport = 0
+                if pd.has_tcp:
+                    dport = pd.tcp_dport
+                    sport = pd.tcp_sport
+                elif pd.has_udp:
+                    dport = pd.udp_dport
+                    sport = pd.udp_sport
+
+                ip_src_index[pd.ip_src].append(offset)
+                idx = pkt_index.packet_index(pd)
+                index_list.append(
+                    (ts, offset, idx, pd.ip_dst, pd.ip_src, pd.header_len, dport, sport))
+
+                self.get_protos(proto_mgr, idx, offset, pd.ip_dst, pd.ip_src)
+
+                offset += incl_len + 16
+
+        mf.close()
+        # proto_idx = ProtoIndex(file_id, pkt_index.ARP)
+        # proto_idx.save(arp_list)
+
+        db_name = f"{Config.pcap_index()}/{file_id}.pidx"
+        proto_mgr.save()
+
+        self.create_db_index(db_name, index_list)
+        end_time = time.time() - start_ts
+        log.info(f"{db_name} completed, {len(index_list)} packets indexed, time: {end_time:.3} {(end_time / len(index_list)) * 1_000_000:.2f}us/packet")
+        # log.info(ip_src_index)
+        # self.save_ip_index(file_id, ip_src_index)
+
+        return (first_ts, last_ts, int(file_id))
+    # def create_index(self, file_id):
+    #     offset = 0
+    #     pd = PacketDecode()
+    #     index_list = []
+    #     first_ts = None
+    #     last_ts = None
+    #     ip_src_index = defaultdict(list)
+
+    #     # arp_list = []
+    #     proto_mgr = ProtoManager(file_id)
+    #     start_ts = time.time()
+
+    #     with open(f"{Config.pcap_path()}/{file_id}.pcap", "r+b") as fd:
+    #         glob_header = fd.read(PCAP_GLOBAL_HEADER_SIZE)
+    #         if unpack("!I", glob_header[0:4])[0] == MAGIC_BE:
+    #             byte_order = "!I"
+    #         else:
+    #             byte_order = "<I"
+
+    #         offset += 24
+
+    #         while True:
+    #             header = fd.read(PCAP_PACKET_HEADER_SIZE)
+    #             if len(header) == 0:
+    #                 break
+
+    #             pkt_header = decode_header(header, byte_order)
+    #             incl_len = pkt_header.incl_len
+    #             packet = fd.read(incl_len)
+
+    #             pd.decode(pkt_header, packet)
+    #             ts = pd.get_field('pkt.timestamp')
+
+    #             last_ts = ts
+    #             if first_ts is None:
+    #                 first_ts = ts
+
+    #             dport = 0
+    #             sport = 0
+    #             if pd.has_tcp:
+    #                 dport = pd.tcp_dport
+    #                 sport = pd.tcp_sport
+    #             elif pd.has_udp:
+    #                 dport = pd.udp_dport
+    #                 sport = pd.udp_sport
+
+    #             ip_src_index[pd.ip_src].append(offset)
+    #             idx = pkt_index.packet_index(pd)
+    #             index_list.append(
+    #                 (ts, offset, idx, pd.ip_dst, pd.ip_src, pd.header_len, dport, sport))
+
+    #             self.get_protos(proto_mgr, idx, offset, pd.ip_dst, pd.ip_src)
+
+    #             offset += incl_len + 16
+
+    #     # proto_idx = ProtoIndex(file_id, pkt_index.ARP)
+    #     # proto_idx.save(arp_list)
+
+    #     db_name = f"{Config.pcap_index()}/{file_id}.pidx"
+    #     proto_mgr.save()
+
+    #     self.create_db_index(db_name, index_list)
+    #     end_time = time.time() - start_ts
+    #     log.info(f"{db_name} completed, {len(index_list)} packets indexed, time: {end_time:.3} {(end_time / len(index_list)) * 1_000_000:.2f}us/packet")
+    #     # log.info(ip_src_index)
+    #     # self.save_ip_index(file_id, ip_src_index)
+
+    #     return (first_ts, last_ts, int(file_id))
+    def next2(self):
         try:
             with open(f"{Config.pcap_path()}/{self.filename}.pcap", "rb") as fd:
                 glob_header = fd.read(PCAP_GLOBAL_HEADER_SIZE)
@@ -66,6 +241,7 @@ class PcapFile:
                     self.offset += incl_len + 16
         except IOError:
             log.error("IO error")
+
 
     def get_packet_by_id(self, ptr: int, hdr_size: int = 0) -> PacketBuilder | None:
         with open(f"{Config.pcap_path()}/{self.filename}.pcap", "rb") as fd:
@@ -119,8 +295,9 @@ class PcapFile:
 
             return (pkt_header, packet)
 
-    def create_index(self, file_id):
-        offset = 0
+
+    def create_index2(self, file_id):
+        # offset = 0
         pd = PacketDecode()
         index_list = []
         first_ts = None
@@ -131,25 +308,12 @@ class PcapFile:
         proto_mgr = ProtoManager(file_id)
         start_ts = time.time()
 
-        with open(f"{Config.pcap_path()}/{file_id}.pcap", "r+b") as fd:
-            glob_header = fd.read(PCAP_GLOBAL_HEADER_SIZE)
-            if unpack("!I", glob_header[0:4])[0] == MAGIC_BE:
-                byte_order = "!I"
-            else:
-                byte_order = "<I"
-
-            offset += 24
-
-            while True:
-                header = fd.read(PCAP_PACKET_HEADER_SIZE)
-                if len(header) == 0:
-                    break
-
-                pkt_header = decode_header(header, byte_order)
-                incl_len = pkt_header.incl_len
-                packet = fd.read(incl_len)
-
-                pd.decode(pkt_header, packet)
+        # print(f"-----> file: {file_id}")
+        self.open(file_id)
+        for p in self.next():
+                header, packet, offset = p
+                # log.debug(f"Packet: {header}")
+                pd.decode(header, packet)
                 ts = pd.get_field('pkt.timestamp')
 
                 last_ts = ts
@@ -172,7 +336,7 @@ class PcapFile:
 
                 self.get_protos(proto_mgr, idx, offset, pd.ip_dst, pd.ip_src)
 
-                offset += incl_len + 16
+                # offset += incl_len + 16
 
         # proto_idx = ProtoIndex(file_id, pkt_index.ARP)
         # proto_idx.save(arp_list)
@@ -182,7 +346,10 @@ class PcapFile:
 
         self.create_db_index(db_name, index_list)
         end_time = time.time() - start_ts
-        log.info(f"{db_name} completed, {len(index_list)} packets indexed, time: {end_time:.3} {(end_time / len(index_list)) * 1_000_000:.2f}us/packet")
+        if len(index_list) > 0:
+            log.info(f"{db_name} completed, {len(index_list)} packets indexed, time: {end_time:.3} {(end_time / len(index_list)) * 1_000_000:.2f}us/packet")
+        else:
+            log.info(f"completed in: {end_time:.3}")
         # log.info(ip_src_index)
         # self.save_ip_index(file_id, ip_src_index)
 
