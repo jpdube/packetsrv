@@ -25,5 +25,6 @@ logs/
 
 # Rust
 target/
+Cargo.lock
 
 dev_certs/
