@@ -5,7 +5,7 @@ import time
 
 from config.config import Config
 from config.config_db import ConfigDB
-from pql.pcapfile import PcapFile
+from dbase.pcapfile import PcapFile
 from watchdog.events import FileSystemEventHandler
 from watchdog.observers import Observer
 

@@ -7,7 +7,7 @@ from collections import defaultdict
 from struct import pack, unpack
 from typing import Any, Generator, Tuple
 
-import pql.packet_index as pkt_index
+import dbase.packet_index as pkt_index
 from config.config import Config
 from packet.layers.packet_decode import PacketDecode
 from packet.layers.packet_hdr import PktHeader

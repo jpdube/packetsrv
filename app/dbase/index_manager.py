@@ -7,11 +7,11 @@ from pathlib import Path
 from struct import unpack
 from typing import Any, Generator, Tuple
 
-import pql.packet_index as pkt_index
+import dbase.packet_index as pkt_index
 from config.config import Config
 from dbase.packet_ptr import PktPtr
 from pql.model import SelectStatement
-from pql.pcapfile import PcapFile
+from dbase.pcapfile import PcapFile
 from dbase.proto_index import ProtoIndex
 from dbase.file_manager import FileManager
 

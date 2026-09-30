@@ -9,7 +9,7 @@ from packet.layers.packet_builder import PacketBuilder
 from pql.model import (Array, BinOp, Boolean, ConstDecl, Date, Grouping,
                        Integer, IPv4, Label, LabelByte, Mac, Now,
                        SelectStatement, Unary)
-from pql.pcapfile import PcapFile
+from dbase.pcapfile import PcapFile
 from pql.tokens_list import Tokens
 
 # ---------------------------------------------
