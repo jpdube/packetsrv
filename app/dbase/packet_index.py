@@ -1,8 +1,8 @@
 from packet.layers.packet_decode import PacketDecode
 
 ETHERNET = 0x01
-IPv4 = 0x02
-IPv6 = 0x04
+IPV4 = 0x02
+IPV6 = 0x04
 ICMP = 0x08
 UDP = 0x10
 TCP = 0x20
@@ -39,61 +39,86 @@ def packet_index(pd: PacketDecode) -> int:
     if pd.has_arp:
         pindex = pindex + ARP
     if pd.has_ipv4:
-        pindex = pindex + IPv4
+        pindex = pindex + IPV4
     if pd.has_icmp_unreachable:
         pindex = pindex + ICMP_UNREACHABLE
     if pd.has_icmp:
         pindex = pindex + ICMP
     if pd.has_udp:
         pindex = pindex + UDP
-
-    if pd.has_dns:
-        pindex = pindex + DNS
-    if pd.has_dhcp:
-        pindex = pindex + DHCP
-    if pd.has_ntp:
-        pindex = pindex + NTP
-    if pd.has_rtp:
-        pindex = pindex + RTP
-    if pd.has_rtcp:
-        pindex = pindex + RTCP
+        if pd.has_dns:
+            pindex = pindex + DNS
+            return pindex
+        if pd.has_dhcp:
+            pindex = pindex + DHCP
+            return pindex
+        if pd.has_sip:
+            pindex = pindex + SIP
+            return pindex
+        if pd.has_siptls:
+            pindex = pindex + SIP_TLS
+            return pindex
+        if pd.has_ntp:
+            pindex = pindex + NTP
+            return pindex
+        if pd.has_rtp:
+            pindex = pindex + RTP
+            return pindex
+        if pd.has_rtcp:
+            pindex = pindex + RTCP
+            return pindex
 
     if pd.has_tcp:
         pindex = pindex + TCP
+        if pd.has_sip:
+            pindex = pindex + SIP
+            return pindex
+        if pd.has_siptls:
+            pindex = pindex + SIP_TLS
+            return pindex
 
-    if pd.has_https:
-        pindex = pindex + HTTPS
-    if pd.has_ssh:
-        pindex = pindex + SSH
-    if pd.has_rdp:
-        pindex = pindex + RDP
-    if pd.has_telnet:
-        pindex = pindex + TELNET
-    if pd.has_smtp:
-        pindex = pindex + SMTP
-    if pd.has_imap:
-        pindex = pindex + IMAP
-    if pd.has_imaps:
-        pindex = pindex + IMAPS
-    if pd.has_pop3:
-        pindex = pindex + POP3
-    if pd.has_pop3s:
-        pindex = pindex + POP3S
-    if pd.has_snmp:
-        pindex = pindex + SNMP
-    if pd.has_ftp:
-        pindex = pindex + FTP
-    if pd.has_http:
-        pindex = pindex + HTTP
-    if pd.has_bgp:
-        pindex = pindex + BGP
-
-    if pd.has_sip:
-        pindex = pindex + SIP
-    if pd.has_siptls:
-        pindex = pindex + SIP_TLS
-    if pd.has_smb:
-        pindex = pindex + SMB
+        if pd.has_https:
+            pindex = pindex + HTTPS
+            return pindex
+        if pd.has_ssh:
+            pindex = pindex + SSH
+            return pindex
+        if pd.has_rdp:
+            pindex = pindex + RDP
+            return pindex
+        if pd.has_telnet:
+            pindex = pindex + TELNET
+            return pindex
+        if pd.has_smtp:
+            pindex = pindex + SMTP
+            return pindex
+        if pd.has_imap:
+            pindex = pindex + IMAP
+            return pindex
+        if pd.has_imaps:
+            pindex = pindex + IMAPS
+            return pindex
+        if pd.has_pop3:
+            pindex = pindex + POP3
+            return pindex
+        if pd.has_pop3s:
+            pindex = pindex + POP3S
+            return pindex
+        if pd.has_snmp:
+            pindex = pindex + SNMP
+            return pindex
+        if pd.has_ftp:
+            pindex = pindex + FTP
+            return pindex
+        if pd.has_http:
+            pindex = pindex + HTTP
+            return pindex
+        if pd.has_bgp:
+            pindex = pindex + BGP
+            return pindex
+        if pd.has_smb:
+            pindex = pindex + SMB
+            return pindex
 
     return pindex
 
@@ -106,7 +131,7 @@ def build_search_index(index_set: set[int]) -> int:
     if 'ARP' in index_set:
         pindex = pindex + ARP
     if 'IP' in index_set:
-        pindex = pindex + IPv4
+        pindex = pindex + IPV4
     if 'ICMP' in index_set:
         pindex = pindex + ICMP
     if 'UDP' in index_set:
