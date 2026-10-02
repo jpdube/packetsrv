@@ -38,6 +38,7 @@ def packet_index(pd: PacketDecode) -> int:
         pindex = pindex + ETHERNET
     if pd.has_arp:
         pindex = pindex + ARP
+        return pindex
     if pd.has_ipv4:
         pindex = pindex + IPV4
     if pd.has_icmp_unreachable:
