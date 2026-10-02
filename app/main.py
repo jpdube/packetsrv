@@ -14,7 +14,6 @@ from config.config_db import ConfigDB
 from dbase.dbengine import DBEngine
 from rich.logging import RichHandler
 from server.file_monitor import start_db_watcher
-from processor import sum_as_string, process_bytes
 
 log_format = '%(threadName)s %(message)s'
 # logging.basicConfig(format=log_format)
@@ -79,7 +78,4 @@ def server():
 group.add_command(indexdb)
 group.add_command(server)
 if __name__ == "__main__":
-    b = [1,0, 3]
-    print(process_bytes(b))
-
     group()
