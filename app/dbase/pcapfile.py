@@ -86,11 +86,15 @@ class PcapFile:
         index_list = []
         first_ts = None
         last_ts = None
-        # ip_src_index = defaultdict(list)
 
+        pkt_count = 0
         # arp_list = []
         proto_mgr = ProtoManager(file_id)
         start_ts = time.time()
+
+        # import cProfile
+
+        # with cProfile.Profile() as pr:
 
         with open(f"{Config.pcap_path()}/{file_id}.pcap", "r+b") as fd:
             mf = mmap.mmap(fd.fileno(), 0, prot=mmap.PROT_READ)
@@ -106,10 +110,12 @@ class PcapFile:
                 if offset + 16 >= mf.size():
                     break
 
-                pkt_header = decode_header(mf[offset: offset + 16], byte_order)
+                pkt_header = decode_header(
+                    mf[offset: offset + 16], byte_order)
                 incl_len = pkt_header.incl_len
 
-                pd.decode(pkt_header, mf[offset + 16: offset + 16 + incl_len])
+                pd.decode(
+                    pkt_header, mf[offset + 16: offset + 16 + incl_len])
                 ts = pd.get_field('pkt.timestamp')
 
                 last_ts = ts
@@ -125,14 +131,15 @@ class PcapFile:
                     dport = pd.udp_dport
                     sport = pd.udp_sport
 
-                # ip_src_index[pd.ip_src].append(offset)
                 idx = pkt_index.packet_index(pd)
-                index_list.append(
-                    (ts, offset, idx, pd.ip_dst, pd.ip_src, pd.header_len, dport, sport))
+                # index_list.append(
+                #     (ts, offset, idx, pd.ip_dst, pd.ip_src, pd.header_len, dport, sport))
 
-                self.get_protos(proto_mgr, idx, offset, pd.ip_dst, pd.ip_src)
+                self.get_protos(proto_mgr, idx, offset,
+                                pd.ip_dst, pd.ip_src)
 
                 offset += incl_len + 16
+                pkt_count += 1
 
         mf.close()
         # proto_idx = ProtoIndex(file_id, pkt_index.ARP)
@@ -142,8 +149,9 @@ class PcapFile:
         proto_mgr.save()
 
         self.create_db_index(db_name, index_list)
+        # pr.print_stats()
         end_time = time.time() - start_ts
-        log.info(f"{db_name} completed, {len(index_list)} packets indexed, time: {end_time:.3} {(end_time / len(index_list)) * 1_000_000:.2f}us/packet")
+        log.info(f"{db_name} completed, {pkt_count} packets indexed, time: {end_time:.3} {(end_time / pkt_count) * 1_000_000:.2f}us/packet")
         # log.info(ip_src_index)
         # self.save_ip_index(file_id, ip_src_index)
 
